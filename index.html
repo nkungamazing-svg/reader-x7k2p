@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#222631">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="คลังบทแปล">
+  <title>คลังบทแปล · ใช้ส่วนตัวเท่านั้น</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <button id="menu-toggle" class="icon-button" type="button" aria-label="เปิดรายการบท">☰</button>
+    <img src="icons/icon-180.png" alt="" width="30" height="30">
+    <div class="brand"><strong>คลังบทแปล</strong><small>ใช้ส่วนตัวเท่านั้น · ข้อมูลอยู่ในเครื่อง</small></div>
+    <button id="theme-toggle" class="icon-button" type="button" aria-label="สลับธีม">☀️</button>
+    <button id="import-open" class="primary-button" type="button">นำเข้าไฟล์สำรอง</button>
+    <input id="backup-file" type="file" accept="application/json,.json" hidden>
+  </header>
+  <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+  <main class="layout">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-heading"><h1>บทที่บันทึกไว้</h1><span id="chapter-count">0</span></div>
+      <label class="search-label" for="search">ค้นหาชื่อเรื่องหรือตอน</label>
+      <input id="search" class="search-input" type="search" placeholder="พิมพ์เพื่อค้นหา…" autocomplete="off">
+      <label class="sort-label" for="sort">เรียงตาม</label>
+      <select id="sort" class="select-input"><option value="asc">Arc / ตอน · เก่าไปใหม่</option><option value="desc">Arc / ตอน · ใหม่ไปเก่า</option><option value="recent">บันทึกล่าสุด</option></select>
+      <div id="chapter-list" class="chapter-list"></div>
+      <div id="empty-state" class="empty-state"><strong>ยังไม่มีบทแปล</strong><span>นำเข้าไฟล์ JSON จากปุ่ม “สำรอง/ย้ายข้อมูล” ในส่วนขยาย</span></div>
+      <footer class="sidebar-footer">ไฟล์สำรองจะถูกอ่านในเครื่องนี้เท่านั้น<br>เว็บนี้ไม่ใช้ API key และไม่ส่งข้อมูลออกเน็ต</footer>
+    </aside>
+    <section class="reader-shell">
+      <div id="welcome" class="welcome"><img src="icons/icon-512.png" alt="" width="92" height="92"><h2>อ่านบทแปลของคุณ</h2><p>นำเข้าไฟล์สำรอง JSON เพื่อเริ่มต้น ข้อมูลจะถูกเก็บใน IndexedDB ของเบราว์เซอร์นี้</p><button id="welcome-import" class="primary-button" type="button">เลือกไฟล์สำรอง</button></div>
+      <article id="reader" class="reader" hidden>
+        <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div>
+        <div class="reader-tools">
+          <div class="tts-controls">
+            <button id="speak-button" class="speak-button" type="button">▶ อ่านออกเสียง</button>
+            <button id="stop-speech" class="tool-button" type="button" disabled>หยุด</button>
+            <label class="compact-control">เสียงไทย<select id="voice-select"><option value="">กำลังค้นหาเสียง…</option></select></label>
+            <label class="compact-control speed-control">ความเร็ว <output id="rate-output">1×</output><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"></label>
+          </div>
+          <div class="type-controls"><button id="font-down" class="tool-button square-button" type="button" aria-label="ลดขนาดตัวอักษร">A−</button><span id="font-size-label">19</span><button id="font-up" class="tool-button square-button" type="button" aria-label="เพิ่มขนาดตัวอักษร">A+</button></div>
+        </div>
+        <div id="speech-notice" class="speech-notice" hidden></div>
+        <div id="reader-content" class="reader-content"></div>
+      </article>
+    </section>
+  </main>
+  <dialog id="import-dialog" class="import-dialog">
+    <form method="dialog" class="dialog-head"><strong>นำเข้าไฟล์สำรอง</strong><button class="icon-button" value="cancel" aria-label="ปิด">×</button></form>
+    <p>รองรับไฟล์สำรอง Novel AI Translator (JSON) การตรวจรูปแบบจะเสร็จก่อนเขียนข้อมูล</p>
+    <div class="dialog-actions"><button id="merge-import" class="primary-button" type="button">รวมกับข้อมูลเดิม</button><button id="replace-import" class="danger-button" type="button">แทนที่บทและตารางคำอ่าน</button></div>
+    <small>การแทนที่จะลบบทเดิมในคลัง PWA นี้ก่อนนำเข้าบทจากไฟล์ ส่วนข้อมูลในส่วนขยายไม่ถูกแตะต้อง</small>
+  </dialog>
+  <script src="app.js" defer></script>
+</body>
+</html>
