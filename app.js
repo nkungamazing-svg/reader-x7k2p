@@ -7,7 +7,7 @@ const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -161,11 +161,21 @@ function showStatus(message, duration = 5000) {
 function applyTheme(theme) {
   state.theme = theme === "light" ? "light" : "dark";
   document.documentElement.dataset.theme = state.theme;
-  byId("theme-toggle").textContent = state.theme === "dark" ? "☀️" : "🌙";
-  byId("theme-toggle").setAttribute("aria-label", state.theme === "dark" ? "เปลี่ยนเป็นธีมสว่าง" : "เปลี่ยนเป็นธีมมืด");
+  byId("theme-dark").setAttribute("aria-pressed", String(state.theme === "dark"));
+  byId("theme-light").setAttribute("aria-pressed", String(state.theme === "light"));
 }
 
-function safeChapterFragment(html) {
+function makeRemoteImageFallback(image, source) {
+  const fallback = document.createElement("div"); fallback.className = "remote-image-error"; fallback.hidden = true;
+  const message = document.createElement("span"); message.textContent = "รูปโหลดไม่ได้ (ต้องมีอินเทอร์เน็ต)";
+  const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "ลองใหม่";
+  retry.addEventListener("click", () => { fallback.hidden = true; image.hidden = false; image.src = source; });
+  fallback.append(message, retry);
+  image.insertAdjacentElement("afterend", fallback);
+  image.addEventListener("error", () => { image.hidden = true; fallback.hidden = false; }, { passive: true });
+}
+
+function safeChapterFragment(html, baseUrl = "") {
   const parser = new DOMParser();
   const doc = parser.parseFromString(String(html || ""), "text/html");
   doc.querySelectorAll("script,iframe,frame,frameset,object,embed,form,link,meta,base,style,svg,video,audio,source,track").forEach(node => node.remove());
@@ -176,10 +186,25 @@ function safeChapterFragment(html) {
       if (name.startsWith("on") || name === "srcset" || name === "formaction") { element.removeAttribute(attribute.name); continue; }
       if (["src", "href", "xlink:href", "poster"].includes(name)) {
         if (/^(?:javascript|vbscript):/i.test(value)) { element.removeAttribute(attribute.name); continue; }
-        if (name === "src" && element.tagName === "IMG" && !/^(?:data:image\/(?:png|jpe?g|gif|webp|avif);base64,|blob:)/i.test(value)) {
-          element.dataset.blockedRemoteImage = "true";
-          element.removeAttribute(attribute.name);
-          element.alt ||= "รูปจากเว็บไซต์ภายนอกไม่โหลดในโหมดส่วนตัวออฟไลน์";
+        if (name === "src" && element.tagName === "IMG") {
+          if (!value) { element.removeAttribute("src"); continue; }
+          const safeDataImage = /^data:image\/(?:png|jpe?g|gif|webp|avif);base64,[a-z\d+/]+=*$/i.test(value);
+          let remoteUrl = "";
+          try {
+            const resolved = new URL(value, baseUrl || location.href);
+            if (/^https?:$/i.test(resolved.protocol)) remoteUrl = resolved.href;
+          } catch (_) {}
+          if (safeDataImage) {
+            element.loading = "lazy"; element.decoding = "async";
+          } else if (remoteUrl && state.loadRemoteImages) {
+            element.loading = "lazy"; element.referrerPolicy = "no-referrer"; element.decoding = "async";
+            makeRemoteImageFallback(element, remoteUrl);
+            element.src = remoteUrl;
+          } else {
+            element.dataset.blockedRemoteImage = remoteUrl ? "disabled" : "unsafe";
+            element.removeAttribute("src");
+            element.alt ||= remoteUrl ? "ปิดการโหลดรูปจากเว็บต้นทางอยู่" : "รูปแบบที่อยู่รูปนี้ไม่รองรับ";
+          }
         }
         if (name === "href" && /^https?:/i.test(value)) { element.setAttribute("target", "_blank"); element.setAttribute("rel", "noopener noreferrer"); element.setAttribute("referrerpolicy", "no-referrer"); }
       }
@@ -201,19 +226,48 @@ async function openChapter(id) {
   state.speechQueue = []; state.speechIndex = 0;
   state.activeId = id;
   byId("welcome").hidden = true; byId("reader").hidden = false;
+  byId("audio-bar").hidden = false;
   byId("reader-novel").textContent = novelLabel(item);
   byId("reader-title").textContent = normalizeTitle(item);
-  byId("reader-content").replaceChildren(safeChapterFragment(item.html));
+  renderChapterContent(item);
   const ratio = Math.max(0, Math.min(1, Number(item.lastScrollRatio ?? item.lastReadProgress) || 0));
+  setSidebarOpen(false, { restorePosition: false });
   requestAnimationFrame(() => window.scrollTo({ top: ratio * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
   await writeSetting("lastActiveId", id);
   renderChapterList();
   history.replaceState(null, "", `#chapter=${encodeURIComponent(id)}`);
-  if (matchMedia("(max-width: 760px)").matches) document.body.classList.remove("sidebar-open");
 }
 
 function closeReader() {
-  stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("welcome").hidden = false; renderChapterList();
+  stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; renderChapterList();
+}
+
+function renderChapterContent(item) {
+  const content = byId("reader-content");
+  content.replaceChildren(safeChapterFragment(item.html, item.sourceUrl || ""));
+  const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
+  const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
+  blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
+  state.currentBlockIndex = -1;
+}
+
+function setSidebarOpen(open, { restorePosition = true } = {}) {
+  const isMobile = matchMedia("(max-width: 760px)").matches;
+  if (!isMobile) { document.body.classList.toggle("sidebar-open", Boolean(open)); return; }
+  if (open) {
+    if (document.body.classList.contains("sidebar-open")) return;
+    state.sidebarLockY = window.scrollY;
+    document.body.classList.add("sidebar-open", "sidebar-locked");
+    document.body.style.top = `-${state.sidebarLockY}px`;
+    document.body.style.left = "0"; document.body.style.right = "0"; document.body.style.width = "100%";
+    byId("menu-toggle").setAttribute("aria-expanded", "true");
+    return;
+  }
+  document.body.classList.remove("sidebar-open", "sidebar-locked");
+  document.body.style.removeProperty("top"); document.body.style.removeProperty("left"); document.body.style.removeProperty("right"); document.body.style.removeProperty("width");
+  const savedY = state.sidebarLockY; state.sidebarLockY = null;
+  byId("menu-toggle").setAttribute("aria-expanded", "false");
+  if (restorePosition && savedY !== null) window.scrollTo({ top: savedY, behavior: "instant" });
 }
 
 function saveReadingPosition() {
@@ -222,17 +276,19 @@ function saveReadingPosition() {
     const item = state.chapters.find(chapter => chapter.id === state.activeId);
     if (!item) return;
     const ratio = Math.max(0, Math.min(1, window.scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)));
-    item.lastScrollRatio = ratio; item.lastReadProgress = ratio; item.lastProgressMode = "scroll";
+    item.lastScrollRatio = ratio;
+    if (!state.speaking) { item.lastReadProgress = ratio; item.lastProgressMode = "scroll"; }
     try { const db = await dbReady; const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); renderChapterList(); }
     catch (error) { showStatus(`บันทึกตำแหน่งอ่านไม่สำเร็จ: ${error.message}`); }
   }, 500);
 }
 
-function parseChapterHtml(item) {
-  const doc = new DOMParser().parseFromString(String(item.html), "text/html");
-  return [...doc.body.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,blockquote,.noat-summary-body")]
-    .filter(element => !element.parentElement?.closest("h1,h2,h3,h4,h5,h6,p,li,blockquote,.noat-summary-body"))
-    .map(element => element.textContent.replace(/\s+/gu, " ").trim()).filter(Boolean);
+function buildSpeechQueue() {
+  const content = byId("reader-content");
+  const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
+  const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
+  return blocks.flatMap((block, blockIndex) => splitSpeechText(block.textContent.replace(/\s+/gu, " ").trim())
+    .map(text => ({ text, blockIndex })));
 }
 
 function splitSpeechText(text, maxLength = 180) {
@@ -268,14 +324,19 @@ function refreshVoices() {
 
 function updateSpeechControls() {
   const active = state.speaking;
-  byId("speak-button").textContent = active && speechSynthesis?.speaking ? "⏸ พักเสียง" : active ? "▶ อ่านต่อ" : "▶ อ่านออกเสียง";
+  const playing = active && speechSynthesis?.speaking && !speechSynthesis.paused;
+  byId("speak-button").textContent = playing ? "Ⅱ" : active ? "▶" : "▶";
+  byId("speak-button").setAttribute("aria-label", playing ? "พักเสียง" : active ? "อ่านต่อ" : "อ่านออกเสียง");
+  byId("speak-button").title = playing ? "พักเสียง" : active ? "อ่านต่อ" : "อ่านออกเสียง";
   byId("stop-speech").disabled = !active;
+  byId("previous-paragraph").disabled = !state.activeId;
+  byId("next-paragraph").disabled = !state.activeId;
 }
 
 function saveSpeechCursor() {
   const item = state.chapters.find(chapter => chapter.id === state.activeId);
   if (!item) return;
-  item.lastSpeechIndex = state.speechIndex; item.lastProgressMode = "speech";
+  item.lastSpeechIndex = state.speechIndex; item.lastSpeechBlockIndex = state.speechQueue[state.speechIndex]?.blockIndex ?? state.currentBlockIndex; item.lastProgressMode = "speech";
   item.lastReadProgress = state.speechQueue.length ? Math.min(1, state.speechIndex / state.speechQueue.length) : 0;
   const dbPromise = dbReady.then(db => { const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); return transactionDone(tx); });
   dbPromise.then(renderChapterList).catch(error => showStatus(`บันทึกตำแหน่งเสียงไม่สำเร็จ: ${error.message}`));
@@ -283,17 +344,20 @@ function saveSpeechCursor() {
 
 function speakFrom(index = state.speechIndex) {
   if (!state.speechQueue.length) { showStatus("บทนี้ไม่มีข้อความสำหรับอ่านออกเสียง"); return; }
+  const boundedIndex = Math.max(0, Math.min(index, state.speechQueue.length - 1));
   const voice = state.voices.find(item => item.voiceURI === state.voiceURI);
   if (!voice) { showStatus("ไม่พบเสียงภาษาไทยในเครื่อง เปิดการตั้งค่า iPhone แล้วดาวน์โหลดเสียงภาษาไทย จากนั้นกลับมาเปิดหน้านี้ใหม่"); return; }
   const token = ++state.speechToken;
-  speechSynthesis.cancel(); state.speechIndex = index; state.speaking = true;
+  speechSynthesis.cancel(); state.speechIndex = boundedIndex; state.speaking = true;
   const next = () => {
     if (token !== state.speechToken || !state.speaking) return;
-    if (state.speechIndex >= state.speechQueue.length) { state.speaking = false; state.utterance = null; updateSpeechControls(); showStatus("อ่านจบบทแล้ว"); return; }
+    if (state.speechIndex >= state.speechQueue.length) { state.speaking = false; state.utterance = null; setActiveBlock(-1); updateSpeechControls(); showStatus("อ่านจบบทแล้ว"); return; }
     const source = state.speechQueue[state.speechIndex];
-    const utterance = new SpeechSynthesisUtterance(applyPronunciation(source));
+    setActiveBlock(source.blockIndex);
+    saveSpeechCursor();
+    const utterance = new SpeechSynthesisUtterance(applyPronunciation(source.text));
     state.utterance = utterance; utterance.voice = voice; utterance.lang = voice.lang || "th-TH"; utterance.rate = Number(byId("rate").value) || 1;
-    utterance.onstart = () => { if (token === state.speechToken) { byId("speech-notice").hidden = true; updateSpeechControls(); } };
+    utterance.onstart = () => { if (token === state.speechToken) { byId("speech-notice").hidden = true; setActiveBlock(source.blockIndex); updateSpeechControls(); } };
     utterance.onend = () => { if (token !== state.speechToken) return; state.speechIndex++; saveSpeechCursor(); setTimeout(next, 40); };
     utterance.onerror = event => {
       if (token !== state.speechToken) return;
@@ -311,7 +375,7 @@ function toggleSpeech() {
   if (!state.speaking) {
     const item = state.chapters.find(chapter => chapter.id === state.activeId);
     if (!item) return;
-    if (!state.speechQueue.length) state.speechQueue = parseChapterHtml(item).flatMap(text => splitSpeechText(text));
+    if (!state.speechQueue.length) state.speechQueue = buildSpeechQueue();
     const restore = item.lastProgressMode === "speech" ? Number(item.lastSpeechIndex) || 0 : 0;
     speakFrom(Math.min(restore, Math.max(0, state.speechQueue.length - 1)));
     return;
@@ -325,7 +389,78 @@ function stopSpeech(reset = true) {
   state.speechToken++; state.speaking = false; state.utterance = null;
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   if (reset) { state.speechIndex = 0; const item = state.chapters.find(chapter => chapter.id === state.activeId); if (item) { item.lastSpeechIndex = 0; item.lastProgressMode = "scroll"; void dbReady.then(async db => { const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); }); } }
+  setActiveBlock(-1);
   updateSpeechControls();
+}
+
+function setActiveBlock(blockIndex) {
+  const changed = state.currentBlockIndex !== blockIndex;
+  state.currentBlockIndex = blockIndex;
+  const content = byId("reader-content");
+  content.querySelectorAll(".read-active").forEach(element => element.classList.remove("read-active"));
+  if (blockIndex < 0 || !state.highlightEnabled) return;
+  const block = content.querySelector(`[data-block-index="${blockIndex}"]`);
+  if (!block) return;
+  block.classList.add("read-active");
+  if (state.followEnabled && changed) block.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function startSpeechFromBlock(blockIndex) {
+  if (!state.speechQueue.length) state.speechQueue = buildSpeechQueue();
+  const index = state.speechQueue.findIndex(item => item.blockIndex === blockIndex);
+  if (index < 0) return;
+  state.speechIndex = index;
+  setActiveBlock(blockIndex);
+  const item = state.chapters.find(chapter => chapter.id === state.activeId);
+  if (item) { item.lastSpeechIndex = index; item.lastSpeechBlockIndex = blockIndex; item.lastProgressMode = "speech"; }
+  speakFrom(index);
+}
+
+function moveSpeechParagraph(direction) {
+  if (!state.speechQueue.length) state.speechQueue = buildSpeechQueue();
+  if (!state.speechQueue.length) return;
+  const uniqueBlocks = [...new Set(state.speechQueue.map(item => item.blockIndex))];
+  const current = state.speechQueue[state.speechIndex]?.blockIndex ?? state.currentBlockIndex;
+  let targetPosition = uniqueBlocks.indexOf(current);
+  if (targetPosition < 0) targetPosition = direction > 0 ? -1 : uniqueBlocks.length;
+  targetPosition = Math.max(0, Math.min(uniqueBlocks.length - 1, targetPosition + direction));
+  startSpeechFromBlock(uniqueBlocks[targetPosition]);
+}
+
+function installParagraphTapTargets() {
+  const content = byId("reader-content");
+  content.addEventListener("pointerdown", event => {
+    const target = event.target;
+    const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
+    const interactive = target.closest?.("a,button,input,select,textarea,[contenteditable=true]");
+    state.pointerStart = event.isPrimary && event.button === 0 && block && !interactive
+      ? { x: event.clientX, y: event.clientY, block }
+      : null;
+  }, { passive: true });
+  document.addEventListener("pointerup", event => {
+    const start = state.pointerStart; state.pointerStart = null;
+    if (!start) return;
+    const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+    const endTarget = document.elementFromPoint(event.clientX, event.clientY);
+    const endBlock = endTarget?.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
+    const interactive = endTarget?.closest?.("a,button,input,select,textarea,[contenteditable=true]");
+    if (moved <= 8 && endBlock === start.block && !interactive) {
+      state.pointerTapReady = start.block;
+      state.pointerTapExpiry = Date.now() + 600;
+    } else state.pointerTapReady = null;
+  }, { passive: true });
+  document.addEventListener("pointercancel", () => { state.pointerStart = null; state.pointerTapReady = null; }, { passive: true });
+  content.addEventListener("click", event => {
+    const target = event.target;
+    if (target.closest?.("a,button,input,select,textarea,[contenteditable=true]")) return;
+    const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
+    if (!block) return;
+    if (event.detail > 0) {
+      if (state.pointerTapReady !== block || Date.now() > state.pointerTapExpiry) return;
+      state.pointerTapReady = null;
+    }
+    startSpeechFromBlock(Number(block.dataset.blockIndex));
+  });
 }
 
 function validateBackup(parsed) {
@@ -390,16 +525,35 @@ function bindEvents() {
   });
   byId("search").addEventListener("input", renderChapterList);
   byId("sort").addEventListener("change", renderChapterList);
-  byId("theme-toggle").addEventListener("click", () => { applyTheme(state.theme === "dark" ? "light" : "dark"); void writeSetting("theme", state.theme); });
-  byId("menu-toggle").addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
-  byId("reader-menu").addEventListener("click", () => document.body.classList.add("sidebar-open"));
-  document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) document.body.classList.remove("sidebar-open"); });
+  byId("menu-toggle").addEventListener("click", () => setSidebarOpen(!document.body.classList.contains("sidebar-open")));
+  byId("reader-menu").addEventListener("click", () => setSidebarOpen(true));
+  document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
+  byId("theme-dark").addEventListener("click", () => { applyTheme("dark"); void writeSetting("theme", "dark"); });
+  byId("theme-light").addEventListener("click", () => { applyTheme("light"); void writeSetting("theme", "light"); });
+  byId("settings-open").addEventListener("click", () => byId("settings-sheet").showModal());
+  byId("settings-close").addEventListener("click", () => byId("settings-sheet").close());
+  byId("settings-sheet").addEventListener("click", event => { if (event.target === byId("settings-sheet")) byId("settings-sheet").close(); });
   byId("font-down").addEventListener("click", () => setFontSize(state.fontSize - 1));
   byId("font-up").addEventListener("click", () => setFontSize(state.fontSize + 1));
   byId("speak-button").addEventListener("click", toggleSpeech);
   byId("stop-speech").addEventListener("click", () => stopSpeech(true));
+  byId("previous-paragraph").addEventListener("click", () => moveSpeechParagraph(-1));
+  byId("next-paragraph").addEventListener("click", () => moveSpeechParagraph(1));
   byId("voice-select").addEventListener("change", event => { state.voiceURI = event.target.value; void writeSetting("voiceURI", state.voiceURI); });
   byId("rate").addEventListener("input", event => { state.rate = Number(event.target.value); byId("rate-output").value = `${state.rate.toFixed(1).replace(/\.0$/, "")}×`; void writeSetting("rate", state.rate); });
+  byId("highlight-toggle").addEventListener("change", event => { state.highlightEnabled = event.target.checked; void writeSetting("highlightEnabled", state.highlightEnabled); setActiveBlock(state.currentBlockIndex); });
+  byId("follow-toggle").addEventListener("change", event => { state.followEnabled = event.target.checked; void writeSetting("followEnabled", state.followEnabled); if (state.followEnabled) { setActiveBlock(state.currentBlockIndex); byId("reader-content").querySelector(".read-active")?.scrollIntoView({ behavior: "smooth", block: "center" }); } });
+  byId("remote-images-toggle").addEventListener("change", event => {
+    state.loadRemoteImages = event.target.checked; void writeSetting("loadRemoteImages", state.loadRemoteImages);
+    const item = state.chapters.find(chapter => chapter.id === state.activeId);
+    if (item) {
+      const scrollY = window.scrollY;
+      if (state.speaking) { saveSpeechCursor(); stopSpeech(false); }
+      renderChapterContent(item);
+      requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: "instant" }));
+    }
+  });
+  installParagraphTapTargets();
   window.addEventListener("scroll", saveReadingPosition, { passive: true });
   window.addEventListener("pagehide", () => { if (state.speaking && document.hidden) { state.speechIndex = Math.max(0, state.speechIndex); saveSpeechCursor(); } });
   document.addEventListener("visibilitychange", () => {
@@ -427,6 +581,12 @@ async function initialize() {
     state.rate = Number(await readSetting("rate", 1)) || 1; byId("rate").value = String(state.rate); byId("rate-output").value = `${state.rate.toFixed(1).replace(/\.0$/, "")}×`;
     state.voiceURI = await readSetting("voiceURI", "");
     state.pronunciation = await readSetting("pronunciation", []);
+    state.highlightEnabled = await readSetting("highlightEnabled", true) !== false;
+    state.followEnabled = await readSetting("followEnabled", true) !== false;
+    state.loadRemoteImages = await readSetting("loadRemoteImages", true) !== false;
+    byId("highlight-toggle").checked = state.highlightEnabled;
+    byId("follow-toggle").checked = state.followEnabled;
+    byId("remote-images-toggle").checked = state.loadRemoteImages;
     await refreshChapters(); bindEvents();
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
