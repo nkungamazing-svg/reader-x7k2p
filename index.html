@@ -24,11 +24,13 @@
   <div id="status" class="status" role="status" aria-live="polite" hidden></div>
   <main class="layout">
     <aside id="sidebar" class="sidebar">
-      <div class="sidebar-heading"><h1>บทที่บันทึกไว้</h1><span id="chapter-count">0</span></div>
-      <label class="search-label" for="search">ค้นหาชื่อเรื่องหรือตอน</label>
-      <input id="search" class="search-input" type="search" placeholder="พิมพ์เพื่อค้นหา…" autocomplete="off">
-      <label class="sort-label" for="sort">เรียงตาม</label>
-      <select id="sort" class="select-input"><option value="asc">Arc / ตอน · เก่าไปใหม่</option><option value="desc">Arc / ตอน · ใหม่ไปเก่า</option><option value="recent">บันทึกล่าสุด</option></select>
+      <div class="sidebar-controls">
+        <div class="sidebar-heading"><h1>บทที่บันทึกไว้</h1><span id="chapter-count">0</span></div>
+        <label class="search-label" for="search">ค้นหาชื่อเรื่องหรือตอน</label>
+        <input id="search" class="search-input" type="search" placeholder="พิมพ์เพื่อค้นหา…" autocomplete="off">
+        <label class="sort-label" for="sort">เรียงตาม</label>
+        <select id="sort" class="select-input"><option value="asc">Arc / ตอน · เก่าไปใหม่</option><option value="desc">Arc / ตอน · ใหม่ไปเก่า</option><option value="recent">บันทึกล่าสุด</option></select>
+      </div>
       <div id="chapter-list" class="chapter-list"></div>
       <div id="empty-state" class="empty-state"><strong>ยังไม่มีบทแปล</strong><span>นำเข้าไฟล์ JSON จากปุ่ม “สำรอง/ย้ายข้อมูล” ในส่วนขยาย</span></div>
       <footer class="sidebar-footer">ไฟล์สำรองจะถูกอ่านในเครื่องนี้เท่านั้น<br>เว็บนี้ไม่ใช้ API key และไม่ส่งข้อมูลออกเน็ต</footer>

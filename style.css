@@ -1,7 +1,7 @@
 @font-face { font-family: "Noto Sans Thai"; src: url("fonts/NotoSansThai-thai.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC; }
 @font-face { font-family: "Noto Sans Thai"; src: url("fonts/NotoSansThai-latin-ext.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Noto Sans Thai"; src: url("fonts/NotoSansThai-latin.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-:root { color-scheme: dark; --page:#17191f; --surface:#222631; --surface-2:#292e3a; --text:#e8eaf0; --muted:#aeb6c5; --line:#3a4050; --accent:#8b5cf6; --accent-strong:#a78bfa; --danger:#bd4b57; --reader:#17191f; --reader-text:#e8eaf0; --safe-bottom:env(safe-area-inset-bottom,0px); font-family:"Noto Sans Thai",sans-serif; }
+:root { color-scheme: dark; --page:#17191f; --surface:#222631; --surface-2:#292e3a; --text:#e8eaf0; --muted:#aeb6c5; --line:#3a4050; --accent:#8b5cf6; --accent-strong:#a78bfa; --danger:#bd4b57; --reader:#17191f; --reader-text:#e8eaf0; --safe-bottom:env(safe-area-inset-bottom,0px); --audio-bar-clearance:calc(61px + var(--safe-bottom)); font-family:"Noto Sans Thai",sans-serif; }
 :root[data-theme="light"] { color-scheme:light; --page:#f7f7f9; --surface:#fff; --surface-2:#f0f1f5; --text:#252a34; --muted:#667085; --line:#d8dbe3; --accent:#7043cf; --accent-strong:#5831b2; --danger:#b43240; --reader:#fff; --reader-text:#252a34; }
 * { box-sizing:border-box; }
 [hidden] { display:none!important; }
@@ -27,13 +27,13 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .sidebar-heading span { color:var(--muted); font-size:12px; }
 .search-label,.sort-label { margin:12px 2px 5px; color:var(--muted); font-size:11px; }
 .search-input,.select-input,.compact-control select { width:100%; min-height:44px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; outline-color:var(--accent); background:var(--page); color:var(--text); }
-.chapter-list { display:grid; gap:10px; margin-top:14px; }
-.novel-group { display:grid; gap:7px; }
+.chapter-list { display:grid; gap:10px; min-width:0; margin-top:14px; }
+.novel-group { display:grid; min-width:0; gap:7px; }
 .novel-title { display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:4px 3px; color:var(--accent-strong); font-size:12px; font-weight:700; }
 .novel-title small,.arc-title small { color:var(--muted); font-weight:400; }
-.arc-group { display:grid; gap:5px; }
+.arc-group { display:grid; min-width:0; gap:5px; }
 .arc-title { padding:2px 4px; color:var(--muted); font-size:11px; }
-.chapter-link { display:block; width:100%; min-height:48px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:color-mix(in srgb,var(--text) 3%,var(--surface)); text-align:left; }
+.chapter-link { display:block; width:100%; min-width:0; min-height:48px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:color-mix(in srgb,var(--text) 3%,var(--surface)); text-align:left; }
 .chapter-link:hover,.chapter-link.active { border-color:color-mix(in srgb,var(--accent) 60%,var(--line)); background:color-mix(in srgb,var(--accent) 17%,var(--surface)); }
 .chapter-link strong { display:block; overflow:hidden; color:var(--text); font-size:12px; font-weight:700; line-height:1.4; text-overflow:ellipsis; white-space:nowrap; }
 .chapter-link small { display:block; margin-top:3px; color:var(--muted); font-size:10px; }
@@ -118,9 +118,18 @@ button:disabled { opacity:.48; cursor:not-allowed; }
   .app-header .primary-button { width:44px; min-width:44px; overflow:hidden; padding:0; font-size:0; }
   .app-header .primary-button::after { content:"＋"; font-size:23px; }
   .layout { display:block; min-height:calc(100dvh - 60px); }
-  .sidebar { position:fixed; z-index:8; inset:calc(60px + env(safe-area-inset-top,0px)) auto 0 0; width:min(88vw,370px); height:calc(100dvh - 60px - env(safe-area-inset-top,0px)); min-height:0; max-height:calc(100dvh - 60px - env(safe-area-inset-top,0px)); padding-bottom:calc(14px + var(--safe-bottom)); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; -webkit-overflow-scrolling:touch; border-right:1px solid var(--line); box-shadow:12px 0 30px #0004; transform:translateX(-105%); transition:transform .2s ease; }
+  .sidebar { position:fixed; z-index:12; top:calc(60px + env(safe-area-inset-top,0px)); right:auto; bottom:var(--audio-bar-clearance); left:0; display:flex; flex-direction:column; width:min(88vw,370px); height:calc(100dvh - 60px - env(safe-area-inset-top,0px) - var(--audio-bar-clearance)); min-height:0; max-height:none; padding:12px 13px 10px; overflow:hidden; overscroll-behavior:contain; touch-action:pan-y; border-right:1px solid var(--line); box-shadow:12px 0 30px #0004; transform:translateX(-105%); transition:transform .2s ease; }
+  .sidebar-controls { flex:none; min-width:0; }
+  .sidebar-controls .search-input,.sidebar-controls .select-input { min-width:0; max-width:100%; }
+  .sidebar-controls .sidebar-heading,.sidebar-controls .search-label,.sidebar-controls .sort-label { flex:none; }
+  .sidebar .chapter-list { display:flex; flex:1 1 auto; flex-direction:column; min-width:0; min-height:0; margin-top:10px; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; scrollbar-width:none; }
+  .sidebar .chapter-list::-webkit-scrollbar { display:none; }
+  .sidebar .empty-state,.sidebar .sidebar-footer { flex:none; min-width:0; }
+  .sidebar .novel-group,.sidebar .arc-group { flex:none; width:100%; min-width:0; }
+  .sidebar .novel-title,.sidebar .arc-title { min-width:0; overflow:hidden; }
+  .sidebar .novel-title span,.sidebar .chapter-link strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   body.sidebar-open .sidebar { transform:translateX(0); }
-  body.sidebar-open::after { position:fixed; z-index:7; inset:0; content:""; background:#0006; }
+  body.sidebar-open::after { position:fixed; z-index:7; inset:0; content:""; background:#0006; pointer-events:auto; }
   /* Keep the document fixed while the drawer is open, but allow vertical
      gestures to reach the scrollable sidebar instead of cancelling all touch. */
   body.sidebar-locked { position:fixed; inset-inline:0; width:100%; overflow:hidden; touch-action:pan-y; }
