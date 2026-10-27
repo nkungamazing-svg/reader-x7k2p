@@ -314,10 +314,34 @@ function applyPronunciation(text) {
 
 function refreshVoices() {
   if (!("speechSynthesis" in window)) { byId("voice-select").innerHTML = "<option value=''>ไม่รองรับเสียงอ่าน</option>"; return; }
-  state.voices = speechSynthesis.getVoices().filter(voice => /^th(?:-|$)/i.test(voice.lang));
+  const uniqueVoices = new Map();
+  for (const voice of speechSynthesis.getVoices().filter(item => /^th(?:-|$)/i.test(item.lang))) {
+    const key = voice.voiceURI || `${voice.name}\u0000${voice.lang}`;
+    if (!uniqueVoices.has(key)) uniqueVoices.set(key, voice);
+  }
+  state.voices = [...uniqueVoices.values()];
   const select = byId("voice-select"); select.replaceChildren();
   if (!state.voices.length) { const option = new Option("ไม่พบเสียงภาษาไทยใน iPhone", ""); select.add(option); state.voiceURI = ""; return; }
-  for (const voice of state.voices) select.add(new Option(`${voice.name} · ${voice.lang}`, voice.voiceURI));
+  const labelCounts = new Map();
+  for (const voice of state.voices) {
+    const label = `${voice.name} · ${voice.lang}`;
+    labelCounts.set(label, (labelCounts.get(label) || 0) + 1);
+  }
+  const labelIndexes = new Map();
+  for (const voice of state.voices) {
+    const baseLabel = `${voice.name} · ${voice.lang}`;
+    const voiceId = String(voice.voiceURI || "").toLowerCase();
+    let quality = "";
+    if (/premium|enhanced|high.?quality|quality.?high/u.test(voiceId)) quality = "คุณภาพสูง";
+    else if (/compact|standard|default/u.test(voiceId)) quality = "มาตรฐาน";
+    let label = baseLabel;
+    if (labelCounts.get(baseLabel) > 1) {
+      const index = (labelIndexes.get(baseLabel) || 0) + 1;
+      labelIndexes.set(baseLabel, index);
+      label = `${voice.name} (${quality || `ตัวเลือก ${index}`}) · ${voice.lang}`;
+    }
+    select.add(new Option(label, voice.voiceURI));
+  }
   const preferred = state.voices.find(voice => voice.voiceURI === state.voiceURI) || state.voices.find(voice => voice.default) || state.voices[0];
   state.voiceURI = preferred.voiceURI; select.value = preferred.voiceURI;
 }
@@ -563,7 +587,15 @@ function bindEvents() {
       byId("speech-notice").hidden = false;
     }
   });
-  if ("speechSynthesis" in window) { speechSynthesis.addEventListener("voiceschanged", refreshVoices); refreshVoices(); }
+  if ("speechSynthesis" in window) {
+    speechSynthesis.addEventListener("voiceschanged", refreshVoices);
+    refreshVoices();
+    // iOS Safari can populate downloaded voices after the initial page load,
+    // and some versions do not reliably fire voiceschanged for that update.
+    setTimeout(refreshVoices, 500);
+    setTimeout(refreshVoices, 1500);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshVoices(); });
+  }
 }
 
 function setFontSize(value) {
