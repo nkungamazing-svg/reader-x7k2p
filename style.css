@@ -3,6 +3,8 @@
 @font-face { font-family: "Noto Sans Thai"; src: url("fonts/NotoSansThai-latin.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 :root { color-scheme: dark; --page:#17191f; --surface:#222631; --surface-2:#292e3a; --text:#e8eaf0; --muted:#aeb6c5; --line:#3a4050; --accent:#8b5cf6; --accent-strong:#a78bfa; --danger:#bd4b57; --reader:#17191f; --reader-text:#e8eaf0; --safe-bottom:env(safe-area-inset-bottom,0px); --audio-bar-clearance:calc(61px + var(--safe-bottom)); font-family:"Noto Sans Thai",sans-serif; }
 :root[data-theme="light"] { color-scheme:light; --page:#f7f7f9; --surface:#fff; --surface-2:#f0f1f5; --text:#252a34; --muted:#667085; --line:#d8dbe3; --accent:#7043cf; --accent-strong:#5831b2; --danger:#b43240; --reader:#fff; --reader-text:#252a34; }
+:root[data-theme="sepia"] { color-scheme:light; --page:#f0e5cf; --surface:#e7dbc4; --surface-2:#ded0b5; --text:#463b2b; --muted:#75674f; --line:#cdbd9e; --accent:#8e5d27; --accent-strong:#71461a; --danger:#a1433e; --reader:#f7efdf; --reader-text:#463b2b; }
+:root[data-theme="black"] { color-scheme:dark; --page:#000; --surface:#080808; --surface-2:#111; --text:#f2f2f2; --muted:#aaa; --line:#292929; --accent:#8b5cf6; --accent-strong:#b69aff; --danger:#bd4b57; --reader:#000; --reader-text:#f2f2f2; }
 * { box-sizing:border-box; }
 [hidden] { display:none!important; }
 html { min-height:100%; scroll-behavior:smooth; background:var(--page); }
@@ -65,7 +67,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .type-controls { padding:2px 4px; border:1px solid var(--line); border-radius:11px; background:var(--surface); }
 .type-controls span { min-width:28px; color:var(--muted); font-size:11px; text-align:center; }
 .speech-notice { margin:10px auto; padding:10px 12px; border:1px solid color-mix(in srgb,#d89a37 48%,var(--line)); border-radius:10px; background:color-mix(in srgb,#d89a37 12%,var(--surface)); color:var(--text); font-size:12px; }
-.reader-content { max-width:760px; margin:0 auto; padding:12px clamp(5px,2vw,20px) calc(100px + var(--safe-bottom)); background:var(--reader); color:var(--reader-text); font-size:var(--reader-size,19px); line-height:1.95; overflow-wrap:anywhere; }
+.reader-content { width:100%; max-width:var(--reader-width,760px); margin:0 auto; padding:12px clamp(5px,2vw,20px) calc(100px + var(--safe-bottom)); background:var(--reader); color:var(--reader-text); font-size:var(--reader-size,19px); line-height:var(--reader-line-height,1.95); overflow-wrap:anywhere; }
 .reader-content :is(p,blockquote,li) { margin:0 0 1.25em; white-space:pre-wrap; }
 .reader-content :is(h1,h2,h3,h4,h5,h6) { margin:1.4em 0 .7em; line-height:1.5; }
 .reader-content img { display:block; max-width:100%; max-height:70vh; margin:1.2em auto; object-fit:contain; }
@@ -77,6 +79,9 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .remote-image-error { display:grid; justify-items:center; gap:6px; max-width:360px; margin:12px auto; padding:14px; border:1px dashed var(--line); border-radius:10px; color:var(--muted); font-size:12px; text-align:center; }
 .remote-image-error button { min-height:44px; padding:7px 14px; border:1px solid var(--line); border-radius:9px; background:var(--surface-2); color:var(--text); font-weight:700; }
 .reader-content a { color:var(--accent-strong); }
+.chapter-navigation { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; max-width:var(--reader-width,760px); margin:18px auto 28px; }
+.chapter-nav-button { min-width:0; min-height:52px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--surface); color:var(--text); font-size:14px; font-weight:700; }
+.chapter-nav-button:disabled { opacity:.4; }
 .audio-bar { position:fixed; z-index:10; inset:auto 0 0; display:grid; grid-template-columns:repeat(5,minmax(44px,1fr)); justify-items:center; gap:6px; padding:7px max(10px,env(safe-area-inset-left)) calc(7px + var(--safe-bottom)) max(10px,env(safe-area-inset-right)); border-top:1px solid var(--line); background:color-mix(in srgb,var(--surface) 96%,transparent); box-shadow:0 -5px 20px #0003; backdrop-filter:blur(14px); touch-action:manipulation; }
 .audio-button { display:inline-grid; place-items:center; width:100%; max-width:64px; min-width:44px; min-height:46px; padding:4px; border:1px solid var(--line); border-radius:12px; background:var(--surface-2); color:var(--text); font-size:17px; font-weight:800; }
 .audio-button:disabled { opacity:.45; }
@@ -93,6 +98,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .setting-hint { color:var(--muted); font-size:11px; font-weight:400; line-height:1.45; }
 .setting-row select { width:100%; min-width:0; min-height:46px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--page); color:var(--text); font:inherit; font-weight:400; }
 .range-row,.font-size-row,.theme-row { display:flex; align-items:center; gap:9px; }
+.theme-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:stretch; }
 .range-row input { flex:1; min-width:0; accent-color:var(--accent); }
 .range-row output,.font-size-row output { min-width:42px; color:var(--muted); text-align:center; }
 .font-size-row .tool-button,.theme-choice { min-width:48px; min-height:44px; }
@@ -136,7 +142,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
   body.sidebar-locked { position:fixed; inset-inline:0; width:100%; overflow:hidden; touch-action:pan-y; }
   .reader-shell { padding:12px 12px calc(20px + var(--safe-bottom)); }
   .reader { min-height:calc(100dvh - 75px); padding-bottom:calc(70px + var(--safe-bottom)); }
-  .reader-content { padding-bottom:calc(110px + var(--safe-bottom)); line-height:1.9; }
+  .reader-content { padding-bottom:calc(110px + var(--safe-bottom)); line-height:var(--reader-line-height,1.9); }
   .audio-bar { gap:5px; padding-right:max(12px,env(safe-area-inset-right)); padding-left:max(12px,env(safe-area-inset-left)); }
   .settings-sheet { max-height:min(82dvh,720px); }
 }
