@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.7.1";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -345,12 +345,13 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
   if (scrollToTop || toEnd) { const db = await dbReady; const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); }
   renderChapterList();
   history.replaceState(null, "", `#chapter=${encodeURIComponent(id)}`);
+  updateScrollProgress();
 }
 
 function closeReader() {
   document.body.classList.remove("reading");
   toggleChrome(true);
-  stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
+  stopSpeech(false); state.activeId = ""; updateScrollProgress(); byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
 }
 
 function markSmallImages(root) {
@@ -428,6 +429,7 @@ async function persistReadingPosition() {
 }
 
 function saveReadingPosition() {
+  updateScrollProgress();
   clearTimeout(state.scrollTimer);
   state.scrollTimer = setTimeout(() => persistReadingPosition().catch(error => showStatus(`บันทึกตำแหน่งอ่านไม่สำเร็จ: ${error.message}`)), 500);
 }
@@ -1129,6 +1131,20 @@ function readingRatio() {
   return clamp01((state.sidebarLockY ?? window.scrollY) / Math.max(1, document.documentElement.scrollHeight - innerHeight));
 }
 
+function updateScrollProgress() {
+  const bar = byId("scroll-progress");
+  if (!bar) return;
+  const visible = Boolean(state.activeId) && !isPageMode();
+  bar.hidden = !visible;
+  if (!visible) return;
+  const ratio = readingRatio();
+  byId("scroll-progress-fill").style.width = `${(ratio * 100).toFixed(2)}%`;
+  byId("scroll-percent").textContent = `${Math.round(ratio * 100)}%`;
+  bar.classList.add("show");
+  clearTimeout(state.scrollProgressTimer);
+  state.scrollProgressTimer = setTimeout(() => bar.classList.remove("show"), 1400);
+}
+
 function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   const ratio = relayout ? readingRatio() : 0;
   state.mode = mode === "scroll" ? "scroll" : "page";
@@ -1143,6 +1159,7 @@ function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   if (!state.activeId) toggleChrome(true);
   if (persist) void writeSetting("readingMode", state.mode);
   updateChromeToggle();
+  updateScrollProgress();
   if (!relayout || !state.activeId) return;
   toggleChrome(!page);
   if (page && state.tapHint && !state.hintShown) { state.hintShown = true; showTapHint(); }

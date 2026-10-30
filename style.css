@@ -334,3 +334,14 @@ body.page-mode .reader-content img:not(.emoji-img) { max-height:calc(var(--page-
 body.page-mode .reader-content :is(p,li,blockquote):has(> img:only-child) { margin-block:.2em; }
 body.page-mode .page-chapter-head { margin-bottom:1em; }
 body.page-mode .reader-content :is(h1,h2,h3,h4,h5,h6) { margin-block:.9em .5em; }
+
+/* ---------- Reading progress in scroll mode ---------- */
+/* Paged mode has its own bar and page numbers; scroll mode gets a matching
+   glow line plus a percentage that fades in while the reader scrolls. */
+.scroll-progress { position:fixed; z-index:26; inset:0 0 auto; height:3px; background:color-mix(in srgb,var(--text) 9%,transparent); }
+.scroll-progress[hidden] { display:none!important; }
+.scroll-progress i { display:block; width:0; height:100%; border-radius:0 3px 3px 0; background:var(--accent-strong); box-shadow:0 0 9px color-mix(in srgb,var(--accent-strong) 75%,transparent); transition:width .12s linear; }
+.scroll-progress span { position:absolute; top:calc(66px + env(safe-area-inset-top,0px)); right:max(10px,env(safe-area-inset-right)); padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:color-mix(in srgb,var(--surface) 88%,transparent); box-shadow:0 5px 16px #0005; color:var(--text); font-size:10.5px; font-variant-numeric:tabular-nums; font-weight:700; opacity:0; transform:translateY(-5px); pointer-events:none; transition:opacity .2s ease,transform .2s ease; backdrop-filter:blur(8px); }
+.scroll-progress.show span { opacity:1; transform:none; }
+body.page-mode .scroll-progress { display:none; }
+@media(prefers-reduced-motion:reduce) { .scroll-progress i,.scroll-progress span { transition:none } }
