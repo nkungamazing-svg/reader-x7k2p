@@ -225,3 +225,14 @@ body.scroll-mode.chrome-hidden .reader-content { padding-top:0; }
 :root[data-theme="dusk"] { color-scheme:dark; --page:#1b1917; --surface:#242120; --surface-2:#2c2825; --text:#d6cec2; --muted:#9a9185; --line:#3a342f; --accent:#b08a5a; --accent-strong:#d2a876; --danger:#c0655e; --reader:#1e1b19; --reader-text:#d6cec2; }
 .theme-row { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .theme-choice { padding:7px 8px; font-size:12px; }
+
+/* ---------- Grouped settings sheet ---------- */
+.settings-groups { display:grid; gap:14px; padding:2px 0 6px; }
+.settings-group { padding:0 11px 2px; border:1px solid var(--line); border-radius:14px; background:color-mix(in srgb,var(--text) 3%,var(--surface)); }
+.settings-group h3 { margin:12px 1px 2px; color:var(--accent-strong); font-size:10.5px; font-weight:800; letter-spacing:.08em; }
+.settings-group .setting-row,.settings-group .switch-row { border-bottom:1px solid color-mix(in srgb,var(--line) 65%,transparent); }
+.settings-group > :last-child { border-bottom:0; }
+.type-preview { display:grid; gap:3px; margin:6px 0 10px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--reader); color:var(--reader-text); overflow:hidden; }
+.type-preview-sample { font-family:var(--reader-font); font-size:var(--reader-size,19px); line-height:var(--reader-line-height,1.95); white-space:pre-wrap; }
+.type-preview-note { color:var(--muted); font-size:10px; font-family:"Noto Sans Thai",sans-serif; }
+.settings-version { grid-column:1/-1; padding:6px 2px 10px; }
