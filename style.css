@@ -152,7 +152,9 @@ button:disabled { opacity:.48; cursor:not-allowed; }
   .sidebar .novel-title,.sidebar .arc-title { min-width:0; overflow:hidden; }
   .sidebar .novel-title span,.sidebar .chapter-link strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   body.sidebar-open .sidebar { transform:translateX(0); }
-  body.sidebar-open::after { position:fixed; z-index:7; inset:0; content:""; background:#0006; pointer-events:auto; }
+  body.sidebar-open::after { position:fixed; z-index:11; inset:0; content:""; background:color-mix(in srgb,var(--page) 35%,#05060a); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); pointer-events:auto; }
+  /* Above the reading chrome (header, toolbar, page footer) but under the drawer. */
+  body.page-mode.sidebar-open::after { z-index:39; }
   /* Keep the document fixed while the drawer is open, but allow vertical
      gestures to reach the scrollable sidebar instead of cancelling all touch. */
   body.sidebar-locked { position:fixed; inset-inline:0; width:100%; overflow:hidden; touch-action:pan-y; }
