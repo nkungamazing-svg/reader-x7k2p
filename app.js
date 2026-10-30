@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.2";
+const APP_VERSION = "1.5.3";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -181,7 +181,8 @@ function renderChapterList() {
     const group = document.createElement("section"); group.className = "novel-group";
     const heading = document.createElement("div"); heading.className = "novel-title";
     const name = document.createElement("span"); name.textContent = novel;
-    const count = document.createElement("small"); count.textContent = `${items.length} ตอน`;
+    const readCount = items.filter(item => Number(item.lastReadProgress || 0) >= 0.98).length;
+    const count = document.createElement("small"); count.textContent = readCount ? `${readCount}/${items.length} ตอน` : `${items.length} ตอน`;
     heading.append(name, count); group.append(heading);
     const arcs = new Map();
     for (const item of items) {
@@ -198,16 +199,30 @@ function renderChapterList() {
     });
     for (const [arc, arcItems] of arcEntries) {
       const section = document.createElement("section"); section.className = "arc-group";
-      const arcHeading = document.createElement("div"); arcHeading.className = "arc-title"; arcHeading.textContent = arc;
-      section.append(arcHeading);
+      const arcHeading = document.createElement("div"); arcHeading.className = "arc-title";
+      const arcName = document.createElement("span"); arcName.textContent = arc;
+      const arcCount = document.createElement("small"); arcCount.textContent = `${arcItems.length} ตอน`;
+      arcHeading.append(arcName, arcCount); section.append(arcHeading);
       for (const item of arcItems) {
-        const button = document.createElement("button"); button.type = "button"; button.className = `chapter-link${item.id === state.activeId ? " active" : ""}`;
-        button.setAttribute("aria-current", item.id === state.activeId ? "true" : "false");
-        const title = document.createElement("strong"); title.textContent = normalizeTitle(item);
-        const subtitle = document.createElement("small"); subtitle.textContent = item.lastReadProgress > 0 ? `อ่านแล้ว ${Math.round(Math.min(1, item.lastReadProgress) * 100)}%` : "ยังไม่ได้อ่าน";
-        const progress = document.createElement("span"); progress.className = "mini-progress";
-        const fill = document.createElement("i"); fill.style.width = `${Math.max(0, Math.min(100, Number(item.lastReadProgress || item.lastScrollRatio || 0) * 100))}%`; progress.append(fill);
-        button.append(title, subtitle, progress); button.addEventListener("click", () => openChapter(item.id)); section.append(button);
+        const ratio = Math.max(0, Math.min(1, Number(item.lastReadProgress || item.lastScrollRatio || 0)));
+        const percent = Math.round(ratio * 100);
+        const active = item.id === state.activeId;
+        const number = chapterParts(item).chapter;
+        const button = document.createElement("button"); button.type = "button"; button.className = `chapter-link${active ? " active" : ""}`;
+        button.setAttribute("aria-current", active ? "true" : "false");
+        button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
+        const index = document.createElement("span"); index.className = "chapter-index"; index.textContent = number == null ? "•" : String(number);
+        const text = document.createElement("span"); text.className = "chapter-text";
+        const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
+        button.append(index, text);
+        if (ratio >= 0.98) {
+          const badge = document.createElement("span"); badge.className = "chapter-badge read"; badge.textContent = "อ่านแล้ว"; button.append(badge);
+        } else if (ratio > 0) {
+          const badge = document.createElement("span"); badge.className = "chapter-badge"; badge.textContent = `${percent}%`; button.append(badge);
+          const bar = document.createElement("span"); bar.className = "mini-progress";
+          const fill = document.createElement("i"); fill.style.width = `${percent}%`; bar.append(fill); button.append(bar);
+        }
+        button.addEventListener("click", () => openChapter(item.id)); section.append(button);
       }
       group.append(section);
     }
@@ -368,6 +383,14 @@ function renderChapterContent(item) {
   }
 }
 
+function revealActiveChapter() {
+  const list = byId("chapter-list");
+  const active = list.querySelector(".chapter-link.active");
+  if (!active || !list.clientHeight) return;
+  const listRect = list.getBoundingClientRect(), rowRect = active.getBoundingClientRect();
+  list.scrollTop += rowRect.top - listRect.top - list.clientHeight / 2 + rowRect.height / 2;
+}
+
 function setSidebarOpen(open, { restorePosition = true } = {}) {
   if (open && isPageMode()) toggleChrome(true);
   const isMobile = matchMedia("(max-width: 760px)").matches;
@@ -379,6 +402,7 @@ function setSidebarOpen(open, { restorePosition = true } = {}) {
     document.body.style.top = `-${state.sidebarLockY}px`;
     document.body.style.left = "0"; document.body.style.right = "0"; document.body.style.width = "100%";
     byId("menu-toggle").setAttribute("aria-expanded", "true");
+    requestAnimationFrame(revealActiveChapter);
     return;
   }
   document.body.classList.remove("sidebar-open", "sidebar-locked");
