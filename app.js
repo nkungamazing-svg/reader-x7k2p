@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.4";
+const APP_VERSION = "1.5.5";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterCardTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -383,6 +383,7 @@ function renderChapterContent(item) {
   blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
   state.currentBlockIndex = -1;
   markSmallImages(content);
+  decorateSpeakerLabels(content);
   for (const image of content.querySelectorAll("img")) {
     if (!image.complete) image.addEventListener("load", () => schedulePaginate(), { once: true });
   }
@@ -605,6 +606,97 @@ function moveSpeechParagraph(direction) {
   startSpeechFromBlock(uniqueBlocks[targetPosition]);
 }
 
+function decorateSpeakerLabels(root) {
+  for (const label of root.querySelectorAll(".noat-speaker-label")) {
+    label.setAttribute("role", "button");
+    if (!label.hasAttribute("tabindex")) label.setAttribute("tabindex", "0");
+    const name = (label.dataset.character || label.dataset.name || label.textContent || "").trim();
+    if (name) label.setAttribute("aria-label", `ดูรูปตัวละคร ${name}`);
+  }
+}
+
+function characterThaiName(label) {
+  return String(label.dataset.character || label.dataset.name || label.textContent || "").replace(/\s+/gu, " ").trim();
+}
+
+function characterQuery(label) {
+  return String(label.dataset.characterEn || label.dataset.english || label.dataset.wiki || label.title || "").trim();
+}
+
+async function lookupCharacterImage(query) {
+  if (!query || !state.loadRemoteImages) return "";
+  if (!state.characterImages) state.characterImages = await readSetting("characterImages", {});
+  const key = query.toLocaleLowerCase();
+  if (Object.prototype.hasOwnProperty.call(state.characterImages, key)) return state.characterImages[key] || "";
+  const endpoint = "https://rezero.fandom.com/api.php";
+  const pageImage = async title => {
+    const url = `${endpoint}?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=320&titles=${encodeURIComponent(title)}`;
+    const response = await fetch(url, { referrerPolicy: "no-referrer" });
+    if (!response.ok) return "";
+    const payload = await response.json();
+    const pages = payload?.query?.pages || {};
+    return Object.values(pages)[0]?.thumbnail?.source || "";
+  };
+  let image = "";
+  try {
+    image = await pageImage(query);
+    if (!image) {
+      const response = await fetch(`${endpoint}?action=query&format=json&origin=*&list=search&srlimit=1&srsearch=${encodeURIComponent(query)}`, { referrerPolicy: "no-referrer" });
+      const hit = response.ok ? (await response.json())?.query?.search?.[0]?.title : "";
+      if (hit) image = await pageImage(hit);
+    }
+  } catch (_) { image = ""; }
+  state.characterImages[key] = image;
+  void writeSetting("characterImages", state.characterImages);
+  return image;
+}
+
+function closeCharacterCard() {
+  const card = byId("character-card");
+  clearTimeout(state.characterCardTimer);
+  if (card) card.hidden = true;
+}
+
+async function openCharacterCard(label) {
+  const card = byId("character-card"), figure = byId("character-card-figure");
+  const thai = characterThaiName(label) || "ตัวละคร";
+  const query = characterQuery(label);
+  byId("character-card-name").textContent = thai;
+  byId("character-card-note").textContent = query ? "กำลังค้นรูป…" : "ไม่พบชื่อภาษาอังกฤษของตัวละครนี้";
+  const spinner = document.createElement("span"); spinner.className = "character-card-spinner"; spinner.setAttribute("aria-hidden", "true");
+  figure.replaceChildren(spinner);
+  card.hidden = false;
+  if (!query) return;
+  const image = await lookupCharacterImage(query);
+  if (card.hidden) return;
+  if (image) {
+    const img = document.createElement("img"); img.alt = thai; img.referrerPolicy = "no-referrer"; img.src = image;
+    figure.replaceChildren(img);
+    byId("character-card-note").textContent = "จาก Re:Zero Wiki";
+  } else {
+    figure.replaceChildren();
+    byId("character-card-note").textContent = state.loadRemoteImages ? "ไม่พบรูปของชื่อนี้" : "เปิด “โหลดรูปจากเว็บต้นทาง” เพื่อดูรูป";
+  }
+  state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
+}
+
+function installCharacterCards() {
+  document.addEventListener("click", event => {
+    const label = event.target.closest?.(".noat-speaker-label");
+    if (!label) { if (!event.target.closest?.("#character-card")) closeCharacterCard(); return; }
+    event.preventDefault(); event.stopPropagation();
+    void openCharacterCard(label);
+  }, true);
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const label = event.target.closest?.(".noat-speaker-label");
+    if (!label) return;
+    event.preventDefault(); event.stopPropagation();
+    void openCharacterCard(label);
+  }, true);
+  byId("character-card-close").addEventListener("click", closeCharacterCard);
+}
+
 function installParagraphTapTargets() {
   const content = byId("reader-content");
   content.addEventListener("pointerdown", event => {
@@ -755,6 +847,7 @@ function bindEvents() {
   byId("tap-hint-toggle").addEventListener("change", event => setTapHint(event.target.checked));
   byId("chrome-toggle").addEventListener("click", () => toggleChrome());
   installParagraphTapTargets();
+  installCharacterCards();
   installPageGestures();
   installChromeRestore();
   window.addEventListener("resize", () => schedulePaginate(140));

@@ -65,6 +65,11 @@
     <button id="chrome-toggle" class="audio-button audio-chrome" type="button" aria-label="ซ่อนแถบเครื่องมือ" title="ซ่อนแถบเครื่องมือ">⤢</button>
     <button id="settings-open" class="audio-button audio-settings" type="button" aria-label="ตั้งค่าการอ่าน" title="ตั้งค่าการอ่าน">⚙</button>
   </nav>
+  <div id="character-card" class="character-card" role="dialog" aria-labelledby="character-card-name" hidden>
+    <button id="character-card-close" class="character-card-close" type="button" aria-label="ปิดการ์ดตัวละคร">×</button>
+    <div id="character-card-figure" class="character-card-figure"></div>
+    <div class="character-card-body"><strong id="character-card-name"></strong><small id="character-card-note"></small></div>
+  </div>
   <div id="tap-hint" class="tap-hint" aria-hidden="true" hidden>
     <span class="tap-hint-zone tap-hint-left">‹</span>
     <span class="tap-hint-zone tap-hint-center"><i>แตะกลางจอ<small>เปิด / ซ่อนเมนู</small></i></span>
