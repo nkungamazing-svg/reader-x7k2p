@@ -5,6 +5,28 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
+const APP_VERSION = "1.4.0";
+const SPLASH_MIN_MS = 850;
+const splashStartedAt = performance.now();
+
+function paintVersionLabels() {
+  const label = `เวอร์ชัน ${APP_VERSION}`;
+  const splashLabel = document.getElementById("splash-version");
+  if (splashLabel) splashLabel.textContent = label;
+  const footerLabel = document.getElementById("app-version");
+  if (footerLabel) footerLabel.textContent = label;
+}
+
+function hideSplash() {
+  const splash = document.getElementById("splash");
+  if (!splash) return;
+  const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashStartedAt));
+  setTimeout(() => {
+    if (splash.classList.contains("hide")) return;
+    splash.classList.add("hide");
+    setTimeout(() => splash.remove(), 500);
+  }, wait);
+}
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
 const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
@@ -961,13 +983,16 @@ async function initialize() {
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
     document.fonts?.ready.then(() => { if (isPageMode() && state.activeId) schedulePaginate(0); }).catch(() => {});
+    hideSplash();
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
       navigator.serviceWorker.register("./service-worker.js")
         .then(() => navigator.serviceWorker.ready)
         .then(() => showStatus("เตรียมไฟล์แอปสำหรับใช้ออฟไลน์แล้ว", 4500))
         .catch(() => {});
     }
-  } catch (error) { showStatus(`เปิดคลังไม่สำเร็จ: ${error.message}`, 0); }
+  } catch (error) { showStatus(`เปิดคลังไม่สำเร็จ: ${error.message}`, 0); hideSplash(); }
 }
 
+paintVersionLabels();
 initialize();
+setTimeout(hideSplash, 4000);

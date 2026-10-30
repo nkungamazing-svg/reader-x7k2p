@@ -14,6 +14,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="splash" class="splash" role="status" aria-label="กำลังเปิดแอป">
+    <img src="icons/icon-512.png" alt="" width="96" height="96">
+    <strong>คลังบทแปล</strong>
+    <small id="splash-version"></small>
+    <span class="splash-bar" aria-hidden="true"><i></i></span>
+  </div>
   <header class="app-header">
     <button id="menu-toggle" class="icon-button" type="button" aria-label="เปิดรายการบท">☰</button>
     <img src="icons/icon-180.png" alt="" width="30" height="30">
@@ -79,6 +85,7 @@
       <label class="switch-row"><span>เลื่อนตามอัตโนมัติ</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       <label class="switch-row"><span>กันจอดับระหว่างอ่าน</span><input id="wake-lock-toggle" type="checkbox"><i aria-hidden="true"></i></label>
+      <div class="settings-version"><small id="app-version"></small></div>
     </div>
   </dialog>
   <dialog id="import-dialog" class="import-dialog">
