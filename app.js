@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.7";
+const APP_VERSION = "1.6.8";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -498,7 +498,9 @@ function refreshVoices() {
 function updateSpeechControls() {
   const active = state.speaking;
   const playing = active && speechSynthesis?.speaking && !speechSynthesis.paused;
-  byId("speak-button").textContent = playing ? "Ⅱ" : active ? "▶" : "▶";
+  byId("speak-button").dataset.state = playing ? "pause" : "play";
+  const speakLabel = byId("speak-button").querySelector(".audio-label");
+  if (speakLabel) speakLabel.textContent = playing ? "พัก" : "ฟัง";
   byId("speak-button").setAttribute("aria-label", playing ? "พักเสียง" : active ? "อ่านต่อ" : "อ่านออกเสียง");
   byId("speak-button").title = playing ? "พักเสียง" : active ? "อ่านต่อ" : "อ่านออกเสียง";
   byId("stop-speech").disabled = !active;
@@ -1136,7 +1138,6 @@ function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   byId("mode-page").setAttribute("aria-pressed", String(page));
   byId("mode-scroll").setAttribute("aria-pressed", String(!page));
   const modeToggle = byId("mode-toggle"), modeLabel = page ? "สลับเป็นโหมดเลื่อนต่อเนื่อง" : "สลับเป็นโหมดพลิกหน้า";
-  modeToggle.textContent = page ? "📜" : "📄";
   modeToggle.title = modeLabel;
   modeToggle.setAttribute("aria-label", modeLabel);
   if (!state.activeId) toggleChrome(true);
@@ -1306,7 +1307,6 @@ function updateChromeToggle() {
   const label = document.body.classList.contains("chrome-hidden") ? "แสดงแถบเครื่องมือ" : "ซ่อนแถบเครื่องมือ";
   button.setAttribute("aria-label", label);
   button.title = label;
-  button.textContent = document.body.classList.contains("chrome-hidden") ? "⤡" : "⤢";
 }
 
 function installChromeRestore() {
