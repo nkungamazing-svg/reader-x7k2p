@@ -7,7 +7,7 @@ const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -127,13 +127,19 @@ function updateChapterNavigation() {
   next.title = index >= 0 && index < ordered.length - 1 ? normalizeTitle(ordered[index + 1]) : "ไม่มีตอนถัดไป";
 }
 
-function goToAdjacentChapter(direction) {
-  const current = state.chapters.find(item => item.id === state.activeId);
-  if (!current) return;
+function activeChapter() {
+  return state.chapters.find(chapter => chapter.id === state.activeId);
+}
+
+function goToAdjacentChapter(direction, { toEnd = false } = {}) {
+  const current = activeChapter();
+  if (!current) return false;
   const ordered = sortChapters(state.chapters.filter(item => novelLabel(item) === novelLabel(current)));
   const index = ordered.findIndex(item => item.id === current.id);
   const target = ordered[index + direction];
-  if (target) void openChapter(target.id, { scrollToTop: true }).catch(error => showStatus(`เปิดตอนไม่สำเร็จ: ${error.message}`));
+  if (!target) return false;
+  void openChapter(target.id, direction > 0 || !toEnd ? { scrollToTop: true } : { toEnd: true }).catch(error => showStatus(`เปิดตอนไม่สำเร็จ: ${error.message}`));
+  return true;
 }
 
 function renderChapterList() {
@@ -256,11 +262,11 @@ function safeChapterFragment(html, baseUrl = "") {
   return fragment;
 }
 
-async function openChapter(id, { scrollToTop = false } = {}) {
+async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
   const item = state.chapters.find(chapter => chapter.id === id);
   if (!item) return;
   stopSpeech(false);
-  if (scrollToTop) { item.lastScrollRatio = 0; item.lastReadProgress = 0; item.lastProgressMode = "scroll"; }
+  if (scrollToTop || toEnd) { item.lastScrollRatio = toEnd ? 1 : 0; item.lastReadProgress = toEnd ? 1 : 0; item.lastProgressMode = "scroll"; }
   state.speechQueue = []; state.speechIndex = 0;
   state.activeId = id;
   byId("welcome").hidden = true; byId("reader").hidden = false;
@@ -269,31 +275,56 @@ async function openChapter(id, { scrollToTop = false } = {}) {
   byId("reader-novel").textContent = novelLabel(item);
   byId("reader-title").textContent = normalizeTitle(item);
   renderChapterContent(item);
-  const ratio = scrollToTop ? 0 : Math.max(0, Math.min(1, Number(item.lastScrollRatio ?? item.lastReadProgress) || 0));
+  document.body.classList.add("reading");
+  const ratio = toEnd ? 1 : scrollToTop ? 0 : clamp01(Number(item.lastScrollRatio ?? item.lastReadProgress) || 0);
   setSidebarOpen(false, { restorePosition: false });
-  requestAnimationFrame(() => window.scrollTo({ top: ratio * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
+  if (isPageMode()) {
+    paginateContent();
+    setPage(Math.round(ratio * Math.max(0, state.pageTotal - 1)), { animate: false });
+    toggleChrome(false);
+    if (!state.pageHintShown) { state.pageHintShown = true; showStatus("แตะขอบซ้าย/ขวาเพื่อพลิกหน้า · แตะกลางจอเพื่อเปิดแถบเครื่องมือ", 6500); }
+  } else {
+    document.body.classList.remove("chrome-hidden");
+    requestAnimationFrame(() => window.scrollTo({ top: ratio * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
+  }
   updateChapterNavigation();
   void syncWakeLock();
   await writeSetting("lastActiveId", id);
-  if (scrollToTop) { const db = await dbReady; const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); }
+  if (scrollToTop || toEnd) { const db = await dbReady; const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); }
   renderChapterList();
   history.replaceState(null, "", `#chapter=${encodeURIComponent(id)}`);
 }
 
 function closeReader() {
+  document.body.classList.remove("reading", "chrome-hidden");
   stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
 }
 
 function renderChapterContent(item) {
   const content = byId("reader-content");
-  content.replaceChildren(safeChapterFragment(item.html, item.sourceUrl || ""));
+  content.replaceChildren();
+  if (isPageMode()) {
+    const heading = document.createElement("header");
+    heading.className = "page-chapter-head";
+    const novel = document.createElement("p");
+    novel.textContent = novelLabel(item);
+    const title = document.createElement("h1");
+    title.textContent = normalizeTitle(item);
+    heading.append(novel, title);
+    content.append(heading);
+  }
+  content.append(safeChapterFragment(item.html, item.sourceUrl || ""));
   const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
   const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
   blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
   state.currentBlockIndex = -1;
+  for (const image of content.querySelectorAll("img")) {
+    if (!image.complete) image.addEventListener("load", () => schedulePaginate(), { once: true });
+  }
 }
 
 function setSidebarOpen(open, { restorePosition = true } = {}) {
+  if (open && isPageMode()) toggleChrome(true);
   const isMobile = matchMedia("(max-width: 760px)").matches;
   if (!isMobile) { document.body.classList.toggle("sidebar-open", Boolean(open)); return; }
   if (open) {
@@ -313,12 +344,11 @@ function setSidebarOpen(open, { restorePosition = true } = {}) {
 }
 
 async function persistReadingPosition() {
-  const item = state.chapters.find(chapter => chapter.id === state.activeId);
+  const item = activeChapter();
   if (!item) return;
-  const scrollY = state.sidebarLockY ?? window.scrollY;
-  const ratio = Math.max(0, Math.min(1, scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)));
+  const ratio = readingRatio();
   item.lastScrollRatio = ratio;
-  if (!state.speaking) { item.lastReadProgress = ratio; item.lastProgressMode = "scroll"; }
+  if (!state.speaking) { item.lastReadProgress = ratio; item.lastProgressMode = isPageMode() ? "page" : "scroll"; }
   const db = await dbReady; const tx = db.transaction(CHAPTERS, "readwrite"); tx.objectStore(CHAPTERS).put(item); await transactionDone(tx); renderChapterList();
 }
 
@@ -470,7 +500,13 @@ function setActiveBlock(blockIndex) {
   const block = content.querySelector(`[data-block-index="${blockIndex}"]`);
   if (!block) return;
   block.classList.add("read-active");
-  if (state.followEnabled && changed) block.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (!state.followEnabled || !changed) return;
+  if (isPageMode()) {
+    const page = state.blockPages.get(blockIndex);
+    if (Number.isFinite(page) && page !== state.pageIndex) setPage(page);
+    return;
+  }
+  block.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function startSpeechFromBlock(blockIndex) {
@@ -501,7 +537,7 @@ function installParagraphTapTargets() {
     const target = event.target;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
     const interactive = target.closest?.("a,button,input,select,textarea,[contenteditable=true]");
-    state.pointerStart = event.isPrimary && event.button === 0 && block && !interactive
+    state.pointerStart = !isPageMode() && event.isPrimary && event.button === 0 && block && !interactive
       ? { x: event.clientX, y: event.clientY, block }
       : null;
   }, { passive: true });
@@ -519,6 +555,7 @@ function installParagraphTapTargets() {
   }, { passive: true });
   document.addEventListener("pointercancel", () => { state.pointerStart = null; state.pointerTapReady = null; }, { passive: true });
   content.addEventListener("click", event => {
+    if (isPageMode()) return;
     const target = event.target;
     if (target.closest?.("a,button,input,select,textarea,[contenteditable=true]")) return;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
@@ -629,7 +666,20 @@ function bindEvents() {
     void writeSetting("keepScreenAwake", state.keepScreenAwake);
     void syncWakeLock();
   });
+  byId("mode-page").addEventListener("click", () => applyReadingMode("page"));
+  byId("mode-scroll").addEventListener("click", () => applyReadingMode("scroll"));
+  byId("mode-toggle").addEventListener("click", () => applyReadingMode(isPageMode() ? "scroll" : "page"));
+  byId("indent-toggle").addEventListener("change", event => {
+    state.indent = event.target.checked;
+    document.body.classList.toggle("indent-on", state.indent);
+    void writeSetting("indent", state.indent);
+    schedulePaginate(60);
+  });
   installParagraphTapTargets();
+  installPageGestures();
+  window.addEventListener("resize", () => schedulePaginate(140));
+  window.addEventListener("orientationchange", () => schedulePaginate(240));
+  window.visualViewport?.addEventListener("resize", () => schedulePaginate(180));
   window.addEventListener("scroll", saveReadingPosition, { passive: true });
   window.addEventListener("pagehide", () => {
     clearTimeout(state.scrollTimer); void persistReadingPosition().catch(() => {});
@@ -656,11 +706,185 @@ function bindEvents() {
   }
 }
 
+function clamp01(value) { return Math.max(0, Math.min(1, Number(value) || 0)); }
+
+function isPageMode() { return state.mode === "page"; }
+
+function readingRatio() {
+  if (isPageMode()) return state.pageTotal > 1 ? state.pageIndex / (state.pageTotal - 1) : 0;
+  return clamp01((state.sidebarLockY ?? window.scrollY) / Math.max(1, document.documentElement.scrollHeight - innerHeight));
+}
+
+function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
+  const ratio = relayout ? readingRatio() : 0;
+  state.mode = mode === "scroll" ? "scroll" : "page";
+  const page = isPageMode();
+  document.body.classList.toggle("page-mode", page);
+  document.body.classList.toggle("scroll-mode", !page);
+  byId("mode-page").setAttribute("aria-pressed", String(page));
+  byId("mode-scroll").setAttribute("aria-pressed", String(!page));
+  const modeToggle = byId("mode-toggle"), modeLabel = page ? "สลับเป็นโหมดเลื่อนต่อเนื่อง" : "สลับเป็นโหมดพลิกหน้า";
+  modeToggle.textContent = page ? "📜" : "📄";
+  modeToggle.title = modeLabel;
+  modeToggle.setAttribute("aria-label", modeLabel);
+  if (!state.activeId) document.body.classList.remove("chrome-hidden");
+  if (persist) void writeSetting("readingMode", state.mode);
+  if (!relayout || !state.activeId) return;
+  if (page) toggleChrome(false);
+  relayoutChapter(ratio);
+}
+
+function relayoutChapter(ratio = readingRatio()) {
+  const item = activeChapter();
+  if (!item) return;
+  if (!isPageMode()) resetPaginationStyles();
+  renderChapterContent(item);
+  if (isPageMode()) {
+    paginateContent();
+    setPage(Math.round(clamp01(ratio) * Math.max(0, state.pageTotal - 1)), { animate: false });
+    return;
+  }
+  requestAnimationFrame(() => window.scrollTo({ top: clamp01(ratio) * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
+}
+
+function resetPaginationStyles() {
+  const content = byId("reader-content");
+  for (const property of ["width", "height", "columnWidth", "columnGap", "transform", "transition"]) content.style.removeProperty(property.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`));
+  state.pageTotal = 1; state.pageIndex = 0; state.pageStep = 0; state.blockPages = new Map();
+  updatePageFooter();
+}
+
+function paginateContent() {
+  const viewport = byId("reading-viewport"), content = byId("reader-content");
+  if (!isPageMode()) { resetPaginationStyles(); return; }
+  const styles = getComputedStyle(viewport);
+  const insetX = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+  const insetY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+  const width = Math.max(160, viewport.clientWidth - insetX);
+  const height = Math.max(160, viewport.clientHeight - insetY);
+  const gap = Math.max(12, Math.min(insetX, 160));
+  content.style.transition = "none";
+  content.style.transform = "translate3d(0,0,0)";
+  content.style.width = `${width}px`;
+  content.style.height = `${height}px`;
+  content.style.columnWidth = `${width}px`;
+  content.style.columnGap = `${gap}px`;
+  const step = width + gap;
+  state.pageStep = step;
+  const baseLeft = content.getBoundingClientRect().left;
+  const blockPages = new Map();
+  let total = 1;
+  for (const element of content.querySelectorAll("[data-block-index]")) {
+    const rect = element.getBoundingClientRect();
+    if (!rect.width && !rect.height) continue;
+    const page = Math.max(0, Math.round((rect.left - baseLeft) / step));
+    blockPages.set(Number(element.dataset.blockIndex), page);
+    if (page + 1 > total) total = page + 1;
+  }
+  if (total === 1) {
+    const overflowPages = Math.round((content.scrollWidth + gap) / (width + gap));
+    if (overflowPages > 1) total = overflowPages;
+  }
+  state.blockPages = blockPages;
+  state.pageTotal = total;
+  state.pageIndex = Math.max(0, Math.min(total - 1, state.pageIndex));
+  content.style.transition = "";
+  updatePageFooter();
+  if (total === 1 && content.scrollHeight > height + 8) {
+    applyReadingMode("scroll", { persist: false });
+    showStatus("เบราว์เซอร์นี้แบ่งหน้าแบบหลายคอลัมน์ไม่ได้ สลับเป็นโหมดเลื่อนต่อเนื่องให้แล้ว", 7000);
+  }
+}
+
+function updatePageFooter() {
+  const total = Math.max(1, state.pageTotal);
+  const current = Math.min(state.pageIndex + 1, total);
+  const percent = Math.round((current / total) * 100);
+  byId("page-position").textContent = `หน้า ${current} / ${total}`;
+  byId("page-percent").textContent = `${percent}%`;
+  byId("page-progress").style.width = `${percent}%`;
+}
+
+function setPage(index, { animate = true } = {}) {
+  if (!isPageMode()) return;
+  const total = Math.max(1, state.pageTotal);
+  const target = Math.max(0, Math.min(total - 1, Math.round(Number(index) || 0)));
+  state.pageIndex = target;
+  const content = byId("reader-content");
+  const step = state.pageStep || byId("reading-viewport").clientWidth;
+  content.style.transition = animate ? "transform .26s cubic-bezier(.22,.61,.36,1)" : "none";
+  content.style.transform = `translate3d(${-target * step}px,0,0)`;
+  if (!animate) void content.offsetWidth;
+  updatePageFooter();
+  scheduleSavePage();
+}
+
+function scheduleSavePage() {
+  clearTimeout(state.pageTimer);
+  state.pageTimer = setTimeout(() => persistReadingPosition().catch(error => showStatus(`บันทึกตำแหน่งอ่านไม่สำเร็จ: ${error.message}`)), 400);
+}
+
+function schedulePaginate(delay = 120) {
+  clearTimeout(state.paginateTimer);
+  state.paginateTimer = setTimeout(() => {
+    if (!isPageMode() || !state.activeId) return;
+    const ratio = readingRatio();
+    paginateContent();
+    setPage(Math.round(ratio * Math.max(0, state.pageTotal - 1)), { animate: false });
+  }, delay);
+}
+
+function turnPage(direction) {
+  if (!isPageMode()) return;
+  const target = state.pageIndex + direction;
+  if (target < 0) { if (!goToAdjacentChapter(-1, { toEnd: true })) showStatus("ถึงตอนแรกของเรื่องแล้ว", 2200); return; }
+  if (target > state.pageTotal - 1) { if (!goToAdjacentChapter(1, { toStart: true })) showStatus("จบเนื้อหาที่บันทึกไว้แล้ว", 2500); return; }
+  setPage(target);
+}
+
+function toggleChrome(show) {
+  if (!isPageMode()) { document.body.classList.remove("chrome-hidden"); return; }
+  const shouldShow = show == null ? document.body.classList.contains("chrome-hidden") : Boolean(show);
+  document.body.classList.toggle("chrome-hidden", !shouldShow);
+}
+
+function installPageGestures() {
+  const viewport = byId("reading-viewport");
+  let start = null;
+  viewport.addEventListener("pointerdown", event => {
+    if (!isPageMode() || (event.pointerType === "mouse" && event.button !== 0)) { start = null; return; }
+    if (event.target.closest?.("a,button,input,select,textarea,[contenteditable=true]")) { start = null; return; }
+    start = { x: event.clientX, y: event.clientY, time: Date.now() };
+  }, { passive: true });
+  viewport.addEventListener("pointerup", event => {
+    const origin = start; start = null;
+    if (!origin || !isPageMode()) return;
+    if (document.body.classList.contains("sidebar-open")) { setSidebarOpen(false); return; }
+    const dx = event.clientX - origin.x, dy = event.clientY - origin.y;
+    if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.25) { turnPage(dx < 0 ? 1 : -1); return; }
+    if (Math.abs(dx) > 9 || Math.abs(dy) > 9 || Date.now() - origin.time > 700) return;
+    const rect = viewport.getBoundingClientRect();
+    const position = (event.clientX - rect.left) / Math.max(1, rect.width);
+    if (position < .32) turnPage(-1);
+    else if (position > .68) turnPage(1);
+    else toggleChrome();
+  });
+  viewport.addEventListener("pointercancel", () => { start = null; }, { passive: true });
+  document.addEventListener("keydown", event => {
+    if (!isPageMode() || !state.activeId) return;
+    if (event.target.closest?.("input,select,textarea")) return;
+    if (event.key === "ArrowRight" || event.key === "PageDown") { event.preventDefault(); turnPage(1); }
+    else if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); turnPage(-1); }
+    else if (event.key === "Escape") toggleChrome(true);
+  });
+}
+
 function setFontSize(value) {
   state.fontSize = Math.max(15, Math.min(32, value));
   document.documentElement.style.setProperty("--reader-size", `${state.fontSize}px`);
   byId("font-size-label").textContent = String(state.fontSize);
   void writeSetting("fontSize", state.fontSize);
+  schedulePaginate(80);
 }
 
 function setLineHeight(value) {
@@ -668,6 +892,7 @@ function setLineHeight(value) {
   document.documentElement.style.setProperty("--reader-line-height", String(state.lineHeight));
   byId("line-height").value = String(state.lineHeight); byId("line-height-output").value = state.lineHeight.toFixed(1);
   void writeSetting("lineHeight", state.lineHeight);
+  schedulePaginate(80);
 }
 
 function setTextWidth(value) {
@@ -691,6 +916,11 @@ async function initialize() {
     state.followEnabled = await readSetting("followEnabled", true) !== false;
     state.loadRemoteImages = await readSetting("loadRemoteImages", true) !== false;
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
+    state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
+    state.indent = await readSetting("indent", true) !== false;
+    document.body.classList.toggle("indent-on", state.indent);
+    byId("indent-toggle").checked = state.indent;
+    applyReadingMode(state.mode, { persist: false, relayout: false });
     byId("highlight-toggle").checked = state.highlightEnabled;
     byId("follow-toggle").checked = state.followEnabled;
     byId("remote-images-toggle").checked = state.loadRemoteImages;
@@ -699,6 +929,7 @@ async function initialize() {
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
+    document.fonts?.ready.then(() => { if (isPageMode() && state.activeId) schedulePaginate(0); }).catch(() => {});
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
       navigator.serviceWorker.register("./service-worker.js")
         .then(() => navigator.serviceWorker.ready)

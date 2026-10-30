@@ -40,7 +40,9 @@
       <article id="reader" class="reader" hidden>
         <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div>
         <div id="speech-notice" class="speech-notice" hidden></div>
-        <div id="reader-content" class="reader-content"></div>
+        <div id="reading-viewport" class="reading-viewport">
+          <div id="reader-content" class="reader-content"></div>
+        </div>
         <nav id="chapter-navigation" class="chapter-navigation" aria-label="เปลี่ยนตอน">
           <button id="chapter-previous" class="chapter-nav-button" type="button">← ตอนก่อนหน้า</button>
           <button id="chapter-next" class="chapter-nav-button" type="button">ตอนถัดไป →</button>
@@ -53,18 +55,23 @@
     <button id="speak-button" class="audio-button audio-play" type="button" aria-label="อ่านออกเสียง">▶</button>
     <button id="next-paragraph" class="audio-button" type="button" aria-label="ข้ามย่อหน้า" title="ข้ามย่อหน้า">⏭</button>
     <button id="stop-speech" class="audio-button" type="button" aria-label="หยุดอ่าน" title="หยุดอ่าน" disabled>■</button>
+    <button id="mode-toggle" class="audio-button audio-mode" type="button" aria-label="สลับเป็นโหมดพลิกหน้า" title="สลับเป็นโหมดพลิกหน้า">📄</button>
     <button id="settings-open" class="audio-button audio-settings" type="button" aria-label="ตั้งค่าการอ่าน" title="ตั้งค่าการอ่าน">⚙</button>
   </nav>
+  <div id="page-progress" class="page-progress" aria-hidden="true"></div>
+  <div id="page-footer" class="page-footer" aria-hidden="true"><span id="page-position">หน้า 1 / 1</span><span id="page-percent">0%</span></div>
   <dialog id="settings-sheet" class="settings-sheet" aria-labelledby="settings-title">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-heading"><h2 id="settings-title">ตั้งค่าการอ่าน</h2><button id="settings-close" class="icon-button" type="button" aria-label="ปิดการตั้งค่า">×</button></div>
     <div class="settings-fields">
+      <div class="setting-row"><span>โหมดการอ่าน</span><div class="theme-row"><button id="mode-page" class="theme-choice" type="button" aria-pressed="true">📖 พลิกหน้า</button><button id="mode-scroll" class="theme-choice" type="button" aria-pressed="false">📜 เลื่อนต่อเนื่อง</button></div><small class="setting-hint">โหมดพลิกหน้า: ปัดซ้าย/ขวาหรือแตะขอบจอเพื่อเปลี่ยนหน้า แตะกลางจอเพื่อซ่อนแถบเครื่องมือ</small></div>
+      <label class="switch-row"><span>ย่อหน้าซึ่งหน้าแบบนิยาย</span><input id="indent-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       <label class="setting-row" for="voice-select"><span>เสียงภาษาไทย</span><select id="voice-select"><option value="">กำลังค้นหาเสียง…</option></select><small class="setting-hint">รายการเสียงขึ้นกับเสียงที่ Safari เปิดให้เว็บใช้งาน อาจไม่แสดงเสียงที่ติดตั้งไว้ทั้งหมด</small></label>
       <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div></div>
       <div class="setting-row"><span>ขนาดตัวอักษร</span><div class="font-size-row"><button id="font-down" class="tool-button square-button" type="button" aria-label="ลดขนาดตัวอักษร">A−</button><output id="font-size-label">19</output><button id="font-up" class="tool-button square-button" type="button" aria-label="เพิ่มขนาดตัวอักษร">A+</button></div></div>
       <div class="setting-row"><span>ธีม</span><div class="theme-row"><button id="theme-dark" class="theme-choice" type="button" aria-pressed="true">🌙 มืด</button><button id="theme-sepia" class="theme-choice" type="button" aria-pressed="false">📖 ซีเปีย</button><button id="theme-black" class="theme-choice" type="button" aria-pressed="false">⬛ ดำสนิท</button><button id="theme-light" class="theme-choice" type="button" aria-pressed="false">☀️ สว่าง</button></div></div>
       <div class="setting-row"><label for="line-height">ระยะบรรทัด</label><div class="range-row"><input id="line-height" type="range" min="1.4" max="2.6" step="0.1" value="1.9"><output id="line-height-output">1.9</output></div></div>
-      <div class="setting-row"><label for="text-width">ความกว้างข้อความ</label><div class="range-row"><input id="text-width" type="range" min="320" max="900" step="20" value="760"><output id="text-width-output">760px</output></div></div>
+      <div class="setting-row text-width-row"><label for="text-width">ความกว้างข้อความ</label><div class="range-row"><input id="text-width" type="range" min="320" max="900" step="20" value="760"><output id="text-width-output">760px</output></div></div>
       <label class="switch-row"><span>ไฮไลต์ย่อหน้าที่กำลังอ่าน</span><input id="highlight-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       <label class="switch-row"><span>เลื่อนตามอัตโนมัติ</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
