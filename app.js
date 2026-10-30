@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.3";
+const APP_VERSION = "1.7.4";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -328,6 +328,9 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
   byId("chapter-navigation").hidden = false;
   byId("reader-novel").textContent = novelLabel(item);
   byId("reader-title").textContent = normalizeTitle(item);
+  // The chapter heading lives in the page footer instead of the text flow: as a
+  // block it could not share its page with the opening illustration.
+  byId("page-chapter-title").textContent = `${novelLabel(item)} · ${normalizeTitle(item)}`;
   renderChapterContent(item);
   document.body.classList.add("reading");
   const ratio = toEnd ? 1 : scrollToTop ? 0 : clamp01(Number(item.lastScrollRatio ?? item.lastReadProgress) || 0);
@@ -370,16 +373,6 @@ function markSmallImages(root) {
 function renderChapterContent(item) {
   const content = byId("reader-content");
   content.replaceChildren();
-  if (isPageMode()) {
-    const heading = document.createElement("header");
-    heading.className = "page-chapter-head";
-    const novel = document.createElement("p");
-    novel.textContent = novelLabel(item);
-    const title = document.createElement("h1");
-    title.textContent = normalizeTitle(item);
-    heading.append(novel, title);
-    content.append(heading);
-  }
   content.append(safeChapterFragment(item.html, item.sourceUrl || ""));
   const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
   const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
