@@ -29,7 +29,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -306,7 +306,7 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
     toggleChrome(false);
     if (!state.pageHintShown) { state.pageHintShown = true; showStatus("แตะขอบซ้าย/ขวาเพื่อพลิกหน้า · แตะกลางจอเพื่อเปิดแถบเครื่องมือ", 6500); }
   } else {
-    document.body.classList.remove("chrome-hidden");
+    toggleChrome(true);
     requestAnimationFrame(() => window.scrollTo({ top: ratio * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
   }
   updateChapterNavigation();
@@ -318,7 +318,8 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
 }
 
 function closeReader() {
-  document.body.classList.remove("reading", "chrome-hidden");
+  document.body.classList.remove("reading");
+  toggleChrome(true);
   stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
 }
 
@@ -577,7 +578,7 @@ function installParagraphTapTargets() {
   }, { passive: true });
   document.addEventListener("pointercancel", () => { state.pointerStart = null; state.pointerTapReady = null; }, { passive: true });
   content.addEventListener("click", event => {
-    if (isPageMode() || !state.tapSpeech) return;
+    if (isPageMode() || !state.tapSpeech || Date.now() < state.suppressTapUntil) return;
     const target = event.target;
     if (target.closest?.("a,button,input,select,textarea,[contenteditable=true]")) return;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
@@ -700,8 +701,10 @@ function bindEvents() {
   });
   byId("font-family").addEventListener("change", event => setFontFamily(event.target.value));
   byId("tap-speech-toggle").addEventListener("change", event => setTapSpeech(event.target.checked));
+  byId("chrome-toggle").addEventListener("click", () => toggleChrome());
   installParagraphTapTargets();
   installPageGestures();
+  installChromeRestore();
   window.addEventListener("resize", () => schedulePaginate(140));
   window.addEventListener("orientationchange", () => schedulePaginate(240));
   window.visualViewport?.addEventListener("resize", () => schedulePaginate(180));
@@ -752,10 +755,11 @@ function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   modeToggle.textContent = page ? "📜" : "📄";
   modeToggle.title = modeLabel;
   modeToggle.setAttribute("aria-label", modeLabel);
-  if (!state.activeId) document.body.classList.remove("chrome-hidden");
+  if (!state.activeId) toggleChrome(true);
   if (persist) void writeSetting("readingMode", state.mode);
+  updateChromeToggle();
   if (!relayout || !state.activeId) return;
-  if (page) toggleChrome(false);
+  toggleChrome(!page);
   relayoutChapter(ratio);
 }
 
@@ -868,9 +872,33 @@ function turnPage(direction) {
 }
 
 function toggleChrome(show) {
-  if (!isPageMode()) { document.body.classList.remove("chrome-hidden"); return; }
   const shouldShow = show == null ? document.body.classList.contains("chrome-hidden") : Boolean(show);
   document.body.classList.toggle("chrome-hidden", !shouldShow);
+  updateChromeToggle();
+}
+
+function updateChromeToggle() {
+  const button = byId("chrome-toggle");
+  if (!button) return;
+  const label = document.body.classList.contains("chrome-hidden") ? "แสดงแถบเครื่องมือ" : "ซ่อนแถบเครื่องมือ";
+  button.setAttribute("aria-label", label);
+  button.title = label;
+  button.textContent = document.body.classList.contains("chrome-hidden") ? "⤡" : "⤢";
+}
+
+function installChromeRestore() {
+  let origin = null;
+  document.addEventListener("pointerdown", event => {
+    origin = !isPageMode() && document.body.classList.contains("chrome-hidden") ? { x: event.clientX, y: event.clientY } : null;
+  }, { capture: true, passive: true });
+  document.addEventListener("pointerup", event => {
+    const start = origin; origin = null;
+    if (!start || isPageMode() || !document.body.classList.contains("chrome-hidden")) return;
+    if (typeof event.button === "number" && event.button !== 0) return;
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) return;
+    state.suppressTapUntil = Date.now() + 500;
+    toggleChrome(true);
+  }, { capture: true, passive: true });
 }
 
 function installPageGestures() {
