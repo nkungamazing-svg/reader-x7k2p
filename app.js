@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.7";
+const APP_VERSION = "1.7.8";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list" };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -172,6 +172,8 @@ function scheduleChapterRender() {
   state.chapterRenderTimer = setTimeout(renderChapterList, 140);
 }
 
+const CHAPTER_COLUMNS = [2, 4, 6];
+
 function chapterIsInterlude(item) {
   return /บทคั่น|ตอนคั่น|\binterlude\b|幕間/iu.test(`${item?.title || ""} ${item?.translatedTitle || ""}`);
 }
@@ -185,8 +187,17 @@ function chapterCompactLabel(item, number) {
 function applyChapterView() {
   const grid = state.chapterView === "grid";
   document.body.classList.toggle("chapter-grid", grid);
+  document.body.dataset.chapterCols = String(state.chapterColumns);
   byId("view-list").setAttribute("aria-pressed", String(!grid));
   byId("view-grid").setAttribute("aria-pressed", String(grid));
+  byId("grid-columns").hidden = !grid;
+  for (const count of CHAPTER_COLUMNS) byId(`cols-${count}`).setAttribute("aria-pressed", String(count === state.chapterColumns));
+}
+
+function setChapterColumns(count) {
+  state.chapterColumns = CHAPTER_COLUMNS.includes(Number(count)) ? Number(count) : 2;
+  applyChapterView();
+  void writeSetting("chapterColumns", state.chapterColumns);
 }
 
 function setChapterView(view) {
@@ -1065,6 +1076,7 @@ function bindEvents() {
   byId("sort").addEventListener("change", () => { renderChapterList(); updateChapterNavigation(); });
   byId("view-list").addEventListener("click", () => setChapterView("list"));
   byId("view-grid").addEventListener("click", () => setChapterView("grid"));
+  for (const count of CHAPTER_COLUMNS) byId(`cols-${count}`).addEventListener("click", () => setChapterColumns(count));
   byId("menu-toggle").addEventListener("click", () => setSidebarOpen(!document.body.classList.contains("sidebar-open")));
   byId("reader-menu").addEventListener("click", () => setSidebarOpen(true));
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
@@ -1502,6 +1514,8 @@ async function initialize() {
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
     state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
     state.chapterView = (await readSetting("chapterView", "list")) === "grid" ? "grid" : "list";
+    const storedColumns = Number(await readSetting("chapterColumns", 2));
+    state.chapterColumns = CHAPTER_COLUMNS.includes(storedColumns) ? storedColumns : 2;
     applyChapterView();
     setPageTop(Number(await readSetting("pageTop", 0)) || 0);
     setFontFamily(await readSetting("fontFamily", "noto"));
