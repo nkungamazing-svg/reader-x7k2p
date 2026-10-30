@@ -356,12 +356,12 @@ body.page-mode .scroll-progress { display:none; }
 .view-button[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 30%,var(--surface)); color:var(--text); }
 body.chapter-grid .arc-group { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
 body.chapter-grid .arc-title { grid-column:1/-1; }
-body.chapter-grid .chapter-link { display:flex; align-items:center; justify-content:space-between; gap:6px; min-height:46px; padding:7px 9px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); }
+body.chapter-grid .chapter-link { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; justify-items:start; gap:6px; min-height:46px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); line-height:1.25; }
 body.chapter-grid .chapter-link:hover { background:color-mix(in srgb,var(--text) 7%,var(--surface-2)); }
 body.chapter-grid .chapter-link.active { border-color:var(--accent-strong); background:color-mix(in srgb,var(--accent) 26%,var(--surface-2)); }
 body.chapter-grid .chapter-link.active::before { inset:8px auto 8px 0; }
 body.chapter-grid .chapter-text { display:none; }
-body.chapter-grid .chapter-index { flex:1 1 auto; min-width:0; min-height:0; padding:0; overflow:hidden; border:0; background:transparent; color:var(--text); font-size:12.5px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+body.chapter-grid .chapter-index { display:block; place-items:initial; min-width:0; min-height:0; height:auto; padding:0; overflow:hidden; border:0; background:transparent; color:var(--text); font-size:12.5px; font-weight:700; line-height:1.35; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
 body.chapter-grid .chapter-link.active .chapter-index { background:transparent; color:var(--accent-strong); }
-body.chapter-grid .chapter-badge { flex:none; min-width:0; padding:2px 6px; font-size:9px; }
+body.chapter-grid .chapter-badge { justify-self:end; align-self:center; flex:none; min-width:0; padding:3px 7px; font-size:9px; line-height:1.2; }
 body.chapter-grid .chapter-link .mini-progress { inset:auto 8px 4px; }
