@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-v17";
+const CACHE_NAME = "noat-mobile-reader-v18";
 const APP_FILES = [
   "./",
   "./index.html",

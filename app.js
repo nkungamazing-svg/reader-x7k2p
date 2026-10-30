@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.5.1";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -314,7 +314,7 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
     paginateContent();
     setPage(Math.round(ratio * Math.max(0, state.pageTotal - 1)), { animate: false });
     toggleChrome(false);
-    if (!state.pageHintShown) { state.pageHintShown = true; showStatus("แตะขอบซ้าย/ขวาเพื่อพลิกหน้า · แตะกลางจอเพื่อเปิดแถบเครื่องมือ", 6500); }
+    if (!state.pageHintShown) { state.pageHintShown = true; state.hintShown = true; showTapHint(); }
   } else {
     toggleChrome(true);
     requestAnimationFrame(() => window.scrollTo({ top: ratio * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "instant" }));
@@ -723,6 +723,7 @@ function bindEvents() {
   });
   byId("font-family").addEventListener("change", event => setFontFamily(event.target.value));
   byId("tap-speech-toggle").addEventListener("change", event => setTapSpeech(event.target.checked));
+  byId("tap-hint-toggle").addEventListener("change", event => setTapHint(event.target.checked));
   byId("chrome-toggle").addEventListener("click", () => toggleChrome());
   installParagraphTapTargets();
   installPageGestures();
@@ -782,6 +783,7 @@ function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   updateChromeToggle();
   if (!relayout || !state.activeId) return;
   toggleChrome(!page);
+  if (page && state.tapHint && !state.hintShown) { state.hintShown = true; showTapHint(); }
   relayoutChapter(ratio);
 }
 
@@ -885,8 +887,45 @@ function schedulePaginate(delay = 120) {
   }, delay);
 }
 
+function showTapHint() {
+  const hint = byId("tap-hint");
+  if (!hint || !isPageMode() || !state.tapHint) return;
+  hint.hidden = false;
+  hint.classList.remove("hide");
+  requestAnimationFrame(() => hint.classList.add("show"));
+  clearTimeout(state.hintTimer);
+  state.hintTimer = setTimeout(hideTapHint, 4200);
+}
+
+function hideTapHint() {
+  const hint = byId("tap-hint");
+  if (!hint || hint.hidden) return;
+  hint.classList.add("hide");
+  clearTimeout(state.hintTimer);
+  setTimeout(() => { hint.hidden = true; hint.classList.remove("show", "hide"); }, 320);
+}
+
+function setTapHint(enabled) {
+  state.tapHint = enabled !== false;
+  byId("tap-hint-toggle").checked = state.tapHint;
+  void writeSetting("tapHint", state.tapHint);
+  if (!state.tapHint) hideTapHint();
+}
+
+function flashPageEdge(direction) {
+  const viewport = byId("reading-viewport");
+  if (!viewport) return;
+  const name = direction > 0 ? "turn-right" : "turn-left";
+  viewport.classList.remove("turn-left", "turn-right");
+  void viewport.offsetWidth;
+  viewport.classList.add(name);
+  clearTimeout(state.flashTimer);
+  state.flashTimer = setTimeout(() => viewport.classList.remove(name), 280);
+}
+
 function turnPage(direction) {
   if (!isPageMode()) return;
+  flashPageEdge(direction);
   const target = state.pageIndex + direction;
   if (target < 0) { if (!goToAdjacentChapter(-1, { toEnd: true })) showStatus("ถึงตอนแรกของเรื่องแล้ว", 2200); return; }
   if (target > state.pageTotal - 1) { if (!goToAdjacentChapter(1, { toStart: true })) showStatus("จบเนื้อหาที่บันทึกไว้แล้ว", 2500); return; }
@@ -934,6 +973,7 @@ function installPageGestures() {
   viewport.addEventListener("pointerup", event => {
     const origin = start; start = null;
     if (!origin || !isPageMode()) return;
+    hideTapHint();
     if (document.body.classList.contains("sidebar-open")) { setSidebarOpen(false); return; }
     const dx = event.clientX - origin.x, dy = event.clientY - origin.y;
     if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.25) { turnPage(dx < 0 ? 1 : -1); return; }
@@ -1044,6 +1084,7 @@ async function initialize() {
     setPageTop(Number(await readSetting("pageTop", 0)) || 0);
     setFontFamily(await readSetting("fontFamily", "noto"));
     setTapSpeech(await readSetting("tapSpeech", true) !== false);
+    setTapHint(await readSetting("tapHint", true) !== false);
     state.indent = await readSetting("indent", true) !== false;
     document.body.classList.toggle("indent-on", state.indent);
     byId("indent-toggle").checked = state.indent;

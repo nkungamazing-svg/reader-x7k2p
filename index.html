@@ -65,6 +65,11 @@
     <button id="chrome-toggle" class="audio-button audio-chrome" type="button" aria-label="ซ่อนแถบเครื่องมือ" title="ซ่อนแถบเครื่องมือ">⤢</button>
     <button id="settings-open" class="audio-button audio-settings" type="button" aria-label="ตั้งค่าการอ่าน" title="ตั้งค่าการอ่าน">⚙</button>
   </nav>
+  <div id="tap-hint" class="tap-hint" aria-hidden="true" hidden>
+    <span class="tap-hint-zone tap-hint-left">‹</span>
+    <span class="tap-hint-zone tap-hint-center"><i>แตะกลางจอ<small>เปิด / ซ่อนเมนู</small></i></span>
+    <span class="tap-hint-zone tap-hint-right">›</span>
+  </div>
   <div id="page-progress" class="page-progress" aria-hidden="true"></div>
   <div id="page-footer" class="page-footer" aria-hidden="true"><span id="page-position">หน้า 1 / 1</span><span id="page-percent">0%</span></div>
   <dialog id="settings-sheet" class="settings-sheet" aria-labelledby="settings-title">
@@ -91,6 +96,7 @@
         <label class="switch-row"><span>ไฮไลต์ย่อหน้าที่กำลังอ่าน</span><input id="highlight-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>เลื่อนตามอัตโนมัติ</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>แตะข้อความเพื่ออ่านออกเสียง</span><input id="tap-speech-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+        <label class="switch-row"><span>แสดงคำแนะนำการแตะจอ</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </section>
       <section class="settings-group">
         <h3>เสียงอ่าน</h3>

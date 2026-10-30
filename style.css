@@ -240,3 +240,19 @@ body.scroll-mode.chrome-hidden .reader-content { padding-top:0; }
 /* ---------- Keep emoji-sized images at text scale ---------- */
 .reader-content img.emoji-img,
 body.page-mode .reader-content img.emoji-img { display:inline-block; width:auto; height:1.4em; max-height:1.4em; max-width:2.6em; margin:0 .1em; vertical-align:-.22em; break-inside:auto; }
+
+/* ---------- Tap affordances in paged mode ---------- */
+.tap-hint { position:fixed; inset:0; z-index:35; display:grid; grid-template-columns:30% 40% 30%; align-items:center; pointer-events:none; opacity:1; transition:opacity .3s ease; }
+.tap-hint.hide { opacity:0; }
+.tap-hint-zone { display:grid; place-items:center; opacity:0; font-size:26px; }
+.tap-hint.show .tap-hint-zone { animation:tap-hint-in .4s ease both; }
+.tap-hint-left { justify-self:stretch; align-self:stretch; align-content:center; padding-left:10px; color:#fff; background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 42%,transparent),transparent 70%); box-shadow:inset 22px 0 30px -22px var(--accent-strong); animation-delay:.04s; }
+.tap-hint-right { justify-self:stretch; align-self:stretch; align-content:center; padding-right:10px; color:#fff; background:linear-gradient(270deg,color-mix(in srgb,var(--accent) 42%,transparent),transparent 70%); box-shadow:inset -22px 0 30px -22px var(--accent-strong); animation-delay:.1s; }
+.tap-hint-center { font-size:11px; }
+.tap-hint-center i { display:block; padding:8px 14px; border:1px solid var(--line); border-radius:999px; background:color-mix(in srgb,var(--surface) 82%,transparent); box-shadow:0 6px 20px #0004; color:var(--text); font-style:normal; font-size:11px; line-height:1.4; }
+.tap-hint-center small { display:block; color:var(--muted); font-size:10px; }
+body.page-mode .reading-viewport::after { position:absolute; inset:0; z-index:2; content:""; opacity:0; pointer-events:none; transition:opacity .28s ease; }
+body.page-mode .reading-viewport.turn-left::after { opacity:1; background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 20%,transparent),transparent 30%); }
+body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linear-gradient(270deg,color-mix(in srgb,var(--accent) 20%,transparent),transparent 30%); }
+@keyframes tap-hint-in { from { opacity:0; transform:scale(.96) } to { opacity:1; transform:none } }
+@media(prefers-reduced-motion:reduce) { .tap-hint.show .tap-hint-zone { animation:none; opacity:1 } }
