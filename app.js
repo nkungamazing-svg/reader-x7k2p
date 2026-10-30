@@ -8,6 +8,8 @@ const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
 const APP_VERSION = "1.4.0";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
+const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120" };
 
 function paintVersionLabels() {
   const label = `เวอร์ชัน ${APP_VERSION}`;
@@ -225,9 +227,10 @@ function showStatus(message, duration = 5000) {
 }
 
 function applyTheme(theme) {
-  state.theme = ["dark", "light", "sepia", "black"].includes(theme) ? theme : "dark";
+  state.theme = THEMES.includes(theme) ? theme : "dark";
   document.documentElement.dataset.theme = state.theme;
-  for (const name of ["dark", "light", "sepia", "black"]) byId(`theme-${name}`).setAttribute("aria-pressed", String(state.theme === name));
+  for (const name of THEMES) byId(`theme-${name}`).setAttribute("aria-pressed", String(state.theme === name));
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
 }
 
 function makeRemoteImageFallback(image, source) {
@@ -658,7 +661,7 @@ function bindEvents() {
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
-  for (const theme of ["dark", "light", "sepia", "black"]) byId(`theme-${theme}`).addEventListener("click", () => { applyTheme(theme); void writeSetting("theme", theme); });
+  for (const theme of THEMES) byId(`theme-${theme}`).addEventListener("click", () => { applyTheme(theme); void writeSetting("theme", theme); });
   byId("settings-open").addEventListener("click", () => byId("settings-sheet").showModal());
   byId("settings-close").addEventListener("click", () => byId("settings-sheet").close());
   byId("settings-sheet").addEventListener("click", event => { if (event.target === byId("settings-sheet")) byId("settings-sheet").close(); });

@@ -218,3 +218,10 @@ body.scroll-mode .audio-bar { transition:opacity .2s ease,transform .2s ease; }
 body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%); pointer-events:none; }
 body.scroll-mode.chrome-hidden .reader-content { padding-top:0; }
 .audio-chrome { color:var(--accent-strong); font-size:15px; }
+
+/* ---------- Extra reading themes ---------- */
+:root[data-theme="eye"] { color-scheme:light; --page:#e6eee1; --surface:#dde8d7; --surface-2:#d2e0cb; --text:#25321f; --muted:#5a6b52; --line:#bdcdb5; --accent:#3f7a46; --accent-strong:#2f6236; --danger:#a4433e; --reader:#e9f1e4; --reader-text:#25321f; }
+:root[data-theme="cool"] { color-scheme:light; --page:#e8edf2; --surface:#f1f5f9; --surface-2:#e2e9f0; --text:#26313a; --muted:#5d6b78; --line:#cbd6e0; --accent:#3a6382; --accent-strong:#2a4c68; --danger:#a1433e; --reader:#f4f8fb; --reader-text:#26313a; }
+:root[data-theme="dusk"] { color-scheme:dark; --page:#1b1917; --surface:#242120; --surface-2:#2c2825; --text:#d6cec2; --muted:#9a9185; --line:#3a342f; --accent:#b08a5a; --accent-strong:#d2a876; --danger:#c0655e; --reader:#1e1b19; --reader-text:#d6cec2; }
+.theme-row { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.theme-choice { padding:7px 8px; font-size:12px; }
