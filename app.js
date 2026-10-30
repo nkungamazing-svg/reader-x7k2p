@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.6";
+const APP_VERSION = "1.5.7";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -635,13 +635,50 @@ async function characterTitleFor(label) {
   const direct = characterQuery(label);
   if (direct) return direct;
   const table = await characterNameTable();
-  return table[characterThaiName(label)] || "";
+  return table[normalizeCharacterKey(characterThaiName(label))] || "";
 }
 
 async function rememberCharacterName(thai, title) {
   const table = await characterNameTable();
-  table[thai] = title;
+  table[normalizeCharacterKey(thai)] = title;
   await writeSetting("characterNames", table);
+}
+
+function normalizeCharacterKey(name) {
+  return String(name || "").replace(/[\u200b-\u200d]/gu, "").replace(/\s+/gu, " ").trim().replace(/[:：,]+$/u, "").trim();
+}
+
+async function updateCharacterTableCount() {
+  const table = await characterNameTable();
+  const count = Object.keys(table).length;
+  const label = byId("character-table-count");
+  if (label) label.textContent = count ? "จับคู่ไว้ " + count.toLocaleString("th-TH") + " ชื่อ" : "ใช้จับคู่ชื่อไทยกับชื่อในวิกิ (ไฟล์ JSON จากคลังคำศัพท์)";
+}
+
+async function importCharacterTable(file) {
+  const raw = JSON.parse(await file.text());
+  const entries = Array.isArray(raw) ? raw : Array.isArray(raw?.glossary) ? raw.glossary : Array.isArray(raw?.data) ? raw.data : null;
+  if (!Array.isArray(entries)) throw new Error("ไฟล์ต้องเป็นรายการ [{ src, dest }]");
+  const table = await characterNameTable();
+  let added = 0;
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    const source = String(entry.src || entry.source || entry.en || "").trim();
+    const target = normalizeCharacterKey(entry.dest || entry.target || entry.th || "");
+    if (!source || !target || source === target) continue;
+    if (!table[target]) { table[target] = source; added += 1; }
+    const bare = normalizeCharacterKey(target.replace(/\([^)]*\)/gu, ""));
+    if (bare && bare !== target && !table[bare]) { table[bare] = source; added += 1; }
+  }
+  await writeSetting("characterNames", table);
+  await updateCharacterTableCount();
+  return added;
+}
+
+async function clearCharacterTable() {
+  state.characterNames = {};
+  await writeSetting("characterNames", {});
+  await updateCharacterTableCount();
 }
 
 async function searchCharacterPages(query) {
@@ -759,6 +796,18 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
+  byId("character-table-open").addEventListener("click", () => byId("character-table-file").click());
+  byId("character-table-file").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      const added = await importCharacterTable(file);
+      showStatus("นำเข้าตารางชื่อแล้ว · เพิ่มใหม่ " + added.toLocaleString("th-TH") + " ชื่อ", 7000);
+    } catch (error) { showStatus("นำเข้าตารางชื่อไม่สำเร็จ: " + error.message, 0); }
+  });
+  byId("character-table-clear").addEventListener("click", () => { void clearCharacterTable(); });
+  void updateCharacterTableCount();
   byId("character-card-form").addEventListener("submit", event => {
     event.preventDefault();
     void applyCharacterName(byId("character-card-input").value.trim());

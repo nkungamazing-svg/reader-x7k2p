@@ -286,3 +286,6 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 .character-card-spinner { width:20px; height:20px; border:2px solid var(--line); border-top-color:var(--accent-strong); border-radius:50%; animation:character-spin .8s linear infinite; }
 @keyframes character-spin { to { transform:rotate(360deg) } }
 @media(prefers-reduced-motion:reduce) { .character-card-spinner { animation:none } }
+
+.row-actions { display:flex; flex-wrap:wrap; gap:6px; }
+.row-actions .tool-button { min-height:40px; padding-inline:12px; font-size:12px; }
