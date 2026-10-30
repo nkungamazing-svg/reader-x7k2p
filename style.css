@@ -289,3 +289,14 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 
 .row-actions { display:flex; flex-wrap:wrap; gap:6px; }
 .row-actions .tool-button { min-height:40px; padding-inline:12px; font-size:12px; }
+
+/* ---------- Reading surfaces: read and tap only, no text selection ---------- */
+.reader-content,
+.reader-content *,
+.reader-topbar,
+.reader-topbar * {
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+.reader-content img { -webkit-user-drag:none; }

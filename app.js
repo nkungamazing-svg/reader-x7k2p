@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.8";
+const APP_VERSION = "1.5.9";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -809,6 +809,9 @@ function installCharacterCards() {
   });
   byId("character-table-clear").addEventListener("click", () => { void clearCharacterTable(); });
   void updateCharacterTableCount();
+  document.addEventListener("selectstart", event => {
+    if (event.target.closest?.("#reader-content, .reader-topbar")) event.preventDefault();
+  });
   byId("character-card-form").addEventListener("submit", event => {
     event.preventDefault();
     void applyCharacterName(byId("character-card-input").value.trim());
