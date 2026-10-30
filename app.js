@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.4";
+const APP_VERSION = "1.7.5";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list" };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -171,6 +171,20 @@ function scheduleChapterRender() {
   state.chapterRenderTimer = setTimeout(renderChapterList, 140);
 }
 
+function applyChapterView() {
+  const grid = state.chapterView === "grid";
+  document.body.classList.toggle("chapter-grid", grid);
+  byId("view-list").setAttribute("aria-pressed", String(!grid));
+  byId("view-grid").setAttribute("aria-pressed", String(grid));
+}
+
+function setChapterView(view) {
+  state.chapterView = view === "grid" ? "grid" : "list";
+  applyChapterView();
+  renderChapterList();
+  void writeSetting("chapterView", state.chapterView);
+}
+
 function renderChapterList() {
   const root = byId("chapter-list");
   root.replaceChildren();
@@ -216,7 +230,8 @@ function renderChapterList() {
         const button = document.createElement("button"); button.type = "button"; button.className = `chapter-link${active ? " active" : ""}`;
         button.setAttribute("aria-current", active ? "true" : "false");
         button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
-        const index = document.createElement("span"); index.className = "chapter-index"; index.textContent = number == null ? "•" : String(number);
+        const index = document.createElement("span"); index.className = "chapter-index";
+        index.textContent = number == null ? "•" : state.chapterView === "grid" ? `ตอนที่ ${number}` : String(number);
         const text = document.createElement("span"); text.className = "chapter-text";
         const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
         button.append(index, text);
@@ -1037,6 +1052,8 @@ function bindEvents() {
   });
   byId("search").addEventListener("input", scheduleChapterRender);
   byId("sort").addEventListener("change", () => { renderChapterList(); updateChapterNavigation(); });
+  byId("view-list").addEventListener("click", () => setChapterView("list"));
+  byId("view-grid").addEventListener("click", () => setChapterView("grid"));
   byId("menu-toggle").addEventListener("click", () => setSidebarOpen(!document.body.classList.contains("sidebar-open")));
   byId("reader-menu").addEventListener("click", () => setSidebarOpen(true));
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
@@ -1473,6 +1490,8 @@ async function initialize() {
     state.loadRemoteImages = await readSetting("loadRemoteImages", true) !== false;
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
     state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
+    state.chapterView = (await readSetting("chapterView", "list")) === "grid" ? "grid" : "list";
+    applyChapterView();
     setPageTop(Number(await readSetting("pageTop", 0)) || 0);
     setFontFamily(await readSetting("fontFamily", "noto"));
     setTapSpeech(await readSetting("tapSpeech", true) !== false);

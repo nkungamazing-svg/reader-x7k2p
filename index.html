@@ -31,7 +31,10 @@
   <main class="layout">
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-controls">
-        <div class="sidebar-heading"><h1>บทที่บันทึกไว้</h1><span id="chapter-count">0</span></div>
+        <div class="sidebar-heading"><h1>บทที่บันทึกไว้</h1><span id="chapter-count">0</span><div class="view-toggle" role="group" aria-label="รูปแบบรายการบท">
+          <button id="view-list" class="view-button" type="button" aria-pressed="true" aria-label="มุมมองรายการ" title="มุมมองรายการ"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/></svg></button>
+          <button id="view-grid" class="view-button" type="button" aria-pressed="false" aria-label="มุมมองตาราง" title="มุมมองตาราง"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.5" y="4.5" width="6" height="6" rx="1.6"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.6"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.6"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.6"/></svg></button>
+        </div></div>
         <label class="search-label" for="search">ค้นหาชื่อเรื่องหรือตอน</label>
         <input id="search" class="search-input" type="search" placeholder="พิมพ์เพื่อค้นหา…" autocomplete="off">
         <label class="sort-label" for="sort">เรียงตาม</label>

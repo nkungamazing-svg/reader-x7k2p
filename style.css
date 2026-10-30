@@ -346,3 +346,22 @@ body.page-mode .reader-content :is(h1,h2,h3,h4,h5,h6) { margin-block:.9em .5em; 
 .scroll-progress.show span { opacity:1; transform:none; }
 body.page-mode .scroll-progress { display:none; }
 @media(prefers-reduced-motion:reduce) { .scroll-progress i,.scroll-progress span { transition:none } }
+
+/* ---------- Chapter picker: list or compact grid ---------- */
+.sidebar-heading { gap:8px; }
+.sidebar-heading #chapter-count { margin-left:auto; }
+.view-toggle { display:flex; flex:none; gap:2px; padding:2px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); }
+.view-button { display:grid; place-items:center; width:36px; height:32px; padding:0; border:0; border-radius:8px; background:transparent; color:var(--muted); }
+.view-button svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.view-button[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 30%,var(--surface)); color:var(--text); }
+body.chapter-grid .arc-group { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+body.chapter-grid .arc-title { grid-column:1/-1; }
+body.chapter-grid .chapter-link { display:flex; align-items:center; justify-content:space-between; gap:6px; min-height:46px; padding:7px 9px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); }
+body.chapter-grid .chapter-link:hover { background:color-mix(in srgb,var(--text) 7%,var(--surface-2)); }
+body.chapter-grid .chapter-link.active { border-color:var(--accent-strong); background:color-mix(in srgb,var(--accent) 26%,var(--surface-2)); }
+body.chapter-grid .chapter-link.active::before { inset:8px auto 8px 0; }
+body.chapter-grid .chapter-text { display:none; }
+body.chapter-grid .chapter-index { flex:1 1 auto; min-width:0; min-height:0; padding:0; overflow:hidden; border:0; background:transparent; color:var(--text); font-size:12.5px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+body.chapter-grid .chapter-link.active .chapter-index { background:transparent; color:var(--accent-strong); }
+body.chapter-grid .chapter-badge { flex:none; min-width:0; padding:2px 6px; font-size:9px; }
+body.chapter-grid .chapter-link .mini-progress { inset:auto 8px 4px; }
