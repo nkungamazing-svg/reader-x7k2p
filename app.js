@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.6";
+const APP_VERSION = "1.6.7";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterSuggestTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -801,9 +801,21 @@ function showCharacterForm(visible) {
   byId("character-card-form").hidden = !visible;
   const box = byId("character-card-suggestions");
   if (!visible) { box.hidden = true; box.replaceChildren(); }
+  // While the rename form is open there is no portrait to look at, so the
+  // auto-close countdown must not run in the background.
+  else clearTimeout(state.characterCardTimer);
+}
+
+function armCharacterCardTimer() {
+  // Always restart the countdown for the image that just appeared; keeping the
+  // previous timeout would close the new card early.
+  clearTimeout(state.characterCardTimer);
+  state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
 function closeCharacterCard() {
+  clearTimeout(state.characterCardTimer);
+  state.characterCardToken++;
   byId("character-card").hidden = true;
 }
 
@@ -817,17 +829,21 @@ function setCharacterFigure(image, thai) {
 
 async function applyCharacterName(title) {
   if (!title) return;
+  const token = state.characterCardToken;
   const thai = byId("character-card-name").textContent || "ตัวละคร";
   await rememberCharacterName(thai, title);
   const image = await lookupCharacterImage(title);
-  if (byId("character-card").hidden) return;
+  if (byId("character-card").hidden || token !== state.characterCardToken) return;
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
+  if (image) armCharacterCardTimer();
 }
 
 async function openCharacterCard(label) {
   const card = byId("character-card");
+  const token = ++state.characterCardToken;
+  clearTimeout(state.characterCardTimer);
   const thai = characterThaiName(label) || "ตัวละคร";
   byId("character-card-name").textContent = thai;
   const spinner = document.createElement("span");
@@ -837,7 +853,7 @@ async function openCharacterCard(label) {
   byId("character-card-note").textContent = "กำลังค้นรูป…";
   card.hidden = false;
   const query = await characterTitleFor(label);
-  if (card.hidden) return;
+  if (card.hidden || token !== state.characterCardToken) return;
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
@@ -851,8 +867,8 @@ async function openCharacterCard(label) {
   }
   const portrait = await lookupCharacterPortrait(query);
   const image = portrait.image;
+  if (card.hidden || token !== state.characterCardToken) return;
   applyCharacterFaction(portrait.entry);
-  if (card.hidden) return;
   if (!image) {
     showCharacterForm(true);
     byId("character-card-note").textContent = state.loadRemoteImages
@@ -863,6 +879,7 @@ async function openCharacterCard(label) {
   }
   setCharacterFigure(image, thai);
   byId("character-card-note").textContent = characterFactionLabel(portrait.entry);
+  armCharacterCardTimer();
 }
 
 function installCharacterCards() {
