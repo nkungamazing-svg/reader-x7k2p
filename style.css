@@ -236,3 +236,7 @@ body.scroll-mode.chrome-hidden .reader-content { padding-top:0; }
 .type-preview-sample { font-family:var(--reader-font); font-size:var(--reader-size,19px); line-height:var(--reader-line-height,1.95); white-space:pre-wrap; }
 .type-preview-note { color:var(--muted); font-size:10px; font-family:"Noto Sans Thai",sans-serif; }
 .settings-version { grid-column:1/-1; padding:6px 2px 10px; }
+
+/* ---------- Keep emoji-sized images at text scale ---------- */
+.reader-content img.emoji-img,
+body.page-mode .reader-content img.emoji-img { display:inline-block; width:auto; height:1.4em; max-height:1.4em; max-width:2.6em; margin:0 .1em; vertical-align:-.22em; break-inside:auto; }

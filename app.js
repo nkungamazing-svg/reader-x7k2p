@@ -277,7 +277,14 @@ function safeChapterFragment(html, baseUrl = "") {
         if (name === "href" && /^https?:/i.test(value)) { element.setAttribute("target", "_blank"); element.setAttribute("rel", "noopener noreferrer"); element.setAttribute("referrerpolicy", "no-referrer"); }
       }
       if (name === "style") {
-        const cleanStyle = value.replace(/url\((?:[^)]*)\)/gi, "none").replace(/expression\s*\(/gi, "invalid(");
+        const cleanStyle = value.replace(/url\((?:[^)]*)\)/gi, "none").replace(/expression\s*\(/gi, "invalid(")
+          .replace(/font-size\s*:\s*([^;]+)/gi, (declaration, size) => {
+            const text = String(size).trim(), number = parseFloat(text);
+            if (!Number.isFinite(number)) return "";
+            if (/px$/i.test(text)) return number > 40 ? "" : declaration;
+            if (/(?:em|rem)$/i.test(text)) return number > 2.2 ? "" : declaration;
+            return declaration;
+          });
         element.setAttribute("style", cleanStyle);
       }
     }
@@ -326,6 +333,17 @@ function closeReader() {
   stopSpeech(false); state.activeId = ""; byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
 }
 
+function markSmallImages(root) {
+  for (const image of root.querySelectorAll("img")) {
+    const apply = () => {
+      if (!image.naturalWidth || !image.naturalHeight) return;
+      image.classList.toggle("emoji-img", image.naturalWidth <= 200 && image.naturalHeight <= 200);
+    };
+    if (image.complete) apply();
+    else image.addEventListener("load", apply, { once: true });
+  }
+}
+
 function renderChapterContent(item) {
   const content = byId("reader-content");
   content.replaceChildren();
@@ -344,6 +362,7 @@ function renderChapterContent(item) {
   const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
   blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
   state.currentBlockIndex = -1;
+  markSmallImages(content);
   for (const image of content.querySelectorAll("img")) {
     if (!image.complete) image.addEventListener("load", () => schedulePaginate(), { once: true });
   }
