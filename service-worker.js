@@ -1,9 +1,31 @@
-const CACHE_NAME = "noat-mobile-reader-v10";
+const CACHE_NAME = "noat-mobile-reader-v11";
 const APP_FILES = [
-  "./", "./index.html", "./app.js", "./style.css", "./manifest.webmanifest", "./service-worker.js",
-  "./icons/icon-180.png", "./icons/icon-512.png",
-  "./fonts/NotoSansThai-thai.woff2", "./fonts/NotoSansThai-latin-ext.woff2", "./fonts/NotoSansThai-latin.woff2",
-  "./fonts/OFL-Noto-Sans-Thai.txt"
+  "./",
+  "./index.html",
+  "./app.js",
+  "./style.css",
+  "./manifest.webmanifest",
+  "./service-worker.js",
+  "./icons/icon-180.png",
+  "./icons/icon-512.png",
+  "./fonts/NotoSansThai-latin-ext.woff2",
+  "./fonts/NotoSansThai-latin.woff2",
+  "./fonts/NotoSansThai-thai.woff2",
+  "./fonts/OFL-Noto-Sans-Thai.txt",
+  "./fonts/OFL-noto-serif-thai.txt",
+  "./fonts/OFL-sarabun.txt",
+  "./fonts/noto-serif-thai-latin-400.woff2",
+  "./fonts/noto-serif-thai-latin-600.woff2",
+  "./fonts/noto-serif-thai-latin-ext-400.woff2",
+  "./fonts/noto-serif-thai-latin-ext-600.woff2",
+  "./fonts/noto-serif-thai-thai-400.woff2",
+  "./fonts/noto-serif-thai-thai-600.woff2",
+  "./fonts/sarabun-latin-400.woff2",
+  "./fonts/sarabun-latin-600.woff2",
+  "./fonts/sarabun-latin-ext-400.woff2",
+  "./fonts/sarabun-latin-ext-600.woff2",
+  "./fonts/sarabun-thai-400.woff2",
+  "./fonts/sarabun-thai-600.woff2"
 ];
 
 self.addEventListener("install", event => {

@@ -7,7 +7,7 @@ const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -537,7 +537,7 @@ function installParagraphTapTargets() {
     const target = event.target;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
     const interactive = target.closest?.("a,button,input,select,textarea,[contenteditable=true]");
-    state.pointerStart = !isPageMode() && event.isPrimary && event.button === 0 && block && !interactive
+    state.pointerStart = !isPageMode() && state.tapSpeech && event.isPrimary && event.button === 0 && block && !interactive
       ? { x: event.clientX, y: event.clientY, block }
       : null;
   }, { passive: true });
@@ -555,7 +555,7 @@ function installParagraphTapTargets() {
   }, { passive: true });
   document.addEventListener("pointercancel", () => { state.pointerStart = null; state.pointerTapReady = null; }, { passive: true });
   content.addEventListener("click", event => {
-    if (isPageMode()) return;
+    if (isPageMode() || !state.tapSpeech) return;
     const target = event.target;
     if (target.closest?.("a,button,input,select,textarea,[contenteditable=true]")) return;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
@@ -676,6 +676,8 @@ function bindEvents() {
     void writeSetting("indent", state.indent);
     schedulePaginate(60);
   });
+  byId("font-family").addEventListener("change", event => setFontFamily(event.target.value));
+  byId("tap-speech-toggle").addEventListener("change", event => setTapSpeech(event.target.checked));
   installParagraphTapTargets();
   installPageGestures();
   window.addEventListener("resize", () => schedulePaginate(140));
@@ -880,6 +882,22 @@ function installPageGestures() {
   });
 }
 
+const FONT_STACKS = { noto: '"Noto Sans Thai", sans-serif', system: '-apple-system, "SF Pro Text", "Thonburi", "Noto Sans Thai", sans-serif', sarabun: '"Sarabun", "Noto Sans Thai", sans-serif', "noto-serif": '"Noto Serif Thai", "Noto Sans Thai", serif' };
+
+function setFontFamily(value) {
+  state.fontFamily = FONT_STACKS[value] ? value : "noto";
+  document.documentElement.style.setProperty("--reader-font", FONT_STACKS[state.fontFamily]);
+  byId("font-family").value = state.fontFamily;
+  void writeSetting("fontFamily", state.fontFamily);
+  schedulePaginate(80);
+}
+
+function setTapSpeech(enabled) {
+  state.tapSpeech = enabled !== false;
+  byId("tap-speech-toggle").checked = state.tapSpeech;
+  void writeSetting("tapSpeech", state.tapSpeech);
+}
+
 function setFontSize(value) {
   state.fontSize = Math.max(15, Math.min(32, value));
   document.documentElement.style.setProperty("--reader-size", `${state.fontSize}px`);
@@ -928,6 +946,8 @@ async function initialize() {
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
     state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
     setPageTop(Number(await readSetting("pageTop", 0)) || 0);
+    setFontFamily(await readSetting("fontFamily", "noto"));
+    setTapSpeech(await readSetting("tapSpeech", true) !== false);
     state.indent = await readSetting("indent", true) !== false;
     document.body.classList.toggle("indent-on", state.indent);
     byId("indent-toggle").checked = state.indent;
