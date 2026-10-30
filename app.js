@@ -5,11 +5,51 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.9";
+const APP_VERSION = "1.8.0";
+const CHANGELOG = [
+  { version: "1.8.0", note: "ท้ายหน้าตั้งค่าแสดงประวัติการอัปเดตแบบกาง/พับได้" },
+  { version: "1.7.9", note: "ป้าย % ในโหมดเลื่อนเล็กลง ไม่ทับบรรทัด และจางเร็วขึ้น" },
+  { version: "1.7.8", note: "โหมดตารางเลือกจำนวนคอลัมน์ 2 / 4 / 6 ได้" },
+  { version: "1.7.7", note: "ปุ่มกริดแสดงเลขตอนล้วน และป้าย \"บทคั่น N\" สำหรับตอนคั่น" },
+  { version: "1.7.6", note: "จัดข้อความในปุ่มกริดให้ตรงกลางทุกปุ่ม" },
+  { version: "1.7.5", note: "สลับมุมมองรายการบทเป็นตารางปุ่มเล็กได้" },
+  { version: "1.7.4", note: "ชื่อเรื่อง/ชื่อตอนย้ายไปแถบเลขหน้าล่าง หน้าแรกของตอนเริ่มที่เนื้อหา" },
+  { version: "1.7.3", note: "ฉากหลังรายการบทเข้มขึ้น ตัวหนังสือหน้าอ่านไม่ทะลุ" },
+  { version: "1.7.2", note: "หัวบทไม่ถูกตัดข้ามหน้า รูปเล็กลง และโหลดรูปทันทีในโหมดพลิกหน้า" },
+  { version: "1.7.1", note: "โหมดเลื่อนมีเส้นความคืบหน้าและป้าย %" },
+  { version: "1.7.0", note: "รูปในโหมดพลิกหน้าไม่กินพื้นที่ทั้งหน้าจนเหลือที่ว่าง" },
+  { version: "1.6.9", note: "การ์ดรูปตัวละครไม่ทับแถบเมนู" },
+  { version: "1.6.8", note: "ไอคอนแถบล่างเป็น SVG พร้อมป้ายกำกับ และปุ่ม + ไม่เอียง" },
+  { version: "1.6.7", note: "นับเวลา 10 วินาทีใหม่ทุกครั้งที่เปิดรูปตัวละคร" },
+  { version: "1.6.4", note: "ปิดการซูมหน้าจอ" },
+  { version: "1.6.2", note: "ดัชนีตัวละครครบ 236 ตัวพร้อมรูปจากวิกิ" },
+];
+
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
 const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120" };
+
+function renderChangelog() {
+  const list = document.getElementById("changelog-list");
+  if (!list) return;
+  list.replaceChildren();
+  for (const entry of CHANGELOG) {
+    const item = document.createElement("li");
+    const version = document.createElement("strong");
+    version.textContent = `v${entry.version}`;
+    if (entry.version === APP_VERSION) {
+      const badge = document.createElement("span");
+      badge.className = "changelog-current";
+      badge.textContent = "ตอนนี้";
+      version.append(badge);
+    }
+    const note = document.createElement("span");
+    note.textContent = entry.note;
+    item.append(version, note);
+    list.append(item);
+  }
+}
 
 function paintVersionLabels() {
   const label = `เวอร์ชัน ${APP_VERSION}`;
@@ -17,6 +57,7 @@ function paintVersionLabels() {
   if (splashLabel) splashLabel.textContent = label;
   const footerLabel = document.getElementById("app-version");
   if (footerLabel) footerLabel.textContent = label;
+  renderChangelog();
 }
 
 function hideSplash() {
