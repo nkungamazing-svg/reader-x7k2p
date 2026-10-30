@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.6";
+const APP_VERSION = "1.7.7";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -120,8 +120,9 @@ function chapterParts(item) {
   const title = `${item.title || ""} ${item.translatedTitle || ""}`;
   const arcMatch = title.match(/\bArc\s*(\d+)\b|อาร์ค\s*(\d+)/iu);
   const chapterMatch = title.match(/\bChapter\s*(\d+)\b|บทที่\s*(\d+)|ตอนที่\s*(\d+)/iu);
+  const interludeMatch = title.match(/บทคั่น\s*(\d+)|(?:\binterlude\b|幕間)\s*(\d+)/iu);
   const arcValue = item.arcNumber ?? item.arc ?? arcMatch?.[1] ?? arcMatch?.[2];
-  const chapterValue = item.chapterNumber ?? item.episodeNumber ?? chapterMatch?.[1] ?? chapterMatch?.[2] ?? chapterMatch?.[3];
+  const chapterValue = item.chapterNumber ?? item.episodeNumber ?? chapterMatch?.[1] ?? chapterMatch?.[2] ?? chapterMatch?.[3] ?? interludeMatch?.[1] ?? interludeMatch?.[2];
   return { arc: Number.isFinite(Number(arcValue)) && arcValue !== "" ? Number(arcValue) : null, chapter: Number.isFinite(Number(chapterValue)) && chapterValue !== "" ? Number(chapterValue) : null };
 }
 
@@ -169,6 +170,16 @@ function goToAdjacentChapter(direction, { toEnd = false } = {}) {
 function scheduleChapterRender() {
   clearTimeout(state.chapterRenderTimer);
   state.chapterRenderTimer = setTimeout(renderChapterList, 140);
+}
+
+function chapterIsInterlude(item) {
+  return /บทคั่น|ตอนคั่น|\binterlude\b|幕間/iu.test(`${item?.title || ""} ${item?.translatedTitle || ""}`);
+}
+
+function chapterCompactLabel(item, number) {
+  // Interludes have no place in the main numbering, so they must be named.
+  if (chapterIsInterlude(item)) return number == null ? "บทคั่น" : `บทคั่น ${number}`;
+  return number == null ? "•" : String(number);
 }
 
 function applyChapterView() {
@@ -231,7 +242,7 @@ function renderChapterList() {
         button.setAttribute("aria-current", active ? "true" : "false");
         button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
         const index = document.createElement("span"); index.className = "chapter-index";
-        index.textContent = number == null ? "•" : state.chapterView === "grid" ? `ตอนที่ ${number}` : String(number);
+        index.textContent = state.chapterView === "grid" ? chapterCompactLabel(item, number) : number == null ? "•" : String(number);
         const text = document.createElement("span"); text.className = "chapter-text";
         const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
         button.append(index, text);
