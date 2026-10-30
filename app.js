@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.2";
+const APP_VERSION = "1.6.3";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -1204,6 +1204,7 @@ function updatePageFooter() {
   byId("page-position").textContent = `หน้า ${current} / ${total}`;
   byId("page-percent").textContent = `${percent}%`;
   byId("page-progress").style.width = `${percent}%`;
+  byId("page-footer").setAttribute("aria-hidden", state.chromeHidden ? "true" : "false");
 }
 
 function setPage(index, { animate = true } = {}) {
