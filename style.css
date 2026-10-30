@@ -342,7 +342,10 @@ body.page-mode .reader-content :is(h1,h2,h3,h4,h5,h6) { margin-block:.9em .5em; 
 .scroll-progress { position:fixed; z-index:26; inset:0 0 auto; height:3px; background:color-mix(in srgb,var(--text) 9%,transparent); }
 .scroll-progress[hidden] { display:none!important; }
 .scroll-progress i { display:block; width:0; height:100%; border-radius:0 3px 3px 0; background:var(--accent-strong); box-shadow:0 0 9px color-mix(in srgb,var(--accent-strong) 75%,transparent); transition:width .12s linear; }
-.scroll-progress span { position:absolute; top:calc(66px + env(safe-area-inset-top,0px)); right:max(10px,env(safe-area-inset-right)); padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:color-mix(in srgb,var(--surface) 88%,transparent); box-shadow:0 5px 16px #0005; color:var(--text); font-size:10.5px; font-variant-numeric:tabular-nums; font-weight:700; opacity:0; transform:translateY(-5px); pointer-events:none; transition:opacity .2s ease,transform .2s ease; backdrop-filter:blur(8px); }
+.scroll-progress span { position:absolute; top:calc(66px + env(safe-area-inset-top,0px)); right:max(8px,env(safe-area-inset-right)); padding:1px 6px; border:0; border-radius:7px; background:color-mix(in srgb,var(--surface) 62%,transparent); color:var(--muted); font-size:9.5px; font-variant-numeric:tabular-nums; font-weight:700; letter-spacing:.02em; opacity:0; transform:translateY(-3px); pointer-events:none; transition:opacity .2s ease,transform .2s ease; backdrop-filter:blur(6px); }
+/* With the chrome hidden there is no header to sit under, so hug the top edge
+   instead of covering the first lines of the page. */
+body.scroll-mode.chrome-hidden .scroll-progress span { top:calc(5px + env(safe-area-inset-top,0px)); opacity:.9; }
 .scroll-progress.show span { opacity:1; transform:none; }
 body.page-mode .scroll-progress { display:none; }
 @media(prefers-reduced-motion:reduce) { .scroll-progress i,.scroll-progress span { transition:none } }

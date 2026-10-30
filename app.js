@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.8";
+const APP_VERSION = "1.7.9";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -1180,7 +1180,7 @@ function updateScrollProgress() {
   byId("scroll-percent").textContent = `${Math.round(ratio * 100)}%`;
   bar.classList.add("show");
   clearTimeout(state.scrollProgressTimer);
-  state.scrollProgressTimer = setTimeout(() => bar.classList.remove("show"), 1400);
+  state.scrollProgressTimer = setTimeout(() => bar.classList.remove("show"), 1100);
 }
 
 function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
