@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.5";
+const APP_VERSION = "1.6.6";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterCardTimer: 0, characterNames: null, characterSuggestTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterSuggestTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -801,11 +801,9 @@ function showCharacterForm(visible) {
   byId("character-card-form").hidden = !visible;
   const box = byId("character-card-suggestions");
   if (!visible) { box.hidden = true; box.replaceChildren(); }
-  else clearTimeout(state.characterCardTimer);
 }
 
 function closeCharacterCard() {
-  clearTimeout(state.characterCardTimer);
   byId("character-card").hidden = true;
 }
 
@@ -826,7 +824,6 @@ async function applyCharacterName(title) {
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
-  if (image) state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
 async function openCharacterCard(label) {
@@ -866,7 +863,6 @@ async function openCharacterCard(label) {
   }
   setCharacterFigure(image, thai);
   byId("character-card-note").textContent = characterFactionLabel(portrait.entry);
-  state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
 function installCharacterCards() {
