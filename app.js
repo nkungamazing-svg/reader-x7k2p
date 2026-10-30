@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.9";
+const APP_VERSION = "1.6.0";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -691,11 +691,44 @@ async function searchCharacterPages(query) {
   } catch (_) { return []; }
 }
 
+function characterMatchScore(query, title) {
+  const q = normalizeCharacterKey(query).toLocaleLowerCase();
+  const t = normalizeCharacterKey(title).toLocaleLowerCase();
+  if (!q || !t) return 0;
+  if (t === q) return 200;
+  const slug = t.replace(/\s*\([^)]*\)\s*$/u, "");
+  if (slug === q) return 190;
+  if (t.startsWith(q)) return 120 + Math.round(40 * q.length / t.length);
+  if (t.includes(q)) return 90 + Math.round(40 * q.length / t.length);
+  const parts = q.split(" ").filter(Boolean);
+  if (!parts.length) return 0;
+  const found = parts.filter(part => t.includes(part)).length;
+  return Math.round(80 * found / parts.length);
+}
+
+async function searchCharacterImages(query) {
+  const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=6&gsrsearch="
+    + encodeURIComponent(query) + "&prop=pageimages&piprop=thumbnail&pithumbsize=320";
+  const response = await fetch(url, { referrerPolicy: "no-referrer" });
+  if (!response.ok) return "";
+  const payload = await response.json();
+  const pages = Object.values(payload?.query?.pages || {});
+  let best = "", bestScore = 0;
+  for (const page of pages) {
+    const image = page?.thumbnail?.source || "";
+    if (!image) continue;
+    const score = characterMatchScore(query, page.title || "");
+    if (score > bestScore) { bestScore = score; best = image; }
+  }
+  return best;
+}
+
 async function lookupCharacterImage(query) {
   if (!query || !state.loadRemoteImages) return "";
   if (!state.characterImages) state.characterImages = await readSetting("characterImages", {});
   const key = query.toLocaleLowerCase();
-  if (Object.prototype.hasOwnProperty.call(state.characterImages, key)) return state.characterImages[key] || "";
+  const cached = state.characterImages[key];
+  if (cached) return cached;
   const pageImage = async title => {
     const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=320&titles=" + encodeURIComponent(title);
     const response = await fetch(url, { referrerPolicy: "no-referrer" });
@@ -707,13 +740,12 @@ async function lookupCharacterImage(query) {
   let image = "";
   try {
     image = await pageImage(query);
-    if (!image) {
-      const hits = await searchCharacterPages(query);
-      if (hits[0]) image = await pageImage(hits[0]);
-    }
+    if (!image) image = await searchCharacterImages(query);
   } catch (_) { image = ""; }
-  state.characterImages[key] = image;
-  void writeSetting("characterImages", state.characterImages);
+  if (image) {
+    state.characterImages[key] = image;
+    void writeSetting("characterImages", state.characterImages);
+  }
   return image;
 }
 
@@ -764,7 +796,10 @@ async function openCharacterCard(label) {
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
-    byId("character-card-note").textContent = "ยังไม่มีชื่อภาษาอังกฤษ — พิมพ์หรือเลือกชื่อจากวิกิแล้วกดบันทึก (จำไว้ครั้งเดียว)";
+    const tableSize = state.characterNames ? Object.keys(state.characterNames).length : 0;
+    byId("character-card-note").textContent = tableSize
+      ? "“" + thai + "” ไม่อยู่ในตารางชื่อที่นำเข้า — พิมพ์ชื่อภาษาอังกฤษแล้วกดบันทึก"
+      : "ยังไม่มีชื่อภาษาอังกฤษ — พิมพ์หรือเลือกชื่อจากวิกิแล้วกดบันทึก (จำไว้ครั้งเดียว)";
     byId("character-card-input").value = "";
     return;
   }
@@ -772,7 +807,9 @@ async function openCharacterCard(label) {
   if (card.hidden) return;
   if (!image) {
     showCharacterForm(true);
-    byId("character-card-note").textContent = "ไม่พบรูปของ “" + query + "” — ลองเลือกชื่ออื่น";
+    byId("character-card-note").textContent = state.loadRemoteImages
+      ? "ไม่พบรูปของ “" + query + "” ในวิกิ — แก้ชื่อภาษาอังกฤษ หรือแตะชื่ออีกครั้งเพื่อค้นใหม่"
+      : "ปิดสวิตช์ “โหลดรูปจากเว็บต้นทาง” อยู่ จึงดึงรูปไม่ได้";
     byId("character-card-input").value = query;
     return;
   }
