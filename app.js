@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.7.2";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -283,9 +283,11 @@ function safeChapterFragment(html, baseUrl = "") {
             if (/^https?:$/i.test(resolved.protocol)) remoteUrl = resolved.href;
           } catch (_) {}
           if (safeDataImage) {
-            element.loading = "lazy"; element.decoding = "async";
+            // Eager: paged mode measures block heights, and a deferred load event
+            // means the page is split before the image has a real size.
+            element.loading = "eager"; element.decoding = "async";
           } else if (remoteUrl && state.loadRemoteImages) {
-            element.loading = "lazy"; element.referrerPolicy = "no-referrer"; element.decoding = "async";
+            element.loading = "eager"; element.referrerPolicy = "no-referrer"; element.decoding = "async";
             makeRemoteImageFallback(element, remoteUrl);
             element.src = remoteUrl;
           } else {
@@ -386,7 +388,10 @@ function renderChapterContent(item) {
   markSmallImages(content);
   decorateSpeakerLabels(content);
   for (const image of content.querySelectorAll("img")) {
-    if (!image.complete) image.addEventListener("load", () => schedulePaginate(), { once: true });
+    // Paged mode needs the real height before splitting pages; scroll mode keeps
+    // images lazy so a long chapter does not download everything at once.
+    if (!isPageMode()) image.loading = "lazy";
+    if (!image.complete) image.addEventListener("load", () => { if (isPageMode()) schedulePaginate(); }, { once: true });
   }
 }
 
