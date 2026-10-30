@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.7";
+const APP_VERSION = "1.5.8";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -783,6 +783,7 @@ async function openCharacterCard(label) {
 
 function installCharacterCards() {
   document.addEventListener("click", event => {
+    if (isPageMode()) return;
     const label = event.target.closest?.(".noat-speaker-label");
     if (!label) { if (!event.target.closest?.("#character-card")) closeCharacterCard(); return; }
     event.preventDefault(); event.stopPropagation();
@@ -1234,6 +1235,8 @@ function installPageGestures() {
     const dx = event.clientX - origin.x, dy = event.clientY - origin.y;
     if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.25) { turnPage(dx < 0 ? 1 : -1); return; }
     if (Math.abs(dx) > 9 || Math.abs(dy) > 9 || Date.now() - origin.time > 700) return;
+    const label = event.target.closest?.(".noat-speaker-label");
+    if (label) { void openCharacterCard(label); return; }
     const rect = viewport.getBoundingClientRect();
     const position = (event.clientX - rect.left) / Math.max(1, rect.width);
     if (position < .32) turnPage(-1);
