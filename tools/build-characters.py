@@ -2,10 +2,11 @@
 """Build characters.json from the Re:Zero wiki "Characters" page.
 
 The wiki lists almost every character on one page as a grid of cards. Each card
-carries the portrait, the wiki page it links to and a background colour that
-marks the character's camp/faction, and the cards are grouped under region and
-camp headings. Scraping that page once gives the reader a local index, so a tap
-finds a portrait without a per-name search.
+links to the character's wiki page, carries a background colour that marks the
+camp/faction, and sits under region and camp headings. Portraits are lazy
+loaded: the parsed HTML often holds a 1x1 data: placeholder instead of the real
+file, so the image name from data-image-name is resolved through the imageinfo
+API in batches.
 
 Usage: python3 tools/build-characters.py [--output characters.json]
 """
@@ -26,17 +27,15 @@ CARD_START = re.compile(r'<div style="background-color:\s*(#[0-9A-Fa-f]{3,6})[^"
 HEADING = re.compile(r"<h([23])[^>]*>(.*?)</h\1>", re.S | re.I)
 LINK = re.compile(r'<a href="/wiki/([^"#]+)"[^>]*title="([^"]*)"', re.I)
 IMG = re.compile(r'<img[^>]*\ssrc="([^"]+)"', re.I)
+IMAGE_NAME = re.compile(r'data-image-name="([^"]+)"', re.I)
 LABEL = re.compile(r"<b>([^<]+)</b>")
 
 
-def fetch_page_html():
-    query = urllib.parse.urlencode(
-        {"action": "parse", "page": "Characters", "prop": "text", "format": "json", "origin": "*"}
-    )
+def api_get(params):
+    query = urllib.parse.urlencode(params)
     request = urllib.request.Request(API + "?" + query, headers={"User-Agent": UA})
     with urllib.request.urlopen(request, timeout=60) as response:
-        payload = json.load(response)
-    return payload["parse"]["text"]["*"]
+        return json.load(response)
 
 
 def strip_tags(value):
@@ -44,8 +43,32 @@ def strip_tags(value):
     return html_module.unescape(re.sub(r"\s+", " ", text)).strip()
 
 
-def large_image(url):
-    return re.sub(r"scale-to-width-down/\d+", "scale-to-width-down/400", url)
+def sized(url, width=400):
+    if not url or url.startswith("data:"):
+        return ""
+    return re.sub(r"scale-to-width-down/\d+", f"scale-to-width-down/{width}", url)
+
+
+def resolve_files(filenames):
+    """Map file names to real image URLs through the imageinfo API."""
+    resolved = {}
+    names = sorted({name for name in filenames if name})
+    for start in range(0, len(names), 40):
+        batch = names[start:start + 40]
+        payload = api_get({
+            "action": "query", "format": "json", "origin": "*", "prop": "imageinfo",
+            "iiprop": "url", "iiurlwidth": "400",
+            "titles": "|".join("File:" + name for name in batch),
+        })
+        for page in (payload.get("query", {}).get("pages") or {}).values():
+            info = (page.get("imageinfo") or [{}])[0]
+            url = info.get("thumburl") or info.get("url") or ""
+            if not url:
+                continue
+            title = page.get("title", "")
+            resolved[title] = url
+            resolved[title[len("File:"):]] = url
+    return resolved
 
 
 def parse_cards(markup):
@@ -54,19 +77,16 @@ def parse_cards(markup):
         for match in HEADING.finditer(markup)
     ]
     starts = [match.start() for match in CARD_START.finditer(markup)]
-    characters = []
-    seen = {}
+    records, pending_files = [], []
     for position, start in enumerate(starts):
         end = starts[position + 1] if position + 1 < len(starts) else len(markup)
         chunk = markup[start:end]
         colour = CARD_START.match(chunk).group(1).upper()
-        link = LINK.search(chunk)
-        image = IMG.search(chunk)
+        link, image, image_name = LINK.search(chunk), IMG.search(chunk), IMAGE_NAME.search(chunk)
         if not link or not image:
             continue
         slug, title = link.group(1), strip_tags(link.group(2))
         label_match = LABEL.search(chunk)
-        label = strip_tags(label_match.group(1)) if label_match else title
         region = section = ""
         for offset, kind, text in headings:
             if offset > start:
@@ -75,35 +95,44 @@ def parse_cards(markup):
                 region, section = text, ""
             else:
                 section = text
-        record = {
+        file_name = html_module.unescape(image_name.group(1)) if image_name else ""
+        records.append({
             "title": title,
             "slug": urllib.parse.unquote(slug).replace("_", " "),
-            "name": label,
+            "name": strip_tags(label_match.group(1)) if label_match else title,
             "section": section,
             "region": region,
             "color": colour,
-            "image": large_image(html_module.unescape(image.group(1))),
-        }
-        key = title.toLocaleLowerCase() if hasattr(title, "toLocaleLowerCase") else title.lower()
-        if key in seen:
-            previous = seen[key]
-            # Keep the first card but fill in a faction if the earlier one had none.
-            if not previous["section"] and record["section"]:
-                previous["section"] = record["section"]
-                previous["region"] = record["region"]
-                previous["color"] = record["color"]
+            "file": file_name,
+            "image": sized(html_module.unescape(image.group(1))),
+        })
+        if not records[-1]["image"] and file_name:
+            pending_files.append(file_name)
+    resolved = resolve_files(pending_files) if pending_files else {}
+    for record in records:
+        if record["image"] or not record["file"]:
             continue
-        seen[key] = record
-        characters.append(record)
-    return characters
+        record["image"] = resolved.get("File:" + record["file"]) or resolved.get(record["file"]) or ""
+    return [record for record in records if record["image"]]
+
+
+def dedupe(characters):
+    seen, unique = set(), []
+    for record in characters:
+        key = record["title"].lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(record)
+    return unique
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="characters.json")
     args = parser.parse_args()
-    markup = fetch_page_html()
-    characters = parse_cards(markup)
+    markup = api_get({"action": "parse", "page": "Characters", "prop": "text", "format": "json", "origin": "*"})["parse"]["text"]["*"]
+    characters = dedupe(parse_cards(markup))
     document = {
         "source": SOURCE,
         "generated": datetime.date.today().isoformat(),
@@ -113,11 +142,8 @@ def main():
     with open(args.output, "w", encoding="utf-8") as handle:
         json.dump(document, handle, ensure_ascii=False, indent=1)
         handle.write("\n")
-    sections = sorted({c["section"] or c["region"] for c in characters})
-    colours = {c["color"] for c in characters}
-    print(f"{len(characters)} characters, {len(colours)} colours, {len(sections)} sections -> {args.output}")
-    for name in sections:
-        print("  -", name)
+    placeholders = sum(1 for c in characters if c["image"].startswith("data:"))
+    print(f"{len(characters)} characters with real images, {len({c['color'] for c in characters})} colours, placeholders left: {placeholders} -> {args.output}")
 
 
 if __name__ == "__main__":

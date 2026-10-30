@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.6.2";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -708,28 +708,31 @@ function characterMatchScore(query, title) {
 
 async function characterIndex() {
   if (state.characterIndex) return state.characterIndex;
-  const map = new Map();
+  const byTitle = new Map(), byName = new Map();
   try {
     const response = await fetch("characters.json", { cache: "force-cache" });
     if (response.ok) {
       const payload = await response.json();
       for (const entry of payload?.characters || []) {
-        if (!entry || !entry.image) continue;
-        for (const key of [entry.title, entry.slug, entry.name]) {
+        if (!entry || !entry.image || String(entry.image).startsWith("data:")) continue;
+        for (const key of [entry.title, entry.slug]) {
           const normalized = normalizeCharacterKey(key).toLocaleLowerCase();
-          if (normalized && !map.has(normalized)) map.set(normalized, entry);
+          if (normalized && !byTitle.has(normalized)) byTitle.set(normalized, entry);
         }
+        const label = normalizeCharacterKey(entry.name).toLocaleLowerCase();
+        if (label && !byName.has(label)) byName.set(label, entry);
       }
     }
   } catch (_) { /* index is optional; live search still works */ }
-  state.characterIndex = map;
-  return map;
+  state.characterIndex = { byTitle, byName };
+  return state.characterIndex;
 }
 
 async function characterIndexEntry(query) {
   if (!query) return null;
   const index = await characterIndex();
-  return index.get(normalizeCharacterKey(query).toLocaleLowerCase()) || null;
+  const key = normalizeCharacterKey(query).toLocaleLowerCase();
+  return index.byTitle.get(key) || index.byName.get(key) || null;
 }
 
 async function lookupCharacterPortrait(query) {

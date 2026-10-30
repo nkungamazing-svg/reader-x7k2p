@@ -10,6 +10,7 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
+   "file": "Emilia CharMug 3.jpg",
    "image": "https://static.wikia.nocookie.net/rezero/images/7/7c/Emilia_CharMug_3.jpg/revision/latest/scale-to-width-down/400?cb=20210502133750"
   },
   {
@@ -19,6 +20,7 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
+   "file": "Natsuki Subaru CharMug 2.jpg",
    "image": "https://static.wikia.nocookie.net/rezero/images/f/f2/Natsuki_Subaru_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502133115"
   },
   {
@@ -28,6 +30,7 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
+   "file": "Puck CharMug.jpg",
    "image": "https://static.wikia.nocookie.net/rezero/images/c/cd/Puck_CharMug.jpg/revision/latest/scale-to-width-down/400?cb=20210502133630"
   },
   {
@@ -37,7 +40,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug RoswaalL.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7b/CharMug_RoswaalL.png/revision/latest/scale-to-width-down/400?cb=20231229084603"
   },
   {
    "title": "Ram",
@@ -46,7 +50,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Ram.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/40/CharMug_Ram.png/revision/latest/scale-to-width-down/400?cb=20231229084248"
   },
   {
    "title": "Rem",
@@ -55,7 +60,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Rem CharMug 3.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/ef/Rem_CharMug_3.png/revision/latest/scale-to-width-down/400?cb=20231229084106"
   },
   {
    "title": "Beatrice",
@@ -64,7 +70,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Beatrice.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9b/CharMug_Beatrice.png/revision/latest/scale-to-width-down/400?cb=20231229084452"
   },
   {
    "title": "Otto Suwen",
@@ -73,7 +80,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Otto Suwen CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/53/Otto_Suwen_CharMug.png/revision/latest/scale-to-width-down/400?cb=20231203015025"
   },
   {
    "title": "Frederica Baumann",
@@ -82,7 +90,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Frederica Baumann CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/83/Frederica_Baumann_CharMug_2.png/revision/latest?cb=20210502135558"
   },
   {
    "title": "Garfiel Tinzel",
@@ -91,7 +100,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Garfiel Tinsel CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/14/Garfiel_Tinsel_CharMug.png/revision/latest?cb=20180320173442"
   },
   {
    "title": "Petra Leyte",
@@ -100,7 +110,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Petra Leyte CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/89/Petra_Leyte_CharMug_2.png/revision/latest?cb=20250408133414"
   },
   {
    "title": "Ryuzu Meyer (copy)",
@@ -109,7 +120,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRyuzu.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/af/CharMugRyuzu.png/revision/latest/scale-to-width-down/400?cb=20180207171820"
   },
   {
    "title": "Annerose Miload",
@@ -118,7 +130,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Annerose CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/58/Annerose_CharMug_2.png/revision/latest?cb=20250626083625"
   },
   {
    "title": "Clind",
@@ -127,7 +140,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Clind.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b6/CharMug_Clind.png/revision/latest?cb=20250626171200"
   },
   {
    "title": "Meili Portroute",
@@ -136,7 +150,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugMeili.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/60/CharMugMeili.png/revision/latest?cb=20180213174521"
   },
   {
    "title": "Patrasche",
@@ -145,7 +160,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Patrasche CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/97/Patrasche_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502135031"
   },
   {
    "title": "Frufoo",
@@ -154,7 +170,8 @@
    "section": "Emilia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EAEAE9",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Frufoo.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/78/CharMug_Frufoo.png/revision/latest?cb=20240113215714"
   },
   {
    "title": "Crusch Karsten",
@@ -163,7 +180,8 @@
    "section": "Crusch Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#2F4F45",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Crusch Karsten CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/08/Crusch_Karsten_CharMug.jpg/revision/latest?cb=20210502140031"
   },
   {
    "title": "Ferris",
@@ -172,7 +190,8 @@
    "section": "Crusch Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#2F4F45",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ferris Argyle CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7f/Ferris_Argyle_CharMug_2.jpg/revision/latest?cb=20210502140442"
   },
   {
    "title": "Wilhelm van Astrea",
@@ -181,7 +200,8 @@
    "section": "Crusch Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#2F4F45",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Wilhelm van Astrea CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d9/Wilhelm_van_Astrea_CharMug.jpg/revision/latest?cb=20210502140520"
   },
   {
    "title": "Priscilla Barielle",
@@ -190,7 +210,8 @@
    "section": "Priscilla Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFC588",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Priscilla Barielle CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7d/Priscilla_Barielle_CharMug.jpg/revision/latest?cb=20210502142551"
   },
   {
    "title": "Al",
@@ -199,7 +220,8 @@
    "section": "Priscilla Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFC588",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Al CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/4a/Al_CharMug_2.jpg/revision/latest?cb=20210502142501"
   },
   {
    "title": "Schult Barielle",
@@ -208,7 +230,8 @@
    "section": "Priscilla Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFC588",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugSchult.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9f/CharMugSchult.png/revision/latest/scale-to-width-down/400?cb=20231216212211"
   },
   {
    "title": "Heinkel Astrea",
@@ -217,7 +240,8 @@
    "section": "Priscilla Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFC588",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Heinkel CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d0/Heinkel_CharMug.png/revision/latest?cb=20180316155909"
   },
   {
    "title": "Yae Tenzen",
@@ -226,7 +250,8 @@
    "section": "Priscilla Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFC588",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Yae Tenzen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/ba/CharMug_Yae_Tenzen.png/revision/latest?cb=20250626084810"
   },
   {
    "title": "Anastasia Hoshin",
@@ -235,7 +260,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Anastasia Hoshin CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/81/Anastasia_Hoshin_CharMug_2.jpg/revision/latest?cb=20210502141010"
   },
   {
    "title": "Julius Juukulius",
@@ -244,7 +270,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Julius Juukulius CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/0b/Julius_Juukulius_CharMug.jpg/revision/latest?cb=20210502141056"
   },
   {
    "title": "Joshua Juukulius",
@@ -253,7 +280,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Joshua CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2f/Joshua_CharMug.png/revision/latest?cb=20180320173319"
   },
   {
    "title": "Ricardo Welkin",
@@ -262,7 +290,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ricardo CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/33/Ricardo_CharMug_2.jpg/revision/latest?cb=20210502141238"
   },
   {
    "title": "Mimi Pearlbaton",
@@ -271,7 +300,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Mimi CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/df/Mimi_CharMug_2.jpg/revision/latest?cb=20210502141753"
   },
   {
    "title": "Hetaro Pearlbaton",
@@ -280,7 +310,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Hetaro Pearlbaton.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/36/Hetaro_Pearlbaton.png/revision/latest?cb=20160421021356"
   },
   {
    "title": "Tivey Pearlbaton",
@@ -289,7 +320,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Tivey CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/41/Tivey_CharMug_2.jpg/revision/latest?cb=20210502202149"
   },
   {
    "title": "Eridna",
@@ -298,7 +330,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Artificial Echidna CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/0d/Artificial_Echidna_CharMug_2.jpg/revision/latest?cb=20210502142126"
   },
   {
    "title": "Shaknar",
@@ -307,7 +340,8 @@
    "section": "Anastasia Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#CFB4DD",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Shaknar - Anime.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/31/Shaknar_-_Anime.png/revision/latest/scale-to-width-down/400?cb=20200305194208"
   },
   {
    "title": "Felt",
@@ -316,7 +350,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Felt CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2a/Felt_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502142941"
   },
   {
    "title": "Reinhard van Astrea",
@@ -325,7 +360,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Reinhard.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/45/CharMug_Reinhard.png/revision/latest/scale-to-width-down/400?cb=20231113034201"
   },
   {
    "title": "Rom",
@@ -334,7 +370,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Valga Cromwell CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/84/Valga_Cromwell_CharMug.jpg/revision/latest?cb=20210502143034"
   },
   {
    "title": "Gaston",
@@ -343,7 +380,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Gaston.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f6/CharMug_Gaston.png/revision/latest?cb=20250324050045"
   },
   {
    "title": "Rachins Hoffman",
@@ -352,7 +390,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Rachins Hoffman.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8f/CharMug_Rachins_Hoffman.png/revision/latest/scale-to-width-down/400?cb=20261011052102"
   },
   {
    "title": "Camberley",
@@ -361,7 +400,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Camberley.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/35/CharMug_Camberley.png/revision/latest?cb=20250324045804"
   },
   {
    "title": "Flam Remendis",
@@ -370,7 +410,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Flam Remendis CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2b/Flam_Remendis_CharMug.png/revision/latest?cb=20250118235300"
   },
   {
    "title": "Grassis Remendis",
@@ -379,7 +420,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Grassis Remendis CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/37/Grassis_Remendis_CharMug.png/revision/latest?cb=20250118235308"
   },
   {
    "title": "Ezzo Cadner",
@@ -388,7 +430,8 @@
    "section": "Felt Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#EB4F50",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ezzo Cadner CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/67/Ezzo_Cadner_CharMug.png/revision/latest?cb=20250118235208"
   },
   {
    "title": "Filore",
@@ -397,7 +440,8 @@
    "section": "Filore Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#415381",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Filore.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b8/CharMug_Filore.png/revision/latest/scale-to-width-down/400?cb=20260615203535"
   },
   {
    "title": "Tiga Rauleon",
@@ -406,7 +450,8 @@
    "section": "Filore Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#415381",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Tiga Rauleon.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8f/CharMug_Tiga_Rauleon.png/revision/latest/scale-to-width-down/400?cb=20260615203650"
   },
   {
    "title": "Sakura Element",
@@ -415,7 +460,8 @@
    "section": "Filore Camp",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#415381",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Sakura Element.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f9/CharMug_Sakura_Element.png/revision/latest/scale-to-width-down/400?cb=20260615203706"
   },
   {
    "title": "Miklotov McMahon",
@@ -424,7 +470,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Miklotov McMahon CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3c/Miklotov_McMahon_CharMug.png/revision/latest?cb=20160620063337"
   },
   {
    "title": "Bordeaux Zergev",
@@ -433,7 +480,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Bordeaux Zellgef CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/22/Bordeaux_Zellgef_CharMug.png/revision/latest?cb=20160620130843"
   },
   {
    "title": "Marcos Gildark",
@@ -442,7 +490,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Marcos Gildark CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/eb/Marcos_Gildark_CharMug.png/revision/latest/scale-to-width-down/400?cb=20160620131350"
   },
   {
    "title": "Russell Fellow",
@@ -451,7 +500,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Russell Fellow CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a2/Russell_Fellow_CharMug.png/revision/latest/scale-to-width-down/400?cb=20261011052035"
   },
   {
    "title": "Rickert Hoffman",
@@ -460,7 +510,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Rickert CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b3/Rickert_CharMug.png/revision/latest/scale-to-width-down/400?cb=20240430192313"
   },
   {
    "title": "Kadomon Risch",
@@ -469,7 +520,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Kadomon CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/50/Kadomon_CharMug.png/revision/latest/scale-to-width-down/400?cb=20231207081005"
   },
   {
    "title": "Raksha Risch",
@@ -478,7 +530,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRaksha.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/55/CharMugRaksha.png/revision/latest?cb=20180207171705"
   },
   {
    "title": "Plum Risch",
@@ -487,7 +540,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugPlum.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9f/CharMugPlum.jpg/revision/latest?cb=20180207171535"
   },
   {
    "title": "Grimm Fauzen",
@@ -496,7 +550,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugGrimm.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f9/CharMugGrimm.png/revision/latest/scale-to-width-down/400?cb=20231229082704"
   },
   {
    "title": "Carol Remendis",
@@ -505,7 +560,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugCarol.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/84/CharMugCarol.png/revision/latest/scale-to-width-down/400?cb=20231229082525"
   },
   {
    "title": "Conwood Melahau",
@@ -514,7 +570,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Conwood Melahau.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1f/CharMug_Conwood_Melahau.png/revision/latest?cb=20240109152805"
   },
   {
    "title": "Orphe",
@@ -523,7 +580,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Orphe CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7f/Orphe_CharMug.png/revision/latest?cb=20250511225112"
   },
   {
    "title": "Garitch Fabless",
@@ -532,7 +590,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Garitch Fabless.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d0/CharMug_Garitch_Fabless.png/revision/latest?cb=20190929231028"
   },
   {
    "title": "Shorty Megan",
@@ -541,7 +600,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Shorty Megan.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8b/CharMug_Shorty_Megan.png/revision/latest/scale-to-width-down/400?cb=20230730220247"
   },
   {
    "title": "Lululala",
@@ -550,7 +610,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Lululala.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/13/CharMug_Lululala.png/revision/latest/scale-to-width-down/400?cb=20230730220253"
   },
   {
    "title": "Nico Olsen",
@@ -559,7 +620,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Nico Olsen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b9/CharMug_Nico_Olsen.png/revision/latest/scale-to-width-down/400?cb=20231229074119"
   },
   {
    "title": "Bikram Edditz",
@@ -568,7 +630,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Bikram Edditz.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/32/CharMug_Bikram_Edditz.png/revision/latest/scale-to-width-down/400?cb=20250424235618"
   },
   {
    "title": "Melty Pristis",
@@ -577,7 +640,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Melty Pristis.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/88/CharMug_Melty_Pristis.png/revision/latest/scale-to-width-down/400?cb=20260824104207"
   },
   {
    "title": "Black Dog",
@@ -586,7 +650,8 @@
    "section": "Royal Capital",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Black Dog.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7b/CharMug_Black_Dog.png/revision/latest/scale-to-width-down/400?cb=20260826063013"
   },
   {
    "title": "Kiritaka Muse",
@@ -595,7 +660,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Kiritake Musa CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/83/Kiritake_Musa_CharMug_2.png/revision/latest?cb=20240825230544"
   },
   {
    "title": "Dartz",
@@ -604,7 +670,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Dartz.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/db/CharMug_Dartz.png/revision/latest/scale-to-width-down/400?cb=20241024155627"
   },
   {
    "title": "Lusbel Kallard",
@@ -613,7 +680,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Lusbel CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/df/Lusbel_CharMug.png/revision/latest?cb=20180926143732"
   },
   {
    "title": "Tina",
@@ -622,7 +690,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Tina CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2d/Tina_CharMug.png/revision/latest?cb=20180926143649"
   },
   {
    "title": "Garek Thompson",
@@ -631,7 +700,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Garek CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/08/Garek_CharMug.png/revision/latest?cb=20180926144552"
   },
   {
    "title": "Reala Thompson",
@@ -640,7 +710,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRealaV17.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a7/CharMugRealaV17.png/revision/latest?cb=20180926144515"
   },
   {
    "title": "Rafiel Thompson",
@@ -649,7 +720,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Rafiel CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/22/Rafiel_CharMug.png/revision/latest?cb=20180925194854"
   },
   {
    "title": "Fred Thompson",
@@ -658,7 +730,8 @@
    "section": "Priestella",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Fred CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/53/Fred_CharMug.png/revision/latest?cb=20180925194714"
   },
   {
    "title": "Yaktol Suwen",
@@ -667,7 +740,8 @@
    "section": "Picoutatte",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Yaktol EX3.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1c/Yaktol_EX3.png/revision/latest?cb=20180926215621"
   },
   {
    "title": "Mazeran Suwen",
@@ -676,7 +750,8 @@
    "section": "Picoutatte",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Mazeran Suwen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/fc/CharMug_Mazeran_Suwen.png/revision/latest/scale-to-width-down/400?cb=20240107230638"
   },
   {
    "title": "Framir Suwen",
@@ -685,7 +760,8 @@
    "section": "Picoutatte",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Framir Suwen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b5/CharMug_Framir_Suwen.png/revision/latest/scale-to-width-down/400?cb=20240107230836"
   },
   {
    "title": "Oslo Suwen",
@@ -694,7 +770,8 @@
    "section": "Picoutatte",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Oslo Suwen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/89/CharMug_Oslo_Suwen.png/revision/latest/scale-to-width-down/400?cb=20240107230539"
   },
   {
    "title": "Diadora Regundra",
@@ -703,7 +780,8 @@
    "section": "Picoutatte",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Diadora Regundra.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/84/CharMug_Diadora_Regundra.png/revision/latest?cb=20240107230858"
   },
   {
    "title": "Leno Rex",
@@ -712,7 +790,8 @@
    "section": "Costuul",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Leno Rex.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/93/CharMug_Leno_Rex.png/revision/latest/scale-to-width-down/400?cb=20241024155048"
   },
   {
    "title": "Doltero Amule",
@@ -721,7 +800,8 @@
    "section": "Flanders",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Doltero CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e3/Doltero_CharMug.png/revision/latest?cb=20250324044538"
   },
   {
    "title": "Toto",
@@ -730,7 +810,8 @@
    "section": "Flanders",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Toto LN design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c8/Toto_LN_design.png/revision/latest/scale-to-width-down/400?cb=20250324044236"
   },
   {
    "title": "Manfred Madison",
@@ -739,7 +820,8 @@
    "section": "Flanders",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Manfred Madison.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/94/CharMug_Manfred_Madison.png/revision/latest?cb=20250324044958"
   },
   {
    "title": "Milde Arlam",
@@ -748,7 +830,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Milde Arlam.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/73/Milde_Arlam.png/revision/latest/scale-to-width-down/400?cb=20160529222037"
   },
   {
    "title": "Rasphum",
@@ -757,7 +840,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Muraosa.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8e/Muraosa.png/revision/latest?cb=20160529221616"
   },
   {
    "title": "Mild",
@@ -766,7 +850,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Mild CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f9/Mild_CharMug.jpg/revision/latest/scale-to-width-down/400?cb=20160723144718"
   },
   {
    "title": "Cain",
@@ -775,7 +860,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Cain Dine Temporary.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d8/Cain_Dine_Temporary.png/revision/latest/scale-to-width-down/400?cb=20160529224716"
   },
   {
    "title": "Dain",
@@ -784,7 +870,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Dine Anime.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/98/Dine_Anime.png/revision/latest/scale-to-width-down/400?cb=20180322155750"
   },
   {
    "title": "Lucas",
@@ -793,7 +880,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Lucas Temporary.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a3/Lucas_Temporary.png/revision/latest/scale-to-width-down/400?cb=20160529224943"
   },
   {
    "title": "Meina",
@@ -802,7 +890,8 @@
    "section": "Arlam Village",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Meina Temporary.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/54/Meina_Temporary.png/revision/latest/scale-to-width-down/400?cb=20160529225147"
   },
   {
    "title": "Farsale Lugunica",
@@ -811,7 +900,8 @@
    "section": "Lugunican Royal Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Farsale Manga.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/21/Farsale_Manga.png/revision/latest?cb=20170825153741"
   },
   {
    "title": "Gionis Lugunica",
@@ -820,7 +910,8 @@
    "section": "Lugunican Royal Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Gionis CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1c/Gionis_CharMug.png/revision/latest?cb=20180624153343"
   },
   {
    "title": "Fourier Lugunica",
@@ -829,7 +920,8 @@
    "section": "Lugunican Royal Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugFourier.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2c/CharMugFourier.png/revision/latest?cb=20180206151443"
   },
   {
    "title": "Reid Astrea",
@@ -838,7 +930,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Reid Astrea CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/de/Reid_Astrea_CharMug.png/revision/latest/scale-to-width-down/400?cb=20251101163220"
   },
   {
    "title": "Fribal van Astrea",
@@ -847,7 +940,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Fribal van Astrea CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5a/Fribal_van_Astrea_CharMug.png/revision/latest/scale-to-width-down/400?cb=20251029133454"
   },
   {
    "title": "Veltol Astrea",
@@ -856,7 +950,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Bertol CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f3/Bertol_CharMug.png/revision/latest?cb=20180926215912"
   },
   {
    "title": "Tishua Astrea",
@@ -865,7 +960,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Tishua CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3f/Tishua_CharMug.png/revision/latest?cb=20180926220058"
   },
   {
    "title": "Thames Astrea",
@@ -874,7 +970,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Thames Astrea CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/07/Thames_Astrea_CharMug.png/revision/latest/scale-to-width-down/400?cb=20241224161023"
   },
   {
    "title": "Carlan Astrea",
@@ -883,7 +980,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Carlan Astrea CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a5/Carlan_Astrea_CharMug.png/revision/latest/scale-to-width-down/400?cb=20250312145422"
   },
   {
    "title": "Theresia van Astrea",
@@ -892,7 +990,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Theresia van Astrea CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/12/Theresia_van_Astrea_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502145320"
   },
   {
    "title": "Casilles Astrea",
@@ -901,7 +1000,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Casilles Astrea CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/cd/Casilles_Astrea_CharMug.png/revision/latest/scale-to-width-down/400?cb=20250312145253"
   },
   {
    "title": "Louanna Astrea",
@@ -910,7 +1010,8 @@
    "section": "Astrea Family",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugLouanna.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d6/CharMugLouanna.png/revision/latest/scale-to-width-down/400?cb=20231112063442"
   },
   {
    "title": "Volcanica",
@@ -919,7 +1020,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Volcanica CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a1/Volcanica_CharMug.jpg/revision/latest/scale-to-width-down/400?cb=20210502145446"
   },
   {
    "title": "Shaula",
@@ -928,7 +1030,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Shaula CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3b/Shaula_CharMug.png/revision/latest?cb=20200323172636"
   },
   {
    "title": "Flugel",
@@ -937,7 +1040,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Season 4 Main PV 1 Flugel Silver Coin.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/90/Season_4_Main_PV_1_Flugel_Silver_Coin.png/revision/latest?cb=20251116180136"
   },
   {
    "title": "Melakuera",
@@ -946,7 +1050,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "MelakueraCharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/ae/MelakueraCharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502154745"
   },
   {
    "title": "Liliana Masquerade",
@@ -955,7 +1060,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Liliana Masquerade CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3f/Liliana_Masquerade_CharMug_2.png/revision/latest?cb=20210502144817"
   },
   {
    "title": "Ia",
@@ -964,7 +1070,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Episode 54 Ia Design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/bf/Episode_54_Ia_Design.png/revision/latest?cb=20260403052708"
   },
   {
    "title": "Joseph",
@@ -973,7 +1080,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Joseph LN design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e9/Joseph_LN_design.png/revision/latest?cb=20230531200257"
   },
   {
    "title": "Biehn Argyle",
@@ -982,7 +1090,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Biehn Argyle.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/ce/Biehn_Argyle.png/revision/latest/scale-to-width-down/400?cb=20160427161826"
   },
   {
    "title": "Hannah Regret",
@@ -991,7 +1100,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Hannah Regret LN design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/02/Hannah_Regret_LN_design.png/revision/latest?cb=20180724194547"
   },
   {
    "title": "Setanta",
@@ -1000,7 +1110,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Setanta.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/13/CharMug_Setanta.png/revision/latest/scale-to-width-down/400?cb=20240326061157"
   },
   {
    "title": "Quark",
@@ -1009,7 +1120,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Quark.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a0/Quark.png/revision/latest/scale-to-width-down/400?cb=20160613053220"
   },
   {
    "title": "Temae",
@@ -1018,7 +1130,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Temae.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/17/Temae.png/revision/latest/scale-to-width-down/400?cb=20160613053230"
   },
   {
    "title": "Pivot Arnancy",
@@ -1027,7 +1140,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugPivot.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/07/CharMugPivot.png/revision/latest/scale-to-width-down/400?cb=20231229082806"
   },
   {
    "title": "Tholter Weasily",
@@ -1036,7 +1150,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Torta Wisley Art.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e1/Torta_Wisley_Art.png/revision/latest?cb=20160802201010"
   },
   {
    "title": "Roswaal J. Mathers",
@@ -1045,7 +1160,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRoswaalJ.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5b/CharMugRoswaalJ.png/revision/latest/scale-to-width-down/400?cb=20231229082909"
   },
   {
    "title": "Libre Fermi",
@@ -1054,7 +1170,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugLibre.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/91/CharMugLibre.png/revision/latest/scale-to-width-down/400?cb=20231229082534"
   },
   {
    "title": "Dynas Trussardi",
@@ -1063,7 +1180,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Dynas CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c7/Dynas_CharMug.png/revision/latest?cb=20231229094221"
   },
   {
    "title": "Sylphy Elmart",
@@ -1072,7 +1190,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Sylphy CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/85/Sylphy_CharMug.png/revision/latest?cb=20181218172457"
   },
   {
    "title": "Fortuna",
@@ -1081,7 +1200,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugFortuna.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/64/CharMugFortuna.png/revision/latest?cb=20180209113959"
   },
   {
    "title": "Meckart Karsten",
@@ -1090,7 +1210,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Meckart Karsten.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/04/Meckart_Karsten.png/revision/latest/scale-to-width-down/400?cb=20160418015820"
   },
   {
    "title": "Archi Elior",
@@ -1099,7 +1220,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugArch.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/43/CharMugArch.png/revision/latest?cb=20180206150739"
   },
   {
    "title": "Dias Fatsbalm",
@@ -1108,7 +1230,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Dias.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/0d/Dias.png/revision/latest?cb=20171226155404"
   },
   {
    "title": "Rodriguez",
@@ -1117,7 +1240,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRodriguez.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6e/CharMugRodriguez.png/revision/latest?cb=20180206151133"
   },
   {
    "title": "Kalifa",
@@ -1126,7 +1250,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Kalifa.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/13/CharMug_Kalifa.png/revision/latest?cb=20240324185409"
   },
   {
    "title": "Ilya",
@@ -1135,7 +1260,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ilya.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3f/Ilya.jpg/revision/latest/scale-to-width-down/400?cb=20190319145015"
   },
   {
    "title": "Leip Barielle",
@@ -1144,7 +1270,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Leip Bariel.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d5/Leip_Bariel.png/revision/latest/scale-to-width-down/400?cb=20241225135436"
   },
   {
    "title": "Ketty Muttart",
@@ -1153,7 +1280,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ketty Muttart CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9f/Ketty_Muttart_CharMug.png/revision/latest/scale-to-width-down/400?cb=20231203015558"
   },
   {
    "title": "Chap",
@@ -1162,7 +1290,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Chap.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/da/CharMug_Chap.png/revision/latest/scale-to-width-down/400?cb=20231229094851"
   },
   {
    "title": "Regin Suwen",
@@ -1171,7 +1300,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Regin CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/ca/Regin_CharMug.png/revision/latest/scale-to-width-down/400?cb=20190929231401"
   },
   {
    "title": "Marone Lisbon",
@@ -1180,7 +1310,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Marone.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/0f/Marone.jpg/revision/latest/scale-to-width-down/400?cb=20190319144621"
   },
   {
    "title": "Earth Spider",
@@ -1189,7 +1320,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Tsuchigumo.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/58/Tsuchigumo.jpg/revision/latest?cb=20230424110348"
   },
   {
    "title": "Gwain Merette",
@@ -1198,7 +1330,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Gwain Merette.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/af/CharMug_Gwain_Merette.png/revision/latest?cb=20241024155317"
   },
   {
    "title": "Colette",
@@ -1207,7 +1340,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Colette.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/67/CharMug_Colette.png/revision/latest/scale-to-width-down/400?cb=20240315162814"
   },
   {
    "title": "Palmyra",
@@ -1216,7 +1350,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Palmyra.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/12/CharMug_Palmyra.png/revision/latest/scale-to-width-down/400?cb=20240315162108"
   },
   {
    "title": "Musica",
@@ -1225,7 +1360,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Musica.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a7/CharMug_Musica.png/revision/latest/scale-to-width-down/400?cb=20230730220222"
   },
   {
    "title": "Helaine Gatness",
@@ -1234,7 +1370,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Helaine Gatness LN character design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c6/Helaine_Gatness_LN_character_design.png/revision/latest/scale-to-width-down/400?cb=20240324200944"
   },
   {
    "title": "Belmont",
@@ -1243,7 +1380,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Belmont.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e3/CharMug_Belmont.png/revision/latest?cb=20250424222334"
   },
   {
    "title": "Reiner Wahrheit",
@@ -1252,7 +1390,8 @@
    "section": "Citizens",
    "region": "Dragon Kingdom of Lugunica",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Reiner Wahrheit.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c5/CharMug_Reiner_Wahrheit.png/revision/latest/scale-to-width-down/400?cb=20250424235217"
   },
   {
    "title": "Vincent Vollachia",
@@ -1261,7 +1400,8 @@
    "section": "Vollachian Imperial Family",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Vincent Vollachia.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/31/CharMug_Vincent_Vollachia.png/revision/latest?cb=20231113034913"
   },
   {
    "title": "Stride Vollachia",
@@ -1270,7 +1410,8 @@
    "section": "Vollachian Imperial Family",
    "region": "Sacred Vollachia Empire",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Stride CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1c/Stride_CharMug.png/revision/latest?cb=20180926215948"
   },
   {
    "title": "Lamia Godwin",
@@ -1279,7 +1420,8 @@
    "section": "Vollachian Imperial Family",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Lamia Godwin.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/06/CharMug_Lamia_Godwin.png/revision/latest?cb=20221204212611"
   },
   {
    "title": "Eugard Vollachia",
@@ -1288,7 +1430,8 @@
    "section": "Vollachian Imperial Family",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Eugard Vollachia.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e9/CharMug_Eugard_Vollachia.png/revision/latest?cb=20231129134510"
   },
   {
    "title": "Cecilus Segmunt",
@@ -1297,7 +1440,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Cecilus Segmunt.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/33/CharMug_Cecilus_Segmunt.jpg/revision/latest?cb=20191209151159"
   },
   {
    "title": "Arakiya",
@@ -1306,7 +1450,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Arakiya.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/78/CharMug_Arakiya.png/revision/latest/scale-to-width-down/400?cb=20230910214323"
   },
   {
    "title": "Olbart Dunkelkenn",
@@ -1315,7 +1460,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Olbart Dunkelkenn CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/ce/Olbart_Dunkelkenn_CharMug.png/revision/latest?cb=20211031193432"
   },
   {
    "title": "Chisha Gold",
@@ -1324,7 +1470,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Chisha CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/00/Chisha_CharMug.jpg/revision/latest?cb=20191209151238"
   },
   {
    "title": "Goz Ralfon",
@@ -1333,7 +1480,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Goz CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6e/Goz_CharMug.jpg/revision/latest?cb=20191211141722"
   },
   {
    "title": "Groovy Gumlet",
@@ -1342,7 +1490,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Groovy CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d2/Groovy_CharMug.jpg/revision/latest?cb=20191212133356"
   },
   {
    "title": "Yorna Mishigure",
@@ -1351,7 +1500,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Yorna Mishigure.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6f/CharMug_Yorna_Mishigure.png/revision/latest/scale-to-width-down/400?cb=20211113181333"
   },
   {
    "title": "Moguro Hagane",
@@ -1360,7 +1510,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Mogro CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/53/Mogro_CharMug.jpg/revision/latest?cb=20191212133320"
   },
   {
    "title": "Madelyn Eschart",
@@ -1369,7 +1520,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Madelyn CharMug 1.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/88/Madelyn_CharMug_1.png/revision/latest/scale-to-width-down/400?cb=20230910214549"
   },
   {
    "title": "Balleroy Temeglyph",
@@ -1378,7 +1530,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Balleroy CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/24/Balleroy_CharMug.jpg/revision/latest?cb=20191211141645"
   },
   {
    "title": "Kafma Irulux",
@@ -1387,7 +1540,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Kafma Irulux CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f0/Kafma_Irulux_CharMug.png/revision/latest?cb=20211214152255"
   },
   {
    "title": "Zikr Osman",
@@ -1396,7 +1550,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Zikr Osman.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/2e/CharMug_Zikr_Osman.png/revision/latest/scale-to-width-down/400?cb=20210812120551"
   },
   {
    "title": "Kurgan",
@@ -1405,7 +1560,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Kurgan CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/84/Kurgan_CharMug.png/revision/latest?cb=20180601121534"
   },
   {
    "title": "Miles",
@@ -1414,7 +1570,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Miles CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5f/Miles_CharMug_2.png/revision/latest?cb=20211031195457"
   },
   {
    "title": "Jamal Aurélie",
@@ -1423,7 +1580,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Jamal Aurélie.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/17/CharMug_Jamal_Aur%C3%A9lie.png/revision/latest/scale-to-width-down/400?cb=20221204210824"
   },
   {
    "title": "Todd Fang",
@@ -1432,7 +1590,8 @@
    "section": "Imperial Army & Nine Divine Generals",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Todd Fang.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c7/CharMug_Todd_Fang.png/revision/latest/scale-to-width-down/400?cb=20221204211842"
   },
   {
    "title": "Berstetz Fondalfon",
@@ -1441,7 +1600,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Berstetz Fondalfon.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/20/CharMug_Berstetz_Fondalfon.png/revision/latest/scale-to-width-down/400?cb=20221204211342"
   },
   {
    "title": "Carillon",
@@ -1450,7 +1610,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Carillon LN character design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/55/Carillon_LN_character_design.png/revision/latest/scale-to-width-down/400?cb=20230924155233"
   },
   {
    "title": "Serena Dracroy",
@@ -1459,7 +1620,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Serena Dracroy.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/0f/CharMug_Serena_Dracroy.png/revision/latest?cb=20211106160838"
   },
   {
    "title": "Jorah Pendleton",
@@ -1468,7 +1630,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Jorah Pendleton.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/53/CharMug_Jorah_Pendleton.png/revision/latest?cb=20211109154146"
   },
   {
    "title": "Neiji Lockhart",
@@ -1477,7 +1640,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugNeijiRockheart.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/11/CharMugNeijiRockheart.jpg/revision/latest?cb=20211111203338"
   },
   {
    "title": "Shasuke",
@@ -1486,7 +1650,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Shasuke.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/12/CharMug_Shasuke.png/revision/latest?cb=20241225132016"
   },
   {
    "title": "Raizo",
@@ -1495,7 +1660,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Raizo.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b3/CharMug_Raizo.png/revision/latest?cb=20241225132023"
   },
   {
    "title": "Melinda",
@@ -1504,7 +1670,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Melinda.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/ee/CharMug_Melinda.png/revision/latest?cb=20241225132247"
   },
   {
    "title": "Flop O'Connell",
@@ -1513,7 +1680,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Flop v2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1c/CharMug_Flop_v2.png/revision/latest/scale-to-width-down/400?cb=20230910223707"
   },
   {
    "title": "Medium O'Connell",
@@ -1522,7 +1690,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Medium v2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/ba/CharMug_Medium_v2.png/revision/latest/scale-to-width-down/400?cb=20210613104526"
   },
   {
    "title": "Rowan Segmunt",
@@ -1531,7 +1700,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Rowan Segmunt.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3f/CharMug_Rowan_Segmunt.png/revision/latest/scale-to-width-down/400?cb=20210613104636"
   },
   {
    "title": "Mizelda",
@@ -1540,7 +1710,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Mizelda.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/57/CharMug_Mizelda.png/revision/latest/scale-to-width-down/400?cb=20240412202304"
   },
   {
    "title": "Utakata",
@@ -1549,7 +1720,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Utakata.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5c/CharMug_Utakata.png/revision/latest/scale-to-width-down/400?cb=20240412202236"
   },
   {
    "title": "Kuna",
@@ -1558,7 +1730,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Kuna LN character design.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/ca/Kuna_LN_character_design.jpg/revision/latest/scale-to-width-down/400?cb=20210408205307"
   },
   {
    "title": "Holly",
@@ -1567,7 +1740,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Holly LN character design.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/15/Holly_LN_character_design.jpg/revision/latest/scale-to-width-down/400?cb=20210408213121"
   },
   {
    "title": "Taritta Shudrak",
@@ -1576,7 +1750,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Taritta Shudrak.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7e/CharMug_Taritta_Shudrak.png/revision/latest/scale-to-width-down/400?cb=20221204210313"
   },
   {
    "title": "Ubilk",
@@ -1585,7 +1760,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Ubilk CharMug LI.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b0/Ubilk_CharMug_LI.png/revision/latest/scale-to-width-down/400?cb=20210831180334"
   },
   {
    "title": "Katya Aurélie",
@@ -1594,7 +1770,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Katya Aurélie.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/dc/CharMug_Katya_Aur%C3%A9lie.png/revision/latest/scale-to-width-down/400?cb=20240817164605"
   },
   {
    "title": "Hornet",
@@ -1603,7 +1780,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugHornet.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/c4/CharMugHornet.png/revision/latest?cb=20211109154317"
   },
   {
    "title": "Tanza",
@@ -1612,7 +1790,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Tanza CharMug 1.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e4/Tanza_CharMug_1.png/revision/latest?cb=20240422100841"
   },
   {
    "title": "Hiain Yatz",
@@ -1621,7 +1800,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Hiain Yatz.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e3/CharMug_Hiain_Yatz.png/revision/latest?cb=20221204205152"
   },
   {
    "title": "Weitz Rogen",
@@ -1630,7 +1810,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Weitz Rogen.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5e/CharMug_Weitz_Rogen.png/revision/latest?cb=20221204205234"
   },
   {
    "title": "Idra Missanga",
@@ -1639,7 +1820,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Idra Missanga.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/62/CharMug_Idra_Missanga.png/revision/latest?cb=20221204205300"
   },
   {
    "title": "Gustav Morello",
@@ -1648,7 +1830,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Gustav Morello.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/bc/CharMug_Gustav_Morello.png/revision/latest?cb=20221204205118"
   },
   {
    "title": "Null",
@@ -1657,7 +1840,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Null.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3d/CharMug_Null.png/revision/latest/scale-to-width-down/400?cb=20230304044811"
   },
   {
    "title": "Mezoreia",
@@ -1666,7 +1850,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Mezoreia.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/91/CharMug_Mezoreia.png/revision/latest?cb=20230716065738"
   },
   {
    "title": "Valgren",
@@ -1675,7 +1860,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Valgren.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b4/CharMug_Valgren.png/revision/latest?cb=20240124151638"
   },
   {
    "title": "Oulouzo Tarask",
@@ -1684,7 +1870,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Oulouzo Tarask.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/bf/CharMug_Oulouzo_Tarask.png/revision/latest/scale-to-width-down/400?cb=20250425032217"
   },
   {
    "title": "Jimrack",
@@ -1693,7 +1880,8 @@
    "section": "Citizens",
    "region": "Sacred Vollachia Empire",
    "color": "#DC143C",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Jimrack LN character design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/68/Jimrack_LN_character_design.png/revision/latest/scale-to-width-down/400?cb=20250424230551"
   },
   {
    "title": "Alec Hoshin",
@@ -1702,7 +1890,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Alec Hoshin.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/69/CharMug_Alec_Hoshin.png/revision/latest/scale-to-width-down/400?cb=20240120033013"
   },
   {
    "title": "Reisel",
@@ -1711,16 +1900,18 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Reisel.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/26/CharMug_Reisel.png/revision/latest?cb=20190929230657"
   },
   {
    "title": "Dorkell",
    "slug": "Dorkell",
    "name": "Dorkell",
-   "section": "Witch Cultists & Associates",
-   "region": "Witch Cult",
+   "section": "",
+   "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugDorkell.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8a/CharMugDorkell.jpg/revision/latest?cb=20211111203657"
   },
   {
    "title": "Halibel",
@@ -1729,7 +1920,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugHalibel.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/20/CharMugHalibel.png/revision/latest/scale-to-width-down/400?cb=20231112061023"
   },
   {
    "title": "Zarestia",
@@ -1738,7 +1930,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugZarestia.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/23/CharMugZarestia.png/revision/latest/scale-to-width-down/400?cb=20180202165212"
   },
   {
    "title": "Reize",
@@ -1747,7 +1940,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugReize.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/30/CharMugReize.png/revision/latest?cb=20231112062529"
   },
   {
    "title": "Natsuki Rigel",
@@ -1756,7 +1950,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugRigel.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/8a/CharMugRigel.png/revision/latest?cb=20180206150238"
   },
   {
    "title": "Natsuki Spica",
@@ -1765,7 +1960,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#5CD411",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugNSpica.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/ee/CharMugNSpica.png/revision/latest?cb=20180206150310"
   },
   {
    "title": "Chamov",
@@ -1774,7 +1970,8 @@
    "section": "",
    "region": "Kararagi City-States",
    "color": "#FFD700",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Chamov.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/51/CharMug_Chamov.png/revision/latest?cb=20180302234836"
   },
   {
    "title": "Elsa Granhiert",
@@ -1783,7 +1980,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Elsa CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6d/Elsa_CharMug.png/revision/latest/scale-to-width-down/400?cb=20231229083715"
   },
   {
    "title": "Vague Adgard",
@@ -1792,7 +1990,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Vague Adgard.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/84/CharMug_Vague_Adgard.png/revision/latest?cb=20260925011219"
   },
   {
    "title": "Tiriena",
@@ -1801,7 +2000,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugTiriena.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/15/CharMugTiriena.png/revision/latest?cb=20180211192727"
   },
   {
    "title": "Beli Hainelga",
@@ -1810,7 +2010,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugBeliHainelga.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6e/CharMugBeliHainelga.jpg/revision/latest/scale-to-width-down/400?cb=20211111202716"
   },
   {
    "title": "Noelle Tuérico",
@@ -1819,7 +2020,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Noelle Tuérico.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/bc/CharMug_Noelle_Tu%C3%A9rico.png/revision/latest?cb=20240315162401"
   },
   {
    "title": "Podoso",
@@ -1828,7 +2030,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Podoso LN character design.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a3/Podoso_LN_character_design.png/revision/latest?cb=20240324194855"
   },
   {
    "title": "Admonsah",
@@ -1837,7 +2040,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Admonsah CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/2/26/Admonsah_CharMug.png/revision/latest/scale-to-width-down/400?cb=20240324200132"
   },
   {
    "title": "Maqueena",
@@ -1846,7 +2050,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Maqueena.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/91/CharMug_Maqueena.png/revision/latest/scale-to-width-down/400?cb=20240324200808"
   },
   {
    "title": "Trellock",
@@ -1855,7 +2060,8 @@
    "section": "",
    "region": "Holy Kingdom of Gusteko",
    "color": "#0070FF",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Trellock CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1b/Trellock_CharMug.png/revision/latest?cb=20240324195004"
   },
   {
    "title": "Spica",
@@ -1864,7 +2070,8 @@
    "section": "",
    "region": "Unspecified",
    "color": "#7D11CA",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Spica.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/d/d6/CharMug_Spica.png/revision/latest?cb=20240527231859"
   },
   {
    "title": "Shion",
@@ -1873,7 +2080,8 @@
    "section": "",
    "region": "Unspecified",
    "color": "#7D11CA",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Shion.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/6/6e/CharMug_Shion.png/revision/latest/scale-to-width-down/400?cb=20240105033554"
   },
   {
    "title": "Lilac",
@@ -1882,16 +2090,18 @@
    "section": "",
    "region": "Unspecified",
    "color": "#7D11CA",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Lyra.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/1e/CharMug_Lyra.png/revision/latest/scale-to-width-down/400?cb=20240105033543"
   },
   {
    "title": "Capella Emerada Lugnica",
    "slug": "Capella Emerada Lugnica",
    "name": "Capella",
-   "section": "Sin Archbishops",
-   "region": "Witch Cult",
+   "section": "",
+   "region": "Beloved Children",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Capella CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/3/3f/Capella_CharMug.png/revision/latest?cb=20230602195456"
   },
   {
    "title": "Clarissa",
@@ -1900,7 +2110,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Clarissa.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/87/CharMug_Clarissa.png/revision/latest?cb=20260625055938"
   },
   {
    "title": "Reborn",
@@ -1909,7 +2120,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Reborn.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a2/CharMug_Reborn.png/revision/latest?cb=20260830070145"
   },
   {
    "title": "Arbalest",
@@ -1918,7 +2130,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Arbalest.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/89/CharMug_Arbalest.png/revision/latest?cb=20260903142257"
   },
   {
    "title": "Tornel",
@@ -1927,7 +2140,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Tornel.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9a/CharMug_Tornel.png/revision/latest?cb=20260901121528"
   },
   {
    "title": "Bellaris",
@@ -1936,7 +2150,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Bellaris.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/4/4d/CharMug_Bellaris.png/revision/latest?cb=20260830070630"
   },
   {
    "title": "Dandon",
@@ -1945,7 +2160,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Dandon.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e0/CharMug_Dandon.png/revision/latest?cb=20260908092420"
   },
   {
    "title": "Lucierica",
@@ -1954,7 +2170,8 @@
    "section": "",
    "region": "Beloved Children",
    "color": "#FEA5D4",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Lucierica.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/89/CharMug_Lucierica.png/revision/latest?cb=20260906130156"
   },
   {
    "title": "Petelgeuse Romanée-Conti",
@@ -1963,7 +2180,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Petelgeuse CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b9/Petelgeuse_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502152936"
   },
   {
    "title": "Regulus Corneas",
@@ -1972,7 +2190,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Regulus Corneas.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/95/CharMug_Regulus_Corneas.png/revision/latest?cb=20230602195325"
   },
   {
    "title": "Lye Batenkaitos",
@@ -1981,7 +2200,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Lye Batenkaitos CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/5b/Lye_Batenkaitos_CharMug.jpg/revision/latest?cb=20210502153137"
   },
   {
    "title": "Roy Alphard",
@@ -1990,7 +2210,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Roy Alphard.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a1/CharMug_Roy_Alphard.png/revision/latest?cb=20250626084212"
   },
   {
    "title": "Rui Arneb",
@@ -1999,7 +2220,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Louis Arneb.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/73/CharMug_Louis_Arneb.png/revision/latest?cb=20230602195803"
   },
   {
    "title": "Sirius Romanée-Conti",
@@ -2008,7 +2230,8 @@
    "section": "Sin Archbishops",
    "region": "Witch Cult",
    "color": "#000000",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Sirius CharMug.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/a/a1/Sirius_CharMug.png/revision/latest?cb=20180315155548"
   },
   {
    "title": "Pandora",
@@ -2017,7 +2240,8 @@
    "section": "Witch Cultists & Associates",
    "region": "Witch Cult",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Pandora.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b3/CharMug_Pandora.png/revision/latest?cb=20230503222855"
   },
   {
    "title": "Satella",
@@ -2026,7 +2250,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugSatella.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/86/CharMugSatella.png/revision/latest/scale-to-width-down/400?cb=20180211192625"
   },
   {
    "title": "Echidna",
@@ -2035,7 +2260,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Echidna CharMug 2.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/8/89/Echidna_CharMug_2.png/revision/latest/scale-to-width-down/400?cb=20210502153936"
   },
   {
    "title": "Minerva",
@@ -2044,7 +2270,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Minerva CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/1/12/Minerva_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502154022"
   },
   {
    "title": "Sekhmet",
@@ -2053,7 +2280,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugSekhmet.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e3/CharMugSekhmet.png/revision/latest?cb=20180206151622"
   },
   {
    "title": "Daphne",
@@ -2062,7 +2290,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Daphne CharMug 2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/5/52/Daphne_CharMug_2.jpg/revision/latest?cb=20210502154115"
   },
   {
    "title": "Typhon",
@@ -2071,7 +2300,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugTyphon.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/b4/CharMugTyphon.png/revision/latest?cb=20180206151651"
   },
   {
    "title": "Carmilla",
@@ -2080,7 +2310,8 @@
    "section": "Witches of Sin",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugCarmilla.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/b/be/CharMugCarmilla.png/revision/latest?cb=20180206151903"
   },
   {
    "title": "Hector",
@@ -2089,7 +2320,8 @@
    "section": "Supernumerary & Other Witches",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "Hector CharMug.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9d/Hector_CharMug.jpg/revision/latest?cb=20220329012900"
   },
   {
    "title": "Omega",
@@ -2098,7 +2330,8 @@
    "section": "Supernumerary & Other Witches",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Omega v2.jpg",
+   "image": "https://static.wikia.nocookie.net/rezero/images/0/04/CharMug_Omega_v2.jpg/revision/latest?cb=20210608095238"
   },
   {
    "title": "Sphinx",
@@ -2107,7 +2340,8 @@
    "section": "Supernumerary & Other Witches",
    "region": "Witches",
    "color": "#C0C0C0",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMugSphinx.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/e/e1/CharMugSphinx.png/revision/latest?cb=20230503222232"
   },
   {
    "title": "Natsuki Kenichi",
@@ -2116,7 +2350,8 @@
    "section": "",
    "region": "Japan",
    "color": "#BC002D",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Natsuki Kenichi.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/9a/CharMug_Natsuki_Kenichi.png/revision/latest?cb=20240412004929"
   },
   {
    "title": "Natsuki Naoko",
@@ -2125,7 +2360,8 @@
    "section": "",
    "region": "Japan",
    "color": "#BC002D",
-   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+   "file": "CharMug Natsuki Naoko.png",
+   "image": "https://static.wikia.nocookie.net/rezero/images/9/99/CharMug_Natsuki_Naoko.png/revision/latest?cb=20240412004828"
   }
  ]
 }
