@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.3";
+const APP_VERSION = "1.6.4";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -1310,6 +1310,19 @@ function installChromeRestore() {
     toggleChrome(true);
   }, { capture: true, passive: true });
 }
+
+/* อ่านอย่างเดียว: ไม่ให้ pinch zoom หรือดับเบิลแตะแล้วหน้าซูม
+   (Safari ไม่สนใจ user-scalable=no จึงต้องกัน gesture เอง) */
+(function installZoomGuards() {
+  const block = (event) => { if (event.cancelable) event.preventDefault(); };
+  for (const name of ["gesturestart", "gesturechange", "gestureend"]) {
+    document.addEventListener(name, block, { passive: false });
+  }
+  document.addEventListener("touchmove", (event) => {
+    if (event.touches.length > 1) block(event);
+  }, { passive: false });
+  document.addEventListener("dblclick", block, { passive: false });
+})();
 
 function installPageGestures() {
   const viewport = byId("reading-viewport");

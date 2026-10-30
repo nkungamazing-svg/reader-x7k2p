@@ -68,7 +68,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .tool-button { min-height:44px; padding:7px 11px; font-size:12px; }
 .tool-button.square-button { min-width:44px; padding-inline:7px; }
 .compact-control { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:11px; }
-.compact-control select { width:auto; min-height:44px; max-width:190px; padding-inline:7px; font-size:11px; }
+.compact-control select { width:auto; min-height:44px; max-width:190px; padding-inline:7px; font-size:16px; }
 .speed-control { flex-wrap:wrap; max-width:185px; }
 .speed-control input { width:95px; accent-color:var(--accent); }
 .speed-control output { min-width:28px; color:var(--text); text-align:right; }
@@ -278,7 +278,7 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 .character-card-close { position:absolute; top:4px; right:4px; display:grid; place-items:center; width:32px; height:32px; border:0; border-radius:50%; background:var(--surface-2); color:var(--muted); font-size:16px; }
 .character-card-form { display:flex; gap:6px; margin-top:9px; }
 .character-card-form[hidden] { display:none!important; }
-.character-card-form input { flex:1 1 auto; min-width:0; min-height:40px; padding:6px 10px; border:1px solid var(--line); border-radius:9px; background:var(--page); color:var(--text); font-size:12px; outline-color:var(--accent); }
+.character-card-form input { flex:1 1 auto; min-width:0; min-height:40px; padding:6px 10px; border:1px solid var(--line); border-radius:9px; background:var(--page); color:var(--text); font-size:16px; outline-color:var(--accent); }
 .character-card-form .tool-button { flex:none; min-height:40px; padding-inline:12px; font-size:12px; }
 .character-card-suggestions { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
 .character-card-suggestions[hidden] { display:none!important; }
@@ -304,3 +304,9 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 /* Faction colour from the wiki Characters page, applied as a top rule + ring */
 .character-card { border-top: 3px solid var(--character-color, rgba(127,127,127,.35)); }
 .character-card #character-card-figure img { box-shadow: 0 0 0 2px var(--character-color, transparent); border-radius: 10px; }
+
+/* กันการซูม: iOS จะซูมเองเมื่อโฟกัสช่องกรอกที่ตัวอักษรเล็กกว่า 16px
+   และ pinch/double-tap zoom ทำให้หน้าอ่านกระโดด */
+html,body { touch-action:pan-y; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+input,select,textarea { font-size:max(16px,1em); }
+button,label,.switch-row,.theme-choice,.tool-button { touch-action:manipulation; }
