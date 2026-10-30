@@ -7,7 +7,7 @@ const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -669,6 +669,7 @@ function bindEvents() {
   byId("mode-page").addEventListener("click", () => applyReadingMode("page"));
   byId("mode-scroll").addEventListener("click", () => applyReadingMode("scroll"));
   byId("mode-toggle").addEventListener("click", () => applyReadingMode(isPageMode() ? "scroll" : "page"));
+  byId("page-top").addEventListener("input", event => setPageTop(Number(event.target.value)));
   byId("indent-toggle").addEventListener("change", event => {
     state.indent = event.target.checked;
     document.body.classList.toggle("indent-on", state.indent);
@@ -895,6 +896,15 @@ function setLineHeight(value) {
   schedulePaginate(80);
 }
 
+function setPageTop(value) {
+  state.pageTop = Math.max(0, Math.min(90, Math.round(Number(value) || 0)));
+  document.documentElement.style.setProperty("--page-top-extra", `${state.pageTop}px`);
+  byId("page-top").value = String(state.pageTop);
+  byId("page-top-output").value = `${state.pageTop}px`;
+  void writeSetting("pageTop", state.pageTop);
+  schedulePaginate(60);
+}
+
 function setTextWidth(value) {
   state.textWidth = Math.max(320, Math.min(900, Number(value) || 760));
   document.documentElement.style.setProperty("--reader-width", `${state.textWidth}px`);
@@ -917,6 +927,7 @@ async function initialize() {
     state.loadRemoteImages = await readSetting("loadRemoteImages", true) !== false;
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
     state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
+    setPageTop(Number(await readSetting("pageTop", 0)) || 0);
     state.indent = await readSetting("indent", true) !== false;
     document.body.classList.toggle("indent-on", state.indent);
     byId("indent-toggle").checked = state.indent;
