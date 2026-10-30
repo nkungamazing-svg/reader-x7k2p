@@ -300,3 +300,7 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
   -webkit-touch-callout:none;
 }
 .reader-content img { -webkit-user-drag:none; }
+
+/* Faction colour from the wiki Characters page, applied as a top rule + ring */
+.character-card { border-top: 3px solid var(--character-color, rgba(127,127,127,.35)); }
+.character-card #character-card-figure img { box-shadow: 0 0 0 2px var(--character-color, transparent); border-radius: 10px; }

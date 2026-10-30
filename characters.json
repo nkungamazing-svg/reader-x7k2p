@@ -1,0 +1,2131 @@
+{
+ "source": "https://rezero.fandom.com/wiki/Characters",
+ "generated": "2026-10-30",
+ "count": 236,
+ "characters": [
+  {
+   "title": "Emilia",
+   "slug": "Emilia",
+   "name": "Emilia",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "https://static.wikia.nocookie.net/rezero/images/7/7c/Emilia_CharMug_3.jpg/revision/latest/scale-to-width-down/400?cb=20210502133750"
+  },
+  {
+   "title": "Natsuki Subaru",
+   "slug": "Natsuki Subaru",
+   "name": "Subaru",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "https://static.wikia.nocookie.net/rezero/images/f/f2/Natsuki_Subaru_CharMug_2.jpg/revision/latest/scale-to-width-down/400?cb=20210502133115"
+  },
+  {
+   "title": "Puck",
+   "slug": "Puck",
+   "name": "Puck",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "https://static.wikia.nocookie.net/rezero/images/c/cd/Puck_CharMug.jpg/revision/latest/scale-to-width-down/400?cb=20210502133630"
+  },
+  {
+   "title": "Roswaal L. Mathers",
+   "slug": "Roswaal L. Mathers",
+   "name": "Roswaal",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ram",
+   "slug": "Ram",
+   "name": "Ram",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rem",
+   "slug": "Rem",
+   "name": "Rem",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Beatrice",
+   "slug": "Beatrice",
+   "name": "Beatrice",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Otto Suwen",
+   "slug": "Otto Suwen",
+   "name": "Otto",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Frederica Baumann",
+   "slug": "Frederica Baumann",
+   "name": "Frederica",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Garfiel Tinzel",
+   "slug": "Garfiel Tinzel",
+   "name": "Garfiel",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Petra Leyte",
+   "slug": "Petra Leyte",
+   "name": "Petra",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ryuzu Meyer (copy)",
+   "slug": "Ryuzu Meyer (copy)",
+   "name": "Ryuzu",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Annerose Miload",
+   "slug": "Annerose Miload",
+   "name": "Annerose",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Clind",
+   "slug": "Clind",
+   "name": "Clind",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Meili Portroute",
+   "slug": "Meili Portroute",
+   "name": "Meili",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Patrasche",
+   "slug": "Patrasche",
+   "name": "Patrasche",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Frufoo",
+   "slug": "Frufoo",
+   "name": "Frufoo",
+   "section": "Emilia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EAEAE9",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Crusch Karsten",
+   "slug": "Crusch Karsten",
+   "name": "Crusch",
+   "section": "Crusch Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#2F4F45",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ferris",
+   "slug": "Ferris",
+   "name": "Ferris",
+   "section": "Crusch Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#2F4F45",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Wilhelm van Astrea",
+   "slug": "Wilhelm van Astrea",
+   "name": "Wilhelm",
+   "section": "Crusch Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#2F4F45",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Priscilla Barielle",
+   "slug": "Priscilla Barielle",
+   "name": "Priscilla",
+   "section": "Priscilla Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFC588",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Al",
+   "slug": "Al",
+   "name": "Al",
+   "section": "Priscilla Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFC588",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Schult Barielle",
+   "slug": "Schult Barielle",
+   "name": "Schult",
+   "section": "Priscilla Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFC588",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Heinkel Astrea",
+   "slug": "Heinkel Astrea",
+   "name": "Heinkel",
+   "section": "Priscilla Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFC588",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Yae Tenzen",
+   "slug": "Yae Tenzen",
+   "name": "Yae",
+   "section": "Priscilla Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFC588",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Anastasia Hoshin",
+   "slug": "Anastasia Hoshin",
+   "name": "Anastasia",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Julius Juukulius",
+   "slug": "Julius Juukulius",
+   "name": "Julius",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Joshua Juukulius",
+   "slug": "Joshua Juukulius",
+   "name": "Joshua",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ricardo Welkin",
+   "slug": "Ricardo Welkin",
+   "name": "Ricardo",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Mimi Pearlbaton",
+   "slug": "Mimi Pearlbaton",
+   "name": "Mimi",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Hetaro Pearlbaton",
+   "slug": "Hetaro Pearlbaton",
+   "name": "Hetaro",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tivey Pearlbaton",
+   "slug": "Tivey Pearlbaton",
+   "name": "Tivey",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Eridna",
+   "slug": "Eridna",
+   "name": "Echidna",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Shaknar",
+   "slug": "Shaknar",
+   "name": "Shaknar",
+   "section": "Anastasia Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#CFB4DD",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Felt",
+   "slug": "Felt",
+   "name": "Felt",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reinhard van Astrea",
+   "slug": "Reinhard van Astrea",
+   "name": "Reinhard",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rom",
+   "slug": "Rom",
+   "name": "Rom",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Gaston",
+   "slug": "Gaston",
+   "name": "Gaston",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rachins Hoffman",
+   "slug": "Rachins Hoffman",
+   "name": "Rachins",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Camberley",
+   "slug": "Camberley",
+   "name": "Camberley",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Flam Remendis",
+   "slug": "Flam Remendis",
+   "name": "Flam",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Grassis Remendis",
+   "slug": "Grassis Remendis",
+   "name": "Grassis",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ezzo Cadner",
+   "slug": "Ezzo Cadner",
+   "name": "Ezzo",
+   "section": "Felt Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#EB4F50",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Filore",
+   "slug": "Filore",
+   "name": "Filore",
+   "section": "Filore Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#415381",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tiga Rauleon",
+   "slug": "Tiga Rauleon",
+   "name": "Tiga",
+   "section": "Filore Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#415381",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Sakura Element",
+   "slug": "Sakura Element",
+   "name": "Sakura",
+   "section": "Filore Camp",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#415381",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Miklotov McMahon",
+   "slug": "Miklotov McMahon",
+   "name": "Miklotov",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Bordeaux Zergev",
+   "slug": "Bordeaux Zergev",
+   "name": "Bordeaux",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Marcos Gildark",
+   "slug": "Marcos Gildark",
+   "name": "Marcos",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Russell Fellow",
+   "slug": "Russell Fellow",
+   "name": "Russell",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rickert Hoffman",
+   "slug": "Rickert Hoffman",
+   "name": "Rickert",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kadomon Risch",
+   "slug": "Kadomon Risch",
+   "name": "Kadomon",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Raksha Risch",
+   "slug": "Raksha Risch",
+   "name": "Raksha",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Plum Risch",
+   "slug": "Plum Risch",
+   "name": "Plum",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Grimm Fauzen",
+   "slug": "Grimm Fauzen",
+   "name": "Grimm",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Carol Remendis",
+   "slug": "Carol Remendis",
+   "name": "Carol",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Conwood Melahau",
+   "slug": "Conwood Melahau",
+   "name": "Conwood",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Orphe",
+   "slug": "Orphe",
+   "name": "Orphe",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Garitch Fabless",
+   "slug": "Garitch Fabless",
+   "name": "Garitch",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Shorty Megan",
+   "slug": "Shorty Megan",
+   "name": "Shorty",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lululala",
+   "slug": "Lululala",
+   "name": "Lululala",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Nico Olsen",
+   "slug": "Nico Olsen",
+   "name": "Olsen",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Bikram Edditz",
+   "slug": "Bikram Edditz",
+   "name": "Bikram",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Melty Pristis",
+   "slug": "Melty Pristis",
+   "name": "Melty",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Black Dog",
+   "slug": "Black Dog",
+   "name": "\"Black Dog\"",
+   "section": "Royal Capital",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kiritaka Muse",
+   "slug": "Kiritaka Muse",
+   "name": "Kiritaka",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dartz",
+   "slug": "Dartz",
+   "name": "Dartz",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lusbel Kallard",
+   "slug": "Lusbel Kallard",
+   "name": "Lusbel",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tina",
+   "slug": "Tina",
+   "name": "Tina",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Garek Thompson",
+   "slug": "Garek Thompson",
+   "name": "Garek",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reala Thompson",
+   "slug": "Reala Thompson",
+   "name": "Reala",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rafiel Thompson",
+   "slug": "Rafiel Thompson",
+   "name": "Rafiel",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Fred Thompson",
+   "slug": "Fred Thompson",
+   "name": "Fred",
+   "section": "Priestella",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Yaktol Suwen",
+   "slug": "Yaktol Suwen",
+   "name": "Yaktol",
+   "section": "Picoutatte",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Mazeran Suwen",
+   "slug": "Mazeran Suwen",
+   "name": "Mazeran",
+   "section": "Picoutatte",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Framir Suwen",
+   "slug": "Framir Suwen",
+   "name": "Framir",
+   "section": "Picoutatte",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Oslo Suwen",
+   "slug": "Oslo Suwen",
+   "name": "Oslo",
+   "section": "Picoutatte",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Diadora Regundra",
+   "slug": "Diadora Regundra",
+   "name": "Diadora",
+   "section": "Picoutatte",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Leno Rex",
+   "slug": "Leno Rex",
+   "name": "Leno",
+   "section": "Costuul",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Doltero Amule",
+   "slug": "Doltero Amule",
+   "name": "Doltero",
+   "section": "Flanders",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Toto",
+   "slug": "Toto",
+   "name": "Toto",
+   "section": "Flanders",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Manfred Madison",
+   "slug": "Manfred Madison",
+   "name": "Manfred",
+   "section": "Flanders",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Milde Arlam",
+   "slug": "Milde Arlam",
+   "name": "Milde",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rasphum",
+   "slug": "Rasphum",
+   "name": "Rasphum",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Mild",
+   "slug": "Mild",
+   "name": "Mild",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Cain",
+   "slug": "Cain",
+   "name": "Cain",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dain",
+   "slug": "Dain",
+   "name": "Dain",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lucas",
+   "slug": "Lucas",
+   "name": "Lucas",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Meina",
+   "slug": "Meina",
+   "name": "Meina",
+   "section": "Arlam Village",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Farsale Lugunica",
+   "slug": "Farsale Lugunica",
+   "name": "Farsale",
+   "section": "Lugunican Royal Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Gionis Lugunica",
+   "slug": "Gionis Lugunica",
+   "name": "Gionis",
+   "section": "Lugunican Royal Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Fourier Lugunica",
+   "slug": "Fourier Lugunica",
+   "name": "Fourier",
+   "section": "Lugunican Royal Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reid Astrea",
+   "slug": "Reid Astrea",
+   "name": "Reid",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Fribal van Astrea",
+   "slug": "Fribal van Astrea",
+   "name": "Fribal",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Veltol Astrea",
+   "slug": "Veltol Astrea",
+   "name": "Veltol",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tishua Astrea",
+   "slug": "Tishua Astrea",
+   "name": "Tishua",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Thames Astrea",
+   "slug": "Thames Astrea",
+   "name": "Thames",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Carlan Astrea",
+   "slug": "Carlan Astrea",
+   "name": "Carlan",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Theresia van Astrea",
+   "slug": "Theresia van Astrea",
+   "name": "Theresia",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Casilles Astrea",
+   "slug": "Casilles Astrea",
+   "name": "Casilles",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Louanna Astrea",
+   "slug": "Louanna Astrea",
+   "name": "Louanna",
+   "section": "Astrea Family",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Volcanica",
+   "slug": "Volcanica",
+   "name": "Volcanica",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Shaula",
+   "slug": "Shaula",
+   "name": "Shaula",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Flugel",
+   "slug": "Flugel",
+   "name": "Flugel",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Melakuera",
+   "slug": "Melakuera",
+   "name": "Melakuera",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Liliana Masquerade",
+   "slug": "Liliana Masquerade",
+   "name": "Liliana",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ia",
+   "slug": "Ia",
+   "name": "Ia",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Joseph",
+   "slug": "Joseph",
+   "name": "Joseph",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Biehn Argyle",
+   "slug": "Biehn Argyle",
+   "name": "Biehn",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Hannah Regret",
+   "slug": "Hannah Regret",
+   "name": "Hannah",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Setanta",
+   "slug": "Setanta",
+   "name": "Setanta",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Quark",
+   "slug": "Quark",
+   "name": "Quark",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Temae",
+   "slug": "Temae",
+   "name": "Temae",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Pivot Arnancy",
+   "slug": "Pivot Arnancy",
+   "name": "Pivot",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tholter Weasily",
+   "slug": "Tholter Weasily",
+   "name": "Tholter",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Roswaal J. Mathers",
+   "slug": "Roswaal J. Mathers",
+   "name": "Roswaal",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Libre Fermi",
+   "slug": "Libre Fermi",
+   "name": "Libre",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dynas Trussardi",
+   "slug": "Dynas Trussardi",
+   "name": "Dynas",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Sylphy Elmart",
+   "slug": "Sylphy Elmart",
+   "name": "Sylphy",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Fortuna",
+   "slug": "Fortuna",
+   "name": "Fortuna",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Meckart Karsten",
+   "slug": "Meckart Karsten",
+   "name": "Meckart",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Archi Elior",
+   "slug": "Archi Elior",
+   "name": "Archi",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dias Fatsbalm",
+   "slug": "Dias Fatsbalm",
+   "name": "Dias",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rodriguez",
+   "slug": "Rodriguez",
+   "name": "Rodriguez",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kalifa",
+   "slug": "Kalifa",
+   "name": "Kalifa",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ilya",
+   "slug": "Ilya",
+   "name": "Ilya",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Leip Barielle",
+   "slug": "Leip Barielle",
+   "name": "Leip",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ketty Muttart",
+   "slug": "Ketty Muttart",
+   "name": "Ketty",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Chap",
+   "slug": "Chap",
+   "name": "Chap",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Regin Suwen",
+   "slug": "Regin Suwen",
+   "name": "Regin",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Marone Lisbon",
+   "slug": "Marone Lisbon",
+   "name": "Marone",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Earth Spider",
+   "slug": "Earth Spider",
+   "name": "Earth Spider",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Gwain Merette",
+   "slug": "Gwain Merette",
+   "name": "Gwain",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Colette",
+   "slug": "Colette",
+   "name": "Colette",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Palmyra",
+   "slug": "Palmyra",
+   "name": "Palmyra",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Musica",
+   "slug": "Musica",
+   "name": "Musica",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Helaine Gatness",
+   "slug": "Helaine Gatness",
+   "name": "Helaine",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Belmont",
+   "slug": "Belmont",
+   "name": "Belmont",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reiner Wahrheit",
+   "slug": "Reiner Wahrheit",
+   "name": "Reiner",
+   "section": "Citizens",
+   "region": "Dragon Kingdom of Lugunica",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Vincent Vollachia",
+   "slug": "Vincent Vollachia",
+   "name": "Vincent",
+   "section": "Vollachian Imperial Family",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Stride Vollachia",
+   "slug": "Stride Vollachia",
+   "name": "Stride",
+   "section": "Vollachian Imperial Family",
+   "region": "Sacred Vollachia Empire",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lamia Godwin",
+   "slug": "Lamia Godwin",
+   "name": "Lamia",
+   "section": "Vollachian Imperial Family",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Eugard Vollachia",
+   "slug": "Eugard Vollachia",
+   "name": "Eugard",
+   "section": "Vollachian Imperial Family",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Cecilus Segmunt",
+   "slug": "Cecilus Segmunt",
+   "name": "Cecilus",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Arakiya",
+   "slug": "Arakiya",
+   "name": "Arakiya",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Olbart Dunkelkenn",
+   "slug": "Olbart Dunkelkenn",
+   "name": "Olbart",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Chisha Gold",
+   "slug": "Chisha Gold",
+   "name": "Chisha",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Goz Ralfon",
+   "slug": "Goz Ralfon",
+   "name": "Goz",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Groovy Gumlet",
+   "slug": "Groovy Gumlet",
+   "name": "Groovy",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Yorna Mishigure",
+   "slug": "Yorna Mishigure",
+   "name": "Yorna",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Moguro Hagane",
+   "slug": "Moguro Hagane",
+   "name": "Moguro",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Madelyn Eschart",
+   "slug": "Madelyn Eschart",
+   "name": "Madelyn",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Balleroy Temeglyph",
+   "slug": "Balleroy Temeglyph",
+   "name": "Balleroy",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kafma Irulux",
+   "slug": "Kafma Irulux",
+   "name": "Kafma",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Zikr Osman",
+   "slug": "Zikr Osman",
+   "name": "Zikr",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kurgan",
+   "slug": "Kurgan",
+   "name": "Kurgan",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Miles",
+   "slug": "Miles",
+   "name": "Miles",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Jamal Aurélie",
+   "slug": "Jamal Aurélie",
+   "name": "Jamal",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Todd Fang",
+   "slug": "Todd Fang",
+   "name": "Todd",
+   "section": "Imperial Army & Nine Divine Generals",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Berstetz Fondalfon",
+   "slug": "Berstetz Fondalfon",
+   "name": "Berstetz",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Carillon",
+   "slug": "Carillon",
+   "name": "Carillon",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Serena Dracroy",
+   "slug": "Serena Dracroy",
+   "name": "Serena",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Jorah Pendleton",
+   "slug": "Jorah Pendleton",
+   "name": "Jorah",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Neiji Lockhart",
+   "slug": "Neiji Lockhart",
+   "name": "Neiji",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Shasuke",
+   "slug": "Shasuke",
+   "name": "Shasuke",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Raizo",
+   "slug": "Raizo",
+   "name": "Raizo",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Melinda",
+   "slug": "Melinda",
+   "name": "Melinda",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Flop O'Connell",
+   "slug": "Flop O'Connell",
+   "name": "Flop",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Medium O'Connell",
+   "slug": "Medium O'Connell",
+   "name": "Medium",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rowan Segmunt",
+   "slug": "Rowan Segmunt",
+   "name": "Rowan",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Mizelda",
+   "slug": "Mizelda",
+   "name": "Mizelda",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Utakata",
+   "slug": "Utakata",
+   "name": "Utakata",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Kuna",
+   "slug": "Kuna",
+   "name": "Kuna",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Holly",
+   "slug": "Holly",
+   "name": "Holly",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Taritta Shudrak",
+   "slug": "Taritta Shudrak",
+   "name": "Taritta",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Ubilk",
+   "slug": "Ubilk",
+   "name": "Ubilk",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Katya Aurélie",
+   "slug": "Katya Aurélie",
+   "name": "Katya",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Hornet",
+   "slug": "Hornet",
+   "name": "Hornet",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tanza",
+   "slug": "Tanza",
+   "name": "Tanza",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Hiain Yatz",
+   "slug": "Hiain Yatz",
+   "name": "Hiain",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Weitz Rogen",
+   "slug": "Weitz Rogen",
+   "name": "Weitz",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Idra Missanga",
+   "slug": "Idra Missanga",
+   "name": "Idra",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Gustav Morello",
+   "slug": "Gustav Morello",
+   "name": "Gustav",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Null",
+   "slug": "Null",
+   "name": "Null",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Mezoreia",
+   "slug": "Mezoreia",
+   "name": "Mezoreia",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Valgren",
+   "slug": "Valgren",
+   "name": "Valgren",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Oulouzo Tarask",
+   "slug": "Oulouzo Tarask",
+   "name": "Oulouzo",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Jimrack",
+   "slug": "Jimrack",
+   "name": "Jimrack",
+   "section": "Citizens",
+   "region": "Sacred Vollachia Empire",
+   "color": "#DC143C",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Alec Hoshin",
+   "slug": "Alec Hoshin",
+   "name": "Alec",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reisel",
+   "slug": "Reisel",
+   "name": "Reisel",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dorkell",
+   "slug": "Dorkell",
+   "name": "Dorkell",
+   "section": "Witch Cultists & Associates",
+   "region": "Witch Cult",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Halibel",
+   "slug": "Halibel",
+   "name": "Halibel",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Zarestia",
+   "slug": "Zarestia",
+   "name": "Zarestia",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reize",
+   "slug": "Reize",
+   "name": "Reize",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Natsuki Rigel",
+   "slug": "Natsuki Rigel",
+   "name": "Rigel",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Natsuki Spica",
+   "slug": "Natsuki Spica",
+   "name": "Spica",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#5CD411",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Chamov",
+   "slug": "Chamov",
+   "name": "Chamov",
+   "section": "",
+   "region": "Kararagi City-States",
+   "color": "#FFD700",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Elsa Granhiert",
+   "slug": "Elsa Granhiert",
+   "name": "Elsa",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Vague Adgard",
+   "slug": "Vague Adgard",
+   "name": "Vague",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tiriena",
+   "slug": "Tiriena",
+   "name": "Tiriena",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Beli Hainelga",
+   "slug": "Beli Hainelga",
+   "name": "Beli",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Noelle Tuérico",
+   "slug": "Noelle Tuérico",
+   "name": "Noelle",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Podoso",
+   "slug": "Podoso",
+   "name": "Podoso",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Admonsah",
+   "slug": "Admonsah",
+   "name": "Admonsah",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Maqueena",
+   "slug": "Maqueena",
+   "name": "Maqueena",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Trellock",
+   "slug": "Trellock",
+   "name": "Trellock",
+   "section": "",
+   "region": "Holy Kingdom of Gusteko",
+   "color": "#0070FF",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Spica",
+   "slug": "Spica",
+   "name": "Spica",
+   "section": "",
+   "region": "Unspecified",
+   "color": "#7D11CA",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Shion",
+   "slug": "Shion",
+   "name": "Shion",
+   "section": "",
+   "region": "Unspecified",
+   "color": "#7D11CA",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lilac",
+   "slug": "Lilac",
+   "name": "Lilac",
+   "section": "",
+   "region": "Unspecified",
+   "color": "#7D11CA",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Capella Emerada Lugnica",
+   "slug": "Capella Emerada Lugnica",
+   "name": "Capella",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Clarissa",
+   "slug": "Clarissa",
+   "name": "Clarissa",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Reborn",
+   "slug": "Reborn",
+   "name": "Reborn",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Arbalest",
+   "slug": "Arbalest",
+   "name": "Arbalest",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Tornel",
+   "slug": "Tornel",
+   "name": "Tornel",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Bellaris",
+   "slug": "Bellaris",
+   "name": "Bellaris",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Dandon",
+   "slug": "Dandon",
+   "name": "Dandon",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lucierica",
+   "slug": "Lucierica",
+   "name": "Lucierica",
+   "section": "",
+   "region": "Beloved Children",
+   "color": "#FEA5D4",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Petelgeuse Romanée-Conti",
+   "slug": "Petelgeuse Romanée-Conti",
+   "name": "Petelgeuse",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Regulus Corneas",
+   "slug": "Regulus Corneas",
+   "name": "Regulus",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Lye Batenkaitos",
+   "slug": "Lye Batenkaitos",
+   "name": "Lye",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Roy Alphard",
+   "slug": "Roy Alphard",
+   "name": "Roy",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Rui Arneb",
+   "slug": "Rui Arneb",
+   "name": "Rui",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Sirius Romanée-Conti",
+   "slug": "Sirius Romanée-Conti",
+   "name": "Sirius",
+   "section": "Sin Archbishops",
+   "region": "Witch Cult",
+   "color": "#000000",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Pandora",
+   "slug": "Pandora",
+   "name": "Pandora",
+   "section": "Witch Cultists & Associates",
+   "region": "Witch Cult",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Satella",
+   "slug": "Satella",
+   "name": "Satella",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Echidna",
+   "slug": "Echidna",
+   "name": "Echidna",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Minerva",
+   "slug": "Minerva",
+   "name": "Minerva",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Sekhmet",
+   "slug": "Sekhmet",
+   "name": "Sekhmet",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Daphne",
+   "slug": "Daphne",
+   "name": "Daphne",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Typhon",
+   "slug": "Typhon",
+   "name": "Typhon",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Carmilla",
+   "slug": "Carmilla",
+   "name": "Carmilla",
+   "section": "Witches of Sin",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Hector",
+   "slug": "Hector",
+   "name": "Hector",
+   "section": "Supernumerary & Other Witches",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Omega",
+   "slug": "Omega",
+   "name": "Omega",
+   "section": "Supernumerary & Other Witches",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Sphinx",
+   "slug": "Sphinx",
+   "name": "Sphinx",
+   "section": "Supernumerary & Other Witches",
+   "region": "Witches",
+   "color": "#C0C0C0",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Natsuki Kenichi",
+   "slug": "Natsuki Kenichi",
+   "name": "Kenichi",
+   "section": "",
+   "region": "Japan",
+   "color": "#BC002D",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  },
+  {
+   "title": "Natsuki Naoko",
+   "slug": "Natsuki Naoko",
+   "name": "Naoko",
+   "section": "",
+   "region": "Japan",
+   "color": "#BC002D",
+   "image": "data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"
+  }
+ ]
+}

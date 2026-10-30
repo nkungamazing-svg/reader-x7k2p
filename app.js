@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -706,6 +706,51 @@ function characterMatchScore(query, title) {
   return Math.round(80 * found / parts.length);
 }
 
+async function characterIndex() {
+  if (state.characterIndex) return state.characterIndex;
+  const map = new Map();
+  try {
+    const response = await fetch("characters.json", { cache: "force-cache" });
+    if (response.ok) {
+      const payload = await response.json();
+      for (const entry of payload?.characters || []) {
+        if (!entry || !entry.image) continue;
+        for (const key of [entry.title, entry.slug, entry.name]) {
+          const normalized = normalizeCharacterKey(key).toLocaleLowerCase();
+          if (normalized && !map.has(normalized)) map.set(normalized, entry);
+        }
+      }
+    }
+  } catch (_) { /* index is optional; live search still works */ }
+  state.characterIndex = map;
+  return map;
+}
+
+async function characterIndexEntry(query) {
+  if (!query) return null;
+  const index = await characterIndex();
+  return index.get(normalizeCharacterKey(query).toLocaleLowerCase()) || null;
+}
+
+async function lookupCharacterPortrait(query) {
+  if (!query || !state.loadRemoteImages) return { image: "", entry: null };
+  const entry = await characterIndexEntry(query);
+  if (entry) return { image: entry.image, entry };
+  return { image: await lookupCharacterImage(query), entry: null };
+}
+
+function applyCharacterFaction(entry) {
+  const card = byId("character-card");
+  if (entry?.color) card.style.setProperty("--character-color", entry.color);
+  else card.style.removeProperty("--character-color");
+}
+
+function characterFactionLabel(entry) {
+  if (!entry) return "";
+  const parts = [entry.section, entry.region].filter(Boolean);
+  return parts.length ? parts.join(" · ") + " · Re:Zero Wiki" : "จาก Re:Zero Wiki";
+}
+
 async function searchCharacterImages(query) {
   const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=6&gsrsearch="
     + encodeURIComponent(query) + "&prop=pageimages&piprop=thumbnail&pithumbsize=320";
@@ -796,6 +841,7 @@ async function openCharacterCard(label) {
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
+    applyCharacterFaction(null);
     const tableSize = state.characterNames ? Object.keys(state.characterNames).length : 0;
     byId("character-card-note").textContent = tableSize
       ? "“" + thai + "” ไม่อยู่ในตารางชื่อที่นำเข้า — พิมพ์ชื่อภาษาอังกฤษแล้วกดบันทึก"
@@ -803,7 +849,9 @@ async function openCharacterCard(label) {
     byId("character-card-input").value = "";
     return;
   }
-  const image = await lookupCharacterImage(query);
+  const portrait = await lookupCharacterPortrait(query);
+  const image = portrait.image;
+  applyCharacterFaction(portrait.entry);
   if (card.hidden) return;
   if (!image) {
     showCharacterForm(true);
@@ -814,7 +862,7 @@ async function openCharacterCard(label) {
     return;
   }
   setCharacterFigure(image, thai);
-  byId("character-card-note").textContent = "จาก Re:Zero Wiki";
+  byId("character-card-note").textContent = characterFactionLabel(portrait.entry);
   state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
