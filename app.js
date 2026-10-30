@@ -5,7 +5,7 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.5.5";
+const APP_VERSION = "1.5.6";
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
@@ -31,7 +31,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterCardTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterCardTimer: 0, characterNames: null, characterSuggestTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -623,14 +623,44 @@ function characterQuery(label) {
   return String(label.dataset.characterEn || label.dataset.english || label.dataset.wiki || label.title || "").trim();
 }
 
+async function characterNameTable() {
+  if (!state.characterNames) {
+    const stored = await readSetting("characterNames", {});
+    state.characterNames = stored && typeof stored === "object" ? stored : {};
+  }
+  return state.characterNames;
+}
+
+async function characterTitleFor(label) {
+  const direct = characterQuery(label);
+  if (direct) return direct;
+  const table = await characterNameTable();
+  return table[characterThaiName(label)] || "";
+}
+
+async function rememberCharacterName(thai, title) {
+  const table = await characterNameTable();
+  table[thai] = title;
+  await writeSetting("characterNames", table);
+}
+
+async function searchCharacterPages(query) {
+  if (!query || query.length < 2) return [];
+  try {
+    const response = await fetch("https://rezero.fandom.com/api.php?action=query&format=json&origin=*&list=search&srlimit=5&srsearch=" + encodeURIComponent(query), { referrerPolicy: "no-referrer" });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    return (payload?.query?.search || []).map(hit => hit.title).filter(Boolean);
+  } catch (_) { return []; }
+}
+
 async function lookupCharacterImage(query) {
   if (!query || !state.loadRemoteImages) return "";
   if (!state.characterImages) state.characterImages = await readSetting("characterImages", {});
   const key = query.toLocaleLowerCase();
   if (Object.prototype.hasOwnProperty.call(state.characterImages, key)) return state.characterImages[key] || "";
-  const endpoint = "https://rezero.fandom.com/api.php";
   const pageImage = async title => {
-    const url = `${endpoint}?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=320&titles=${encodeURIComponent(title)}`;
+    const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=320&titles=" + encodeURIComponent(title);
     const response = await fetch(url, { referrerPolicy: "no-referrer" });
     if (!response.ok) return "";
     const payload = await response.json();
@@ -641,9 +671,8 @@ async function lookupCharacterImage(query) {
   try {
     image = await pageImage(query);
     if (!image) {
-      const response = await fetch(`${endpoint}?action=query&format=json&origin=*&list=search&srlimit=1&srsearch=${encodeURIComponent(query)}`, { referrerPolicy: "no-referrer" });
-      const hit = response.ok ? (await response.json())?.query?.search?.[0]?.title : "";
-      if (hit) image = await pageImage(hit);
+      const hits = await searchCharacterPages(query);
+      if (hits[0]) image = await pageImage(hits[0]);
     }
   } catch (_) { image = ""; }
   state.characterImages[key] = image;
@@ -651,32 +680,67 @@ async function lookupCharacterImage(query) {
   return image;
 }
 
+function showCharacterForm(visible) {
+  byId("character-card-form").hidden = !visible;
+  const box = byId("character-card-suggestions");
+  if (!visible) { box.hidden = true; box.replaceChildren(); }
+  else clearTimeout(state.characterCardTimer);
+}
+
 function closeCharacterCard() {
-  const card = byId("character-card");
   clearTimeout(state.characterCardTimer);
-  if (card) card.hidden = true;
+  byId("character-card").hidden = true;
+}
+
+function setCharacterFigure(image, thai) {
+  const figure = byId("character-card-figure");
+  if (!image) { figure.replaceChildren(); return; }
+  const img = document.createElement("img");
+  img.alt = thai; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = image;
+  figure.replaceChildren(img);
+}
+
+async function applyCharacterName(title) {
+  if (!title) return;
+  const thai = byId("character-card-name").textContent || "ตัวละคร";
+  await rememberCharacterName(thai, title);
+  const image = await lookupCharacterImage(title);
+  if (byId("character-card").hidden) return;
+  setCharacterFigure(image, thai);
+  showCharacterForm(!image);
+  byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
+  if (image) state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
 async function openCharacterCard(label) {
-  const card = byId("character-card"), figure = byId("character-card-figure");
+  const card = byId("character-card");
   const thai = characterThaiName(label) || "ตัวละคร";
-  const query = characterQuery(label);
   byId("character-card-name").textContent = thai;
-  byId("character-card-note").textContent = query ? "กำลังค้นรูป…" : "ไม่พบชื่อภาษาอังกฤษของตัวละครนี้";
-  const spinner = document.createElement("span"); spinner.className = "character-card-spinner"; spinner.setAttribute("aria-hidden", "true");
-  figure.replaceChildren(spinner);
+  const spinner = document.createElement("span");
+  spinner.className = "character-card-spinner"; spinner.setAttribute("aria-hidden", "true");
+  byId("character-card-figure").replaceChildren(spinner);
+  showCharacterForm(false);
+  byId("character-card-note").textContent = "กำลังค้นรูป…";
   card.hidden = false;
-  if (!query) return;
+  const query = await characterTitleFor(label);
+  if (card.hidden) return;
+  if (!query) {
+    setCharacterFigure("", thai);
+    showCharacterForm(true);
+    byId("character-card-note").textContent = "ยังไม่มีชื่อภาษาอังกฤษ — พิมพ์หรือเลือกชื่อจากวิกิแล้วกดบันทึก (จำไว้ครั้งเดียว)";
+    byId("character-card-input").value = "";
+    return;
+  }
   const image = await lookupCharacterImage(query);
   if (card.hidden) return;
-  if (image) {
-    const img = document.createElement("img"); img.alt = thai; img.referrerPolicy = "no-referrer"; img.src = image;
-    figure.replaceChildren(img);
-    byId("character-card-note").textContent = "จาก Re:Zero Wiki";
-  } else {
-    figure.replaceChildren();
-    byId("character-card-note").textContent = state.loadRemoteImages ? "ไม่พบรูปของชื่อนี้" : "เปิด “โหลดรูปจากเว็บต้นทาง” เพื่อดูรูป";
+  if (!image) {
+    showCharacterForm(true);
+    byId("character-card-note").textContent = "ไม่พบรูปของ “" + query + "” — ลองเลือกชื่ออื่น";
+    byId("character-card-input").value = query;
+    return;
   }
+  setCharacterFigure(image, thai);
+  byId("character-card-note").textContent = "จาก Re:Zero Wiki";
   state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
 }
 
@@ -695,6 +759,27 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
+  byId("character-card-form").addEventListener("submit", event => {
+    event.preventDefault();
+    void applyCharacterName(byId("character-card-input").value.trim());
+  });
+  byId("character-card-input").addEventListener("input", event => {
+    const value = event.target.value.trim();
+    clearTimeout(state.characterSuggestTimer);
+    state.characterSuggestTimer = setTimeout(async () => {
+      const box = byId("character-card-suggestions");
+      const suggestions = await searchCharacterPages(value);
+      box.replaceChildren();
+      if (!suggestions.length) { box.hidden = true; return; }
+      for (const title of suggestions) {
+        const chip = document.createElement("button");
+        chip.type = "button"; chip.className = "character-chip"; chip.textContent = title;
+        chip.addEventListener("click", () => { byId("character-card-input").value = title; void applyCharacterName(title); });
+        box.append(chip);
+      }
+      box.hidden = false;
+    }, 320);
+  });
 }
 
 function installParagraphTapTargets() {
