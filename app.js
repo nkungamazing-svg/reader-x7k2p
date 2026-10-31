@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.8";
+const APP_VERSION = "1.8.9";
 const CHANGELOG = [
+  { version: "1.8.9", note: "การ์ดตัวละครมีป้ายสีบอกกลุ่ม/แคมป์ ปุ่มแก้ชื่อกะทัดรัดขึ้น และเปิดแอปแล้วไม่เห็นหน้าจอซ้ำสองรอบ" },
   { version: "1.8.8", note: "การ์ดตัวละครบอกชื่อภาษาอังกฤษที่จับคู่ไว้ แก้ชื่อที่พิมพ์ผิดได้ และข้อความออฟไลน์ขึ้นครั้งเดียวต่อเวอร์ชัน" },
   { version: "1.8.7", note: "การแจ้งเตือนย้ายขึ้นไปใต้แถบด้านบน ไม่บังปุ่มหรือเนื้อหาด้านล่างแล้ว" },
   { version: "1.8.6", note: "ตอนแถบเมนูโผล่หรือซ่อน ตัวหนังสือไม่กระตุกขี้นลงแล้ว" },
@@ -833,13 +834,19 @@ async function lookupCharacterPortrait(query) {
 
 function applyCharacterFaction(entry) {
   const card = byId("character-card");
+  const badge = byId("character-card-faction");
   if (entry?.color) card.style.setProperty("--character-color", entry.color);
   else card.style.removeProperty("--character-color");
+  // บอกด้วยว่ารูปนี้อยู่กลุ่ม/แคมป์ไหน แล้วใช้สีกลุ่มนั้นกับการ์ดทั้งหลัง
+  const group = entry?.section || entry?.region || "";
+  badge.hidden = !group;
+  badge.textContent = group;
+  card.classList.toggle("has-faction", Boolean(group));
 }
 
 function characterFactionLabel(entry) {
   if (!entry) return "";
-  const parts = [entry.section, entry.region].filter(Boolean);
+  const parts = [entry.region].filter(Boolean);
   return parts.length ? parts.join(" · ") + " · Re:Zero Wiki" : "จาก Re:Zero Wiki";
 }
 
@@ -1729,12 +1736,17 @@ function setTextWidth(value) {
 
 function startServiceWorker() {
   const hadController = Boolean(navigator.serviceWorker.controller);
+  const openedAt = performance.now();
   let reloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (!hadController || reloaded) return;
     reloaded = true;
     if (sessionStorage.getItem("noat-sw-reloaded") === APP_VERSION) return;
     sessionStorage.setItem("noat-sw-reloaded", APP_VERSION);
+    // An update that lands while the splash is still up would reload the page a
+    // second time, so the app looked like it started twice. The new cache is
+    // already stored; the next launch picks it up without a second splash.
+    if (performance.now() - openedAt < 4000) return;
     location.reload();
   });
   navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" })
