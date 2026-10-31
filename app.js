@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.4";
+const APP_VERSION = "1.9.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.9.5", note: "เพิ่มธีมฮาโลวีน คริสต์มาส ปีใหม่ไทย และโคมไฟอ่านหนังสือ" },
   { version: "1.9.4", note: "หน้าเปิดแอปนุ่มขึ้น โลโก้ค่อย ๆ ปรากฏ ไม่กระตุกเข้าหา" },
   { version: "1.9.3", note: "กดค้างแล้วเลือกหรือก๊อปข้อความในแอปไม่ได้แล้ว ยกเว้นช่องกรอก" },
   { version: "1.9.2", note: "การ์ดรูปตัวละครกะทัดรัดขึ้น ชื่อไทยกับชื่ออังกฤษอยู่บรรทัดเดียวกัน" },
@@ -23,8 +24,8 @@ const CHANGELOG = [
 
 const SPLASH_MIN_MS = 850;
 const splashStartedAt = performance.now();
-const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk"];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120" };
+const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk", "halloween", "christmas", "songkran", "reading"];
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", halloween: "#150f1f", christmas: "#0d1d16", songkran: "#eaf6fb", reading: "#1e170f" };
 
 function renderChangelog() {
   const list = document.getElementById("changelog-list");
