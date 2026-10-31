@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.3";
+const APP_VERSION = "1.9.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.9.4", note: "หน้าเปิดแอปนุ่มขึ้น โลโก้ค่อย ๆ ปรากฏ ไม่กระตุกเข้าหา" },
   { version: "1.9.3", note: "กดค้างแล้วเลือกหรือก๊อปข้อความในแอปไม่ได้แล้ว ยกเว้นช่องกรอก" },
   { version: "1.9.2", note: "การ์ดรูปตัวละครกะทัดรัดขึ้น ชื่อไทยกับชื่ออังกฤษอยู่บรรทัดเดียวกัน" },
   { version: "1.9.1", note: "ประวัติอัปเดตสั้นลง เหลือเฉพาะเรื่องสำคัญ" },
