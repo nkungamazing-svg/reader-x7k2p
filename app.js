@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.9";
+const APP_VERSION = "1.9.0";
 const CHANGELOG = [
+  { version: "1.9.0", note: "หน้าตั้งค่ามีคู่มือสั้น ๆ ว่าปุ่มบนแถบล่างและท่าทางต่าง ๆ ทำอะไร และแก้ชื่อสวิตช์ให้เข้าใจง่ายขึ้น" },
   { version: "1.8.9", note: "การ์ดตัวละครมีป้ายสีบอกกลุ่ม/แคมป์ ปุ่มแก้ชื่อกะทัดรัดขึ้น และเปิดแอปแล้วไม่เห็นหน้าจอซ้ำสองรอบ" },
   { version: "1.8.8", note: "การ์ดตัวละครบอกชื่อภาษาอังกฤษที่จับคู่ไว้ แก้ชื่อที่พิมพ์ผิดได้ และข้อความออฟไลน์ขึ้นครั้งเดียวต่อเวอร์ชัน" },
   { version: "1.8.7", note: "การแจ้งเตือนย้ายขึ้นไปใต้แถบด้านบน ไม่บังปุ่มหรือเนื้อหาด้านล่างแล้ว" },
@@ -742,7 +743,9 @@ async function updateCharacterTableCount() {
   const table = await characterNameTable();
   const count = Object.keys(table).length;
   const label = byId("character-table-count");
-  if (label) label.textContent = count ? "จับคู่ไว้ " + count.toLocaleString("th-TH") + " ชื่อ" : "ใช้จับคู่ชื่อไทยกับชื่อในวิกิ (ไฟล์ JSON จากคลังคำศัพท์)";
+  if (label) label.textContent = count
+    ? "จับคู่ไว้ " + count.toLocaleString("th-TH") + " ชื่อ · ใช้ดึงรูปและกลุ่มของตัวละคร"
+    : "จับคู่ชื่อไทยในบทกับชื่ออังกฤษในวิกิ เพื่อดึงรูปและกลุ่มของตัวละคร";
 }
 
 async function importCharacterTable(file) {

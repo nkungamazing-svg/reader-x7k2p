@@ -132,16 +132,16 @@
       <section class="settings-group">
         <h3>การอ่าน</h3>
         <div class="setting-row"><span>โหมดการอ่าน</span><div class="theme-row"><button id="mode-page" class="theme-choice" type="button" aria-pressed="true">📖 พลิกหน้า</button><button id="mode-scroll" class="theme-choice" type="button" aria-pressed="false">📜 เลื่อนต่อเนื่อง</button></div><small class="setting-hint">โหมดพลิกหน้า: ปัดซ้าย/ขวาหรือแตะขอบจอเพื่อเปลี่ยนหน้า แตะกลางจอเพื่อซ่อนแถบเครื่องมือ</small></div>
-        <label class="switch-row"><span>ย่อหน้าซึ่งหน้าแบบนิยาย</span><input id="indent-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+        <label class="switch-row"><span>ย่อหน้าถอยร่นแบบหนังสือ</span><input id="indent-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>ไฮไลต์ย่อหน้าที่กำลังอ่าน</span><input id="highlight-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
-        <label class="switch-row"><span>เลื่อนตามอัตโนมัติ</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+        <label class="switch-row"><span>เลื่อนจอตามเสียงอ่าน</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>แตะข้อความเพื่ออ่านออกเสียง</span><input id="tap-speech-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
-        <label class="switch-row"><span>แสดงคำแนะนำการแตะจอ</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+        <label class="switch-row"><span>คำแนะนำการแตะจอ (ขึ้นครั้งแรก)</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </section>
       <section class="settings-group">
         <h3>เสียงอ่าน</h3>
         <label class="setting-row" for="voice-select"><span>เสียงภาษาไทย</span><select id="voice-select"><option value="">กำลังค้นหาเสียง…</option></select><small class="setting-hint">รายการเสียงขึ้นกับเสียงที่ Safari เปิดให้เว็บใช้งาน อาจไม่แสดงเสียงที่ติดตั้งไว้ทั้งหมด</small></label>
-        <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div></div>
+        <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div><small class="setting-hint">0.6× ช้า ถึง 1.6× เร็ว</small></div>
       </section>
       <section class="settings-group">
         <h3>ซิงก์กับต้นทาง</h3>
@@ -162,6 +162,19 @@
         <div class="setting-row"><span>ตารางชื่อตัวละคร</span><div class="row-actions"><button id="character-table-open" class="tool-button" type="button">นำเข้า JSON</button><button id="character-table-clear" class="tool-button" type="button">ล้าง</button></div><small id="character-table-count" class="setting-hint">ใช้จับคู่ชื่อไทยกับชื่อในวิกิ</small></div>
         <input id="character-table-file" type="file" accept="application/json,.json" hidden>
       </section>
+      <details id="settings-help" class="changelog settings-help">
+        <summary>ปุ่มบนแถบล่างและท่าทางใช้งาน</summary>
+        <dl class="help-list">
+          <dt>ย้อน · ข้าม</dt><dd>เลื่อนเสียงอ่านไปย่อหน้าก่อนหน้าหรือถัดไป</dd>
+          <dt>ฟัง · หยุด</dt><dd>เริ่มอ่านต่อจากย่อหน้าปัจจุบัน หรือหยุดชั่วคราว</dd>
+          <dt>โหมด</dt><dd>สลับระหว่างพลิกหน้าทีละหน้าและเลื่อนต่อเนื่อง</dd>
+          <dt>ซ่อน</dt><dd>เก็บแถบเครื่องมือลง แตะเนื้อหาเพื่อเรียกกลับ</dd>
+          <dt>ตั้งค่า</dt><dd>เปิดแผงนี้เพื่อปรับการอ่าน</dd>
+          <dt>แตะกลางจอ</dt><dd>โหมดพลิกหน้า: เปิดหรือซ่อนแถบเครื่องมือ</dd>
+          <dt>แตะขอบหรือปัด</dt><dd>โหมดพลิกหน้า: ไปหน้าถัดไปหรือย้อนกลับ</dd>
+          <dt>แตะย่อหน้า</dt><dd>อ่านออกเสียงจากย่อหน้านั้น</dd>
+        </dl>
+      </details>
       <div class="settings-version"><small id="app-version"></small></div>
       <details id="changelog" class="changelog">
         <summary>มีอะไรใหม่ในแต่ละเวอร์ชัน</summary>
