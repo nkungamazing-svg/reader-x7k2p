@@ -330,6 +330,9 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 /* กันการซูม: iOS จะซูมเองเมื่อโฟกัสช่องกรอกที่ตัวอักษรเล็กกว่า 16px
    และ pinch/double-tap zoom ทำให้หน้าอ่านกระโดด */
 html,body { touch-action:pan-y; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+/* กันกดค้างแล้วเลือก/ก๊อปข้อความทั้งแอป (ช่องกรอกยังพิมพ์ได้ตามปกติ) */
+html,body { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+input,textarea,select,[contenteditable="true"] { -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
 input,select,textarea { font-size:max(16px,1em); }
 button,label,.switch-row,.theme-choice,.tool-button { touch-action:manipulation; }
 

@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.2";
+const APP_VERSION = "1.9.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.9.3", note: "กดค้างแล้วเลือกหรือก๊อปข้อความในแอปไม่ได้แล้ว ยกเว้นช่องกรอก" },
   { version: "1.9.2", note: "การ์ดรูปตัวละครกะทัดรัดขึ้น ชื่อไทยกับชื่ออังกฤษอยู่บรรทัดเดียวกัน" },
   { version: "1.9.1", note: "ประวัติอัปเดตสั้นลง เหลือเฉพาะเรื่องสำคัญ" },
   { version: "1.9.0", note: "คู่มือปุ่มและท่าทางในหน้าตั้งค่า" },
@@ -1013,8 +1014,10 @@ function installCharacterCards() {
   });
   byId("character-table-clear").addEventListener("click", () => { void clearCharacterTable(); });
   void updateCharacterTableCount();
+  // ไม่ให้เลือก/ก๊อปข้อความทั้งแอป เว้นแต่ช่องกรอกที่ต้องพิมพ์หรือวางลิงก์
   document.addEventListener("selectstart", event => {
-    if (event.target.closest?.("#reader-content, .reader-topbar")) event.preventDefault();
+    if (event.target.closest?.("input, textarea, select, [contenteditable=true]")) return;
+    event.preventDefault();
   });
   byId("character-card-form").addEventListener("submit", event => {
     event.preventDefault();
