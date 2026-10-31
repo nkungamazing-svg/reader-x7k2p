@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "คลังบทแปลส่วนตัว",
-  "short_name": "คลังบทแปล",
+  "name": "Re:NovelTH",
+  "short_name": "Re:NovelTH",
   "description": "อ่านบทแปลที่นำเข้าไว้แบบออฟไลน์ ใช้ส่วนตัวเท่านั้น",
   "lang": "th",
   "start_url": "./",
