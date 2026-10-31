@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.2";
+const APP_VERSION = "1.8.3";
 const CHANGELOG = [
+  { version: "1.8.3", note: "ฉากหลังตอนเปิดรายการบทจางลงและลิ้นชักขอบมน ให้เข้ากับหน้าตั้งค่ามากขึ้น" },
   { version: "1.8.2", note: "หน้าเริ่มต้นมีปุ่ม “ซิงก์จากลิงก์ต้นทาง” ไม่ต้องนำเข้าไฟล์ JSON ก่อน" },
   { version: "1.8.1", note: "ซิงก์บทแปลจากลิงก์ไฟล์สำรองเองเมื่อเปิดแอป ไม่ต้อง import ไฟล์ซ้ำ" },
   { version: "1.8.0", note: "ท้ายหน้าตั้งค่าแสดงประวัติการอัปเดตแบบกาง/พับได้" },
