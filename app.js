@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.5";
+const APP_VERSION = "1.8.6";
 const CHANGELOG = [
+  { version: "1.8.6", note: "ตอนแถบเมนูโผล่หรือซ่อน ตัวหนังสือไม่กระตุกขี้นลงแล้ว" },
   { version: "1.8.5", note: "เลื่อนอ่านขึ้นแล้วแถบเมนูไม่โผล่เองอีก แตะเนื้อหาเมื่อต้องการเปิด" },
   { version: "1.8.4", note: "แถบเมนูซ่อนเองอัตโนมัติทั้งโหมดเลื่อนและโหมดพลิกหน้า แตะกลางจอหรือเลื่อนขึ้นเพื่อเปิดใหม่" },
   { version: "1.8.3", note: "ฉากหลังตอนเปิดรายการบทจางลงและลิ้นชักขอบมน ให้เข้ากับหน้าตั้งค่ามากขึ้น" },

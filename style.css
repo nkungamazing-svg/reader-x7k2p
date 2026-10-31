@@ -231,11 +231,12 @@ body.scroll-mode .page-top-row { display:none; }
 @media(prefers-reduced-motion:reduce) { .splash img,.splash strong,.splash small,.splash-bar i { animation:none } }
 
 /* ---------- Hide the chrome in scroll mode too ---------- */
-body.scroll-mode .app-header { transition:opacity .2s ease,transform .2s ease; }
-body.scroll-mode.chrome-hidden .app-header { display:none; }
+/* Keep the header's space in the layout while it slides away, otherwise the
+   text jumps up and down every time the chrome appears or hides. */
+body.scroll-mode .app-header { transition:opacity .2s ease,transform .2s ease,visibility 0s linear 0s; }
+body.scroll-mode.chrome-hidden .app-header { opacity:0; visibility:hidden; transform:translateY(-100%); pointer-events:none; transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s; }
 body.scroll-mode .audio-bar { transition:opacity .2s ease,transform .2s ease; }
 body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%); pointer-events:none; }
-body.scroll-mode.chrome-hidden .reader-content { padding-top:0; }
 .audio-chrome { color:var(--accent-strong); font-size:15px; }
 
 /* ---------- Extra reading themes ---------- */
