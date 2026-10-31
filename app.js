@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.1";
+const APP_VERSION = "1.8.2";
 const CHANGELOG = [
+  { version: "1.8.2", note: "หน้าเริ่มต้นมีปุ่ม “ซิงก์จากลิงก์ต้นทาง” ไม่ต้องนำเข้าไฟล์ JSON ก่อน" },
   { version: "1.8.1", note: "ซิงก์บทแปลจากลิงก์ไฟล์สำรองเองเมื่อเปิดแอป ไม่ต้อง import ไฟล์ซ้ำ" },
   { version: "1.8.0", note: "ท้ายหน้าตั้งค่าแสดงประวัติการอัปเดตแบบกาง/พับได้" },
   { version: "1.7.9", note: "ป้าย % ในโหมดเลื่อนเล็กลง ไม่ทับบรรทัด และจางเร็วขึ้น" },
@@ -1253,6 +1254,15 @@ function bindEvents() {
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
   for (const theme of THEMES) byId(`theme-${theme}`).addEventListener("click", () => { applyTheme(theme); void writeSetting("theme", theme); });
+  // ปุ่มบนหน้าเริ่มต้น: เปิดหน้าตั้งค่าแล้วเลื่อนไปกลุ่มซิงก์เลย ไม่ต้อง import ไฟล์ก่อน
+  const openSyncSettings = () => {
+    const sheet = byId("settings-sheet");
+    if (typeof sheet.showModal === "function") { if (!sheet.open) sheet.showModal(); } else sheet.setAttribute("open", "");
+    const group = byId("sync-url").closest("section");
+    if (group) group.scrollIntoView({ block: "center" });
+    byId("sync-url").focus({ preventScroll: true });
+  };
+  byId("welcome-sync").addEventListener("click", openSyncSettings);
   byId("settings-open").addEventListener("click", () => byId("settings-sheet").showModal());
   byId("settings-close").addEventListener("click", () => byId("settings-sheet").close());
   byId("settings-sheet").addEventListener("click", event => { if (event.target === byId("settings-sheet")) byId("settings-sheet").close(); });

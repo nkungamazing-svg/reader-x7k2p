@@ -57,7 +57,8 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .welcome[hidden] { display:none!important; }
 .welcome img { border-radius:22px; box-shadow:0 12px 40px #0003; }
 .welcome h2 { margin:20px 0 3px; font-size:22px; }
-.welcome p { max-width:440px; color:var(--muted); font-size:14px; }
+.welcome p { max-width:440px; margin-bottom:0; color:var(--muted); font-size:14px; }
+.welcome-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:16px; }
 .reader { max-width:900px; min-height:80dvh; margin:0 auto; padding-bottom:calc(88px + var(--safe-bottom)); }
 .reader-topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin:0 auto 12px; }
 .reader-topbar h2 { margin:3px 0; font-size:clamp(18px,4vw,24px); line-height:1.45; }
