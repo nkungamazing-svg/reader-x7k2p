@@ -288,6 +288,9 @@ body.page-mode .reading-viewport.turn-right::after { opacity:1; background:linea
 .character-card-body { display:grid; gap:3px; min-width:0; padding-right:26px; }
 .character-card-body strong { overflow:hidden; color:var(--text); font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
 .character-card-body small { color:var(--muted); font-size:10px; line-height:1.5; }
+.character-card-en { color:var(--accent-strong); font-size:11px; font-weight:600; }
+.character-card-edit { display:inline-flex; align-items:center; justify-content:center; min-height:44px; margin-top:8px; padding:0 14px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--text); font-size:12px; font-weight:600; }
+.character-card-edit[hidden] { display:none!important; }
 .character-card-close { position:absolute; top:4px; right:4px; display:grid; place-items:center; width:32px; height:32px; border:0; border-radius:50%; background:var(--surface-2); color:var(--muted); font-size:16px; }
 .character-card-form { display:flex; gap:6px; margin-top:9px; }
 .character-card-form[hidden] { display:none!important; }

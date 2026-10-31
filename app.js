@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.7";
+const APP_VERSION = "1.8.8";
 const CHANGELOG = [
+  { version: "1.8.8", note: "การ์ดตัวละครบอกชื่อภาษาอังกฤษที่จับคู่ไว้ แก้ชื่อที่พิมพ์ผิดได้ และข้อความออฟไลน์ขึ้นครั้งเดียวต่อเวอร์ชัน" },
   { version: "1.8.7", note: "การแจ้งเตือนย้ายขึ้นไปใต้แถบด้านบน ไม่บังปุ่มหรือเนื้อหาด้านล่างแล้ว" },
   { version: "1.8.6", note: "ตอนแถบเมนูโผล่หรือซ่อน ตัวหนังสือไม่กระตุกขี้นลงแล้ว" },
   { version: "1.8.5", note: "เลื่อนอ่านขึ้นแล้วแถบเมนูไม่โผล่เองอีก แตะเนื้อหาเมื่อต้องการเปิด" },
@@ -79,7 +80,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -885,6 +886,12 @@ async function lookupCharacterImage(query) {
   return image;
 }
 
+function setCharacterTitle(title) {
+  state.characterCardTitle = String(title || "");
+  byId("character-card-title").textContent = state.characterCardTitle;
+  byId("character-card-edit").hidden = !state.characterCardTitle || !byId("character-card-form").hidden;
+}
+
 function showCharacterForm(visible) {
   byId("character-card-form").hidden = !visible;
   const box = byId("character-card-suggestions");
@@ -892,6 +899,7 @@ function showCharacterForm(visible) {
   // While the rename form is open there is no portrait to look at, so the
   // auto-close countdown must not run in the background.
   else clearTimeout(state.characterCardTimer);
+  byId("character-card-edit").hidden = visible || !state.characterCardTitle;
 }
 
 function armCharacterCardTimer() {
@@ -922,6 +930,7 @@ async function applyCharacterName(title) {
   await rememberCharacterName(thai, title);
   const image = await lookupCharacterImage(title);
   if (byId("character-card").hidden || token !== state.characterCardToken) return;
+  setCharacterTitle(title);
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
@@ -932,6 +941,7 @@ async function openCharacterCard(label) {
   const card = byId("character-card");
   const token = ++state.characterCardToken;
   clearTimeout(state.characterCardTimer);
+  setCharacterTitle("");
   const thai = characterThaiName(label) || "ตัวละคร";
   byId("character-card-name").textContent = thai;
   const spinner = document.createElement("span");
@@ -942,6 +952,7 @@ async function openCharacterCard(label) {
   card.hidden = false;
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
+  setCharacterTitle(query);
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
@@ -986,6 +997,16 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
+  // ชื่อที่เคยจับคู่ไว้อาจพิมพ์ผิด แก้ทับได้โดยไม่ต้องล้างตารางชื่อทั้งไฟล์
+  byId("character-card-edit").addEventListener("click", () => {
+    const input = byId("character-card-input");
+    input.value = state.characterCardTitle || "";
+    showCharacterForm(true);
+    byId("character-card-note").textContent = "แก้ชื่อภาษาอังกฤษแล้วกดบันทึก — ชื่อเดิมของ “"
+      + (byId("character-card-name").textContent || "ตัวละคร") + "” จะถูกทับ";
+    input.focus();
+    input.select();
+  });
   byId("character-table-open").addEventListener("click", () => byId("character-table-file").click());
   byId("character-table-file").addEventListener("change", async event => {
     const file = event.target.files?.[0];
@@ -1726,7 +1747,13 @@ function startServiceWorker() {
       state.updateTimer = setInterval(check, 5 * 60 * 1000);
       return navigator.serviceWorker.ready;
     })
-    .then(() => showStatus("เตรียมไฟล์แอปสำหรับใช้ออฟไลน์แล้ว", 4500))
+    .then(async () => {
+      // แจ้งครั้งเดียวต่อเวอร์ชัน; ขึ้นทุกครั้งที่เปิดแอปจะกลายเป็นเสียงรบกวน
+      const announced = await readSetting("offlineReadyVersion", "");
+      if (announced === APP_VERSION) return;
+      await writeSetting("offlineReadyVersion", APP_VERSION);
+      showStatus("เตรียมไฟล์แอปสำหรับใช้ออฟไลน์แล้ว", 4500);
+    })
     .catch(() => {});
 }
 
