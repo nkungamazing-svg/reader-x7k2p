@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "1.8.1";
 const CHANGELOG = [
+  { version: "1.8.1", note: "ซิงก์บทแปลจากลิงก์ไฟล์สำรองเองเมื่อเปิดแอป ไม่ต้อง import ไฟล์ซ้ำ" },
   { version: "1.8.0", note: "ท้ายหน้าตั้งค่าแสดงประวัติการอัปเดตแบบกาง/พับได้" },
   { version: "1.7.9", note: "ป้าย % ในโหมดเลื่อนเล็กลง ไม่ทับบรรทัด และจางเร็วขึ้น" },
   { version: "1.7.8", note: "โหมดตารางเลือกจำนวนคอลัมน์ 2 / 4 / 6 ได้" },
@@ -72,7 +73,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -1099,6 +1100,118 @@ async function importBackup(mode) {
   showStatus(`นำเข้าสำเร็จ ${backup.chapters.length.toLocaleString("th-TH")} บท · ${pronunciation.length.toLocaleString("th-TH")} คำอ่าน · ${mode === "merge" ? "รวมกับข้อมูลเดิมแล้ว" : "แทนที่ข้อมูลเดิมแล้ว"}`, 8000);
 }
 
+// Automatic sync: pull the same JSON backup from a URL the reader controls and
+// merge only the chapters whose text changed, so no file picking is needed.
+const SYNC_TIMEOUT_MS = 20000;
+const SYNC_PROGRESS_KEYS = ["lastScrollRatio", "lastReadProgress", "lastProgressMode", "lastSpeechIndex"];
+
+function syncTimeLabel(timestamp) {
+  if (!timestamp) return "ยังไม่เคยซิงก์";
+  try { return new Date(timestamp).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" }); } catch { return ""; }
+}
+
+function paintSyncHint(message = "") {
+  const hint = byId("sync-hint");
+  if (!hint) return;
+  if (message) { hint.textContent = message; return; }
+  if (!state.syncUrl) { hint.textContent = "ยังไม่ได้ตั้งลิงก์ · วางลิงก์ไฟล์สำรองแล้วกด “บันทึกลิงก์”"; return; }
+  hint.textContent = `ซิงก์ล่าสุด: ${syncTimeLabel(state.syncedAt)}`;
+}
+
+function normalizeSyncUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  let url;
+  try { url = new URL(text); } catch { throw new Error("ลิงก์ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://"); }
+  if (!/^https?:$/i.test(url.protocol)) throw new Error("ลิงก์ต้องเป็น http หรือ https เท่านั้น");
+  return url.href;
+}
+
+async function setSyncUrl(value, { persist = true } = {}) {
+  state.syncUrl = normalizeSyncUrl(value);
+  const input = byId("sync-url");
+  if (input && input.value.trim() !== state.syncUrl) input.value = state.syncUrl;
+  if (persist) await writeSetting("syncUrl", state.syncUrl);
+  paintSyncHint();
+  return state.syncUrl;
+}
+
+async function fetchBackupFromUrl(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: controller.signal });
+    if (!response.ok) throw new Error(`ลิงก์ตอบกลับ ${response.status}${response.statusText ? ` ${response.statusText}` : ""}`);
+    const text = await response.text();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch { throw new Error("ลิงก์นี้ไม่ใช่ไฟล์ JSON"); }
+    return validateBackup(parsed);
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error("รอข้อมูลนานเกินไป ลองอีกครั้งเมื่อเน็ตดีขึ้น");
+    if (error instanceof TypeError) throw new Error("ดึงไฟล์ไม่ได้ (ลิงก์ผิด เน็ตหลุด หรือปลายทางไม่ได้เปิด CORS)");
+    throw error;
+  } finally { clearTimeout(timer); }
+}
+
+async function syncChapters({ manual = false } = {}) {
+  if (state.syncing) return;
+  const url = state.syncUrl;
+  if (!url) { if (manual) showStatus("ยังไม่ได้ตั้งลิงก์ไฟล์สำรอง", 6000); return; }
+  state.syncing = true;
+  byId("sync-now")?.setAttribute("disabled", "");
+  if (manual) showStatus("กำลังซิงก์กับต้นทาง…", 20000);
+  try {
+    const backup = await fetchBackupFromUrl(url);
+    await persistReadingPosition().catch(() => {});
+    const db = await dbReady;
+    const existing = new Map((await readAllChapters()).map(item => [item.id, item]));
+    const touched = new Set();
+    let added = 0, updated = 0;
+    for (const chapter of backup.chapters) {
+      const previous = existing.get(chapter.id);
+      if (!previous) { added += 1; touched.add(chapter.id); continue; }
+      const changed = previous.html !== chapter.html
+        || String(previous.savedAt ?? "") !== String(chapter.savedAt ?? "")
+        || normalizeTitle(previous) !== normalizeTitle(chapter);
+      if (!changed) continue;
+      // Keep the reader's place in a chapter whose text was revised upstream.
+      for (const key of SYNC_PROGRESS_KEYS) if (previous[key] !== undefined) chapter[key] = previous[key];
+      updated += 1; touched.add(chapter.id);
+    }
+    const table = new Map((await readSetting("pronunciation", [])).map(item => [item.word.toLocaleLowerCase(), item]));
+    let tableChanged = false;
+    for (const item of backup.pronunciations) {
+      const previous = table.get(item.word.toLocaleLowerCase());
+      if (!previous || previous.reading !== item.reading) { table.set(item.word.toLocaleLowerCase(), item); tableChanged = true; }
+    }
+    if (touched.size || tableChanged) {
+      const tx = db.transaction([CHAPTERS, SETTINGS], "readwrite");
+      for (const chapter of backup.chapters) if (touched.has(chapter.id)) tx.objectStore(CHAPTERS).put(chapter);
+      if (tableChanged) {
+        state.pronunciation = [...table.values()];
+        tx.objectStore(SETTINGS).put({ id: "pronunciation", value: state.pronunciation });
+      }
+      await transactionDone(tx);
+      await refreshChapters();
+      if (state.activeId && touched.has(state.activeId)) await openChapter(state.activeId);
+    }
+    state.syncedAt = Date.now();
+    await writeSetting("syncedAt", state.syncedAt);
+    paintSyncHint();
+    const summary = [];
+    if (added) summary.push(`ใหม่ ${added.toLocaleString("th-TH")} บท`);
+    if (updated) summary.push(`แก้ไข ${updated.toLocaleString("th-TH")} บท`);
+    if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
+    else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
+  } catch (error) {
+    paintSyncHint(`ซิงก์ไม่สำเร็จ: ${error.message}`);
+    if (manual) showStatus(`ซิงก์ไม่สำเร็จ: ${error.message}`, 0);
+  } finally {
+    state.syncing = false;
+    byId("sync-now")?.removeAttribute("disabled");
+  }
+}
+
 function bindEvents() {
   byId("import-open").addEventListener("click", () => byId("backup-file").click());
   byId("welcome-import").addEventListener("click", () => byId("backup-file").click());
@@ -1112,6 +1225,22 @@ function bindEvents() {
   byId("replace-import").addEventListener("click", () => {
     if (!confirm("แทนที่บทและตารางคำอ่านใน PWA นี้ทั้งหมดใช่ไหม? ข้อมูลในส่วนขยายต้นทางจะไม่ถูกลบ")) return;
     importBackup("replace").catch(error => showStatus(`นำเข้าไม่สำเร็จ: ${error.message}`, 0));
+  });
+  byId("sync-url").addEventListener("change", () => { setSyncUrl(byId("sync-url").value).catch(error => showStatus(error.message, 0)); });
+  byId("sync-save").addEventListener("click", () => {
+    setSyncUrl(byId("sync-url").value)
+      .then(url => {
+        showStatus(url ? "บันทึกลิงก์ซิงก์แล้ว" : "ลบลิงก์ซิงก์แล้ว แอปจะไม่ดึงข้อมูลเอง", 5000);
+        if (url) return syncChapters({ manual: true });
+      })
+      .catch(error => showStatus(error.message, 0));
+  });
+  byId("sync-now").addEventListener("click", () => {
+    setSyncUrl(byId("sync-url").value).then(() => syncChapters({ manual: true })).catch(error => showStatus(error.message, 0));
+  });
+  byId("sync-toggle").addEventListener("change", event => {
+    state.autoSync = event.target.checked;
+    void writeSetting("autoSync", state.autoSync);
   });
   byId("search").addEventListener("input", scheduleChapterRender);
   byId("sort").addEventListener("change", () => { renderChapterList(); updateChapterNavigation(); });
@@ -1562,6 +1691,12 @@ async function initialize() {
     setFontFamily(await readSetting("fontFamily", "noto"));
     setTapSpeech(await readSetting("tapSpeech", true) !== false);
     setTapHint(await readSetting("tapHint", true) !== false);
+    state.syncUrl = await readSetting("syncUrl", "");
+    state.autoSync = await readSetting("autoSync", true) !== false;
+    state.syncedAt = Number(await readSetting("syncedAt", 0)) || 0;
+    byId("sync-url").value = state.syncUrl;
+    byId("sync-toggle").checked = state.autoSync;
+    paintSyncHint();
     state.indent = await readSetting("indent", true) !== false;
     document.body.classList.toggle("indent-on", state.indent);
     byId("indent-toggle").checked = state.indent;
@@ -1576,6 +1711,7 @@ async function initialize() {
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
     document.fonts?.ready.then(() => { if (isPageMode() && state.activeId) schedulePaginate(0); }).catch(() => {});
     hideSplash();
+    if (state.syncUrl && state.autoSync) void syncChapters();
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) startServiceWorker();
   } catch (error) { showStatus(`เปิดคลังไม่สำเร็จ: ${error.message}`, 0); hideSplash(); }
 }

@@ -143,6 +143,18 @@
         <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div></div>
       </section>
       <section class="settings-group">
+        <h3>ซิงก์กับต้นทาง</h3>
+        <label class="setting-row" for="sync-url"><span>ลิงก์ไฟล์สำรอง JSON</span>
+          <input id="sync-url" class="search-input" type="url" inputmode="url" placeholder="https://…/backup.json" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <small class="setting-hint">วางลิงก์ไฟล์สำรองแบบเดียวกับที่ import (NOAT_STORAGE_EXPORT) ที่เปิดให้เบราว์เซอร์อ่านได้ แอปจะเทียบกับคลังในเครื่องแล้วอัปเดตเฉพาะบทที่ใหม่หรือถูกแก้</small>
+        </label>
+        <div class="setting-row"><span>ซิงก์ตอนนี้</span>
+          <div class="row-actions"><button id="sync-save" class="tool-button" type="button">บันทึกลิงก์</button><button id="sync-now" class="tool-button" type="button">ซิงก์เดี๋ยวนี้</button></div>
+          <small id="sync-hint" class="setting-hint">ยังไม่ได้ตั้งลิงก์ · วางลิงก์ไฟล์สำรองแล้วกด “บันทึกลิงก์”</small>
+        </div>
+        <label class="switch-row"><span>ซิงก์อัตโนมัติเมื่อเปิดแอป</span><input id="sync-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+      </section>
+      <section class="settings-group">
         <h3>อื่น ๆ</h3>
         <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>กันจอดับระหว่างอ่าน</span><input id="wake-lock-toggle" type="checkbox"><i aria-hidden="true"></i></label>
