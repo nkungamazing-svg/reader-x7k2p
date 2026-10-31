@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.3";
+const APP_VERSION = "1.8.4";
 const CHANGELOG = [
+  { version: "1.8.4", note: "แถบเมนูซ่อนเองอัตโนมัติทั้งโหมดเลื่อนและโหมดพลิกหน้า แตะกลางจอหรือเลื่อนขึ้นเพื่อเปิดใหม่" },
   { version: "1.8.3", note: "ฉากหลังตอนเปิดรายการบทจางลงและลิ้นชักขอบมน ให้เข้ากับหน้าตั้งค่ามากขึ้น" },
   { version: "1.8.2", note: "หน้าเริ่มต้นมีปุ่ม “ซิงก์จากลิงก์ต้นทาง” ไม่ต้องนำเข้าไฟล์ JSON ก่อน" },
   { version: "1.8.1", note: "ซิงก์บทแปลจากลิงก์ไฟล์สำรองเองเมื่อเปิดแอป ไม่ต้อง import ไฟล์ซ้ำ" },
@@ -75,7 +76,7 @@ function hideSplash() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -495,6 +496,7 @@ function setSidebarOpen(open, { restorePosition = true } = {}) {
   document.body.style.removeProperty("top"); document.body.style.removeProperty("left"); document.body.style.removeProperty("right"); document.body.style.removeProperty("width");
   const savedY = state.sidebarLockY; state.sidebarLockY = null;
   byId("menu-toggle").setAttribute("aria-expanded", "false");
+  if (!document.body.classList.contains("chrome-hidden")) armChromeAutoHide(1400);
   if (restorePosition && savedY !== null) window.scrollTo({ top: savedY, behavior: "instant" });
 }
 
@@ -1312,6 +1314,7 @@ function bindEvents() {
   installCharacterCards();
   installPageGestures();
   installChromeRestore();
+  installChromeAutoHide();
   window.addEventListener("resize", () => schedulePaginate(140));
   window.addEventListener("orientationchange", () => schedulePaginate(240));
   window.visualViewport?.addEventListener("resize", () => schedulePaginate(180));
@@ -1531,10 +1534,59 @@ function turnPage(direction) {
   setPage(target);
 }
 
-function toggleChrome(show) {
+/* ปล่อยไว้สักพักแล้วแถบเครื่องมือเก็บเอง ไม่ต้องกดปุ่มซ่อนทุกครั้ง */
+const CHROME_HIDE_MS = 4200;
+
+function toggleChrome(show, { auto = true } = {}) {
   const shouldShow = show == null ? document.body.classList.contains("chrome-hidden") : Boolean(show);
   document.body.classList.toggle("chrome-hidden", !shouldShow);
+  clearTimeout(state.chromeTimer); state.chromeTimer = 0;
+  if (shouldShow && auto) armChromeAutoHide();
   updateChromeToggle();
+}
+
+function armChromeAutoHide(delay = CHROME_HIDE_MS) {
+  clearTimeout(state.chromeTimer);
+  state.chromeTimer = setTimeout(() => {
+    state.chromeTimer = 0;
+    if (!canAutoHideChrome()) return;
+    toggleChrome(false, { auto: false });
+  }, delay);
+}
+
+function canAutoHideChrome() {
+  if (!state.activeId) return false;
+  if (document.body.classList.contains("sidebar-open")) return false;
+  if (byId("settings-sheet")?.open) return false;
+  if (byId("import-dialog")?.open) return false;
+  if (byId("character-card") && !byId("character-card").hidden) return false;
+  if (state.speaking) return false;
+  if (document.activeElement?.closest?.("dialog, #character-card")) return false;
+  return true;
+}
+
+/* ระหว่างอ่าน: เลื่อนลงแล้วเก็บแถบเครื่องมือเอง เลื่อนขึ้นเพื่อเรียกกลับ
+   (โหมดพลิกหน้ามีการซ่อนตอนเปิดบทอยู่แล้ว) */
+function installChromeAutoHide() {
+  let lastY = window.scrollY;
+  window.addEventListener("scroll", () => {
+    if (!state.activeId || isPageMode()) return;
+    if (document.body.classList.contains("sidebar-open")) return;
+    const y = window.scrollY, delta = y - lastY;
+    if (Math.abs(delta) < 8) return;
+    lastY = y;
+    if (delta > 0) {
+      if (!document.body.classList.contains("chrome-hidden")) toggleChrome(false, { auto: false });
+    } else if (document.body.classList.contains("chrome-hidden")) {
+      toggleChrome(true);
+    }
+  }, { passive: true });
+  // กำลังแตะ/กดปุ่มอยู่ในแถบเครื่องมือ อย่าเพิ่งซ่อน
+  document.addEventListener("pointerdown", event => {
+    if (!state.chromeTimer) return;
+    if (!event.target.closest?.(".app-header, .audio-bar, .page-footer")) return;
+    armChromeAutoHide();
+  }, { capture: true, passive: true });
 }
 
 function updateChromeToggle() {
