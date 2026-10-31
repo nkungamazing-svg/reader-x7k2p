@@ -5,8 +5,9 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.8.4";
+const APP_VERSION = "1.8.5";
 const CHANGELOG = [
+  { version: "1.8.5", note: "เลื่อนอ่านขึ้นแล้วแถบเมนูไม่โผล่เองอีก แตะเนื้อหาเมื่อต้องการเปิด" },
   { version: "1.8.4", note: "แถบเมนูซ่อนเองอัตโนมัติทั้งโหมดเลื่อนและโหมดพลิกหน้า แตะกลางจอหรือเลื่อนขึ้นเพื่อเปิดใหม่" },
   { version: "1.8.3", note: "ฉากหลังตอนเปิดรายการบทจางลงและลิ้นชักขอบมน ให้เข้ากับหน้าตั้งค่ามากขึ้น" },
   { version: "1.8.2", note: "หน้าเริ่มต้นมีปุ่ม “ซิงก์จากลิงก์ต้นทาง” ไม่ต้องนำเข้าไฟล์ JSON ก่อน" },
@@ -1565,8 +1566,8 @@ function canAutoHideChrome() {
   return true;
 }
 
-/* ระหว่างอ่าน: เลื่อนลงแล้วเก็บแถบเครื่องมือเอง เลื่อนขึ้นเพื่อเรียกกลับ
-   (โหมดพลิกหน้ามีการซ่อนตอนเปิดบทอยู่แล้ว) */
+/* ระหว่างอ่าน: เลื่อนลงแล้วเก็บแถบเครื่องมือเอง
+   เลื่อนขึ้นไม่ต้องโผล่มาเอง แตะเนื้อหาเมื่อต้องการเปิด (โหมดพลิกหน้ามีการซ่อนตอนเปิดบทอยู่แล้ว) */
 function installChromeAutoHide() {
   let lastY = window.scrollY;
   window.addEventListener("scroll", () => {
@@ -1575,11 +1576,7 @@ function installChromeAutoHide() {
     const y = window.scrollY, delta = y - lastY;
     if (Math.abs(delta) < 8) return;
     lastY = y;
-    if (delta > 0) {
-      if (!document.body.classList.contains("chrome-hidden")) toggleChrome(false, { auto: false });
-    } else if (document.body.classList.contains("chrome-hidden")) {
-      toggleChrome(true);
-    }
+    if (delta > 0 && !document.body.classList.contains("chrome-hidden")) toggleChrome(false, { auto: false });
   }, { passive: true });
   // กำลังแตะ/กดปุ่มอยู่ในแถบเครื่องมือ อย่าเพิ่งซ่อน
   document.addEventListener("pointerdown", event => {
