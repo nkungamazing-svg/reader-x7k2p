@@ -319,6 +319,42 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 :root[data-theme="rezero"] .book-face::before, :root[data-theme="rezero"] .book-face::after { display:none; }
 :root[data-theme="rezero"] .book-face strong { font-size:clamp(24px,7.6vw,34px); color:#fff; text-shadow:0 2px 20px #000d,0 0 44px color-mix(in srgb,var(--accent) 70%,transparent); }
 :root[data-theme="rezero"] .book-sub, :root[data-theme="rezero"] #splash-version { color:#e6e9f5; text-shadow:0 1px 10px #000c; }
+
+/* ---------- ธีมรี:ซีโร่: แต่งทั้งแอปให้เป็นธีมเฉพาะตัว ---------- */
+/* พื้นหลัง: แสงม่วงจากมุมบนขวาและล่างซ้าย ให้หน้าดูมีมิติไม่แบน */
+:root[data-theme="rezero"] body { background-image:radial-gradient(circle at 86% -6%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 46%),radial-gradient(circle at 4% 106%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 48%); background-attachment:fixed; }
+/* หัวเว็บ: ไล่เฉดม่วง + เส้นแสงวิ่งใต้แถบ */
+:root[data-theme="rezero"] .app-header { background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,var(--surface)),var(--surface) 62%); }
+:root[data-theme="rezero"] .app-header::after { position:absolute; inset:auto 0 -1px; height:2px; background:linear-gradient(90deg,transparent,var(--accent),#ff7ab6,var(--accent),transparent); background-size:200% 100%; content:""; animation:rezero-sheen 7s linear infinite; }
+:root[data-theme="rezero"] .brand strong { color:#fff; text-shadow:0 0 14px color-mix(in srgb,var(--accent) 85%,transparent); }
+:root[data-theme="rezero"] .brand-logo { box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 60%,transparent),0 0 20px color-mix(in srgb,var(--accent) 55%,transparent); }
+/* เมนูด้านข้าง + รายการบท */
+:root[data-theme="rezero"] .sidebar { background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 9%,var(--surface)),var(--surface) 44%); border-right-color:color-mix(in srgb,var(--accent) 34%,var(--line)); }
+:root[data-theme="rezero"] .sidebar-heading { border-bottom-color:color-mix(in srgb,var(--accent) 40%,var(--line)); }
+:root[data-theme="rezero"] .novel-title { background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 16%,var(--surface)),var(--surface)); border-bottom-color:color-mix(in srgb,var(--accent) 40%,var(--line)); letter-spacing:.02em; }
+:root[data-theme="rezero"] .arc-title { background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 8%,var(--surface)),var(--surface)); }
+:root[data-theme="rezero"] .arc-title span::before { margin-right:6px; color:var(--accent); content:"◆"; font-size:9px; vertical-align:middle; }
+:root[data-theme="rezero"] .chapter-link { border-color:color-mix(in srgb,var(--accent) 16%,transparent); background:color-mix(in srgb,var(--accent) 5%,transparent); }
+:root[data-theme="rezero"] .chapter-link:hover { border-color:color-mix(in srgb,var(--accent) 48%,var(--line)); background:color-mix(in srgb,var(--accent) 14%,var(--surface)); box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent); }
+:root[data-theme="rezero"] .chapter-link.active { border-color:color-mix(in srgb,var(--accent) 70%,transparent); background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 32%,var(--surface)),color-mix(in srgb,var(--accent) 10%,var(--surface))); box-shadow:0 0 24px color-mix(in srgb,var(--accent) 35%,transparent); }
+:root[data-theme="rezero"] .chapter-index { border-color:color-mix(in srgb,var(--accent) 40%,var(--line)); color:var(--accent-strong); }
+:root[data-theme="rezero"] .chapter-badge { border-color:color-mix(in srgb,var(--accent) 45%,transparent); background:color-mix(in srgb,var(--accent) 22%,var(--surface)); color:var(--accent-strong); }
+/* หน้าอ่าน */
+:root[data-theme="rezero"] .reader-shell { background-image:radial-gradient(circle at 50% 0%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 58%); }
+:root[data-theme="rezero"] .reader-content :is(h2,h3) { color:var(--accent-strong); text-shadow:0 0 16px color-mix(in srgb,var(--accent) 45%,transparent); }
+:root[data-theme="rezero"] .reader-content blockquote { border-left:3px solid var(--accent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
+:root[data-theme="rezero"] .welcome h2 { color:#fff; text-shadow:0 0 26px color-mix(in srgb,var(--accent) 70%,transparent); }
+/* แถบเครื่องมือล่าง */
+:root[data-theme="rezero"] .audio-bar { background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 18%,color-mix(in srgb,var(--surface) 92%,transparent)),color-mix(in srgb,var(--surface) 92%,transparent)); }
+:root[data-theme="rezero"] .audio-play { box-shadow:0 0 22px color-mix(in srgb,var(--accent) 65%,transparent),0 0 44px color-mix(in srgb,var(--accent) 28%,transparent); }
+/* หน้าตั้งค่า การ์ดตัวละคร และแถบสถานะ */
+:root[data-theme="rezero"] .settings-sheet { border-color:color-mix(in srgb,var(--accent) 42%,var(--line)); background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,var(--surface)),var(--surface) 34%); }
+:root[data-theme="rezero"] .settings-group { border-color:color-mix(in srgb,var(--accent) 26%,var(--line)); background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 7%,var(--surface)),color-mix(in srgb,var(--text) 2%,var(--surface))); }
+:root[data-theme="rezero"] .settings-group h3 { color:var(--accent-strong); text-shadow:0 0 12px color-mix(in srgb,var(--accent) 60%,transparent); }
+:root[data-theme="rezero"] .character-card { border-color:color-mix(in srgb,var(--accent) 50%,var(--line)); box-shadow:0 20px 60px #000a,0 0 34px color-mix(in srgb,var(--accent) 32%,transparent); }
+:root[data-theme="rezero"] .scroll-progress i { background:linear-gradient(90deg,var(--accent),#ff7ab6); box-shadow:0 0 12px color-mix(in srgb,var(--accent) 75%,transparent); }
+@keyframes rezero-sheen { 0% { background-position:0% 50%; } 100% { background-position:200% 50%; } }
+@media(prefers-reduced-motion:reduce) { :root[data-theme="rezero"] .app-header::after { animation:none; } }
 .cover-collage img:nth-child(2n) { animation-duration:22s; }
 .cover-collage img:nth-child(3n) { animation-duration:14s; }
 .cover-collage img:nth-child(4n) { animation-duration:26s; }
