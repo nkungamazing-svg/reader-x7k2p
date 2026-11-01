@@ -602,3 +602,8 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 :root[data-low-power="on"] .header-sky,
 :root[data-low-power="on"] .ambient { display:none; }
 :root[data-low-power="on"] .app-header::after { animation:none; }
+
+/* ม่านหรี่จอกลางคืน: คลุมทุกอย่างแต่ไม่บล็อกการแตะ */
+.night-shade { position:fixed; inset:0; z-index:130; background:#000; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+.night-shade[hidden] { display:none; }
+@media(prefers-reduced-motion:reduce) { .night-shade { transition:none; } }

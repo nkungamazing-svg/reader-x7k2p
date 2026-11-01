@@ -187,6 +187,8 @@
           <div class="theme-row"><button id="rezero-random" class="theme-choice" type="button">🎲 สุ่มชุดสี</button><button id="rezero-reset" class="theme-choice" type="button">↺ คืนค่าเดิม</button></div>
         </div>
         <div class="setting-row"><span>อนิเมชันพื้นหลัง</span><div class="theme-row"><button id="lowpower-auto" class="theme-choice" type="button" aria-pressed="true">🔋 อัตโนมัติ</button><button id="lowpower-off" class="theme-choice" type="button" aria-pressed="false">⏸ หยุดตลอด</button></div><small class="setting-hint">อัตโนมัติ: แบตต่ำกว่า 20% และไม่ได้ชาร์จอยู่ แอปจะหยุดดาวตก หิมะ และเส้นแสงวิ่งให้เอง · หยุดตลอด: ประหยัดแบตที่สุด</small></div>
+        <div class="setting-row"><label for="night-dim">หรี่จอกลางคืน</label><div class="range-row"><input id="night-dim" type="range" min="0" max="60" step="5" value="0"><output id="night-dim-output">0%</output></div><small class="setting-hint">ม่านดำบาง ๆ คลุมทั้งจอ ช่วยตอนอ่านในที่มืด ใช้ได้ทุกธีม (0% = ปิด)</small></div>
+        <label class="switch-row"><span>🌙 สลับธีมหรี่เอง 22:00–06:00</span><input id="night-auto" type="checkbox"><i aria-hidden="true"></i></label>
       </section>
       <section class="settings-group">
         <h3>การอ่าน</h3>
@@ -248,6 +250,7 @@
     <div class="dialog-actions"><button id="merge-import" class="primary-button" type="button">รวมกับข้อมูลเดิม</button><button id="replace-import" class="danger-button" type="button">แทนที่บทและตารางคำอ่าน</button></div>
     <small>การแทนที่จะลบบทเดิมในคลัง PWA นี้ก่อนนำเข้าบทจากไฟล์ ส่วนข้อมูลในส่วนขยายไม่ถูกแตะต้อง</small>
   </dialog>
+  <div id="night-shade" class="night-shade" aria-hidden="true" hidden></div>
   <script src="app.js" defer></script>
 </body>
 </html>

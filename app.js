@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.4";
+const APP_VERSION = "1.12.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.5", note: "หรี่จอกลางคืนได้ทุกธีม และในช่วง 22:00–06:00 โหมดอัตโนมัติจะสลับเป็นธีมหรี่ถนอมตาให้เอง" },
   { version: "1.12.4", note: "พื้นหลังรี:ซีโร่รับสีเน้นที่เลือก มีปุ่มสุ่มชุดสี และหยุดอนิเมชันเองเมื่อแบตต่ำกว่า 20%" },
   { version: "1.12.3", note: "ธีมรี:ซีโร่ปรับสีพื้น สีเน้น สีโลโก้ และเอฟเฟกต์เองได้ โดยยังมีรูปตอนเข้าแอปและโลโก้กับชื่อที่หัวเว็บ" },
   { version: "1.12.2", note: "เพิ่มธีมกำหนดเอง ตั้งสีพื้น ตัวอักษร การ์ด สีเน้น สีโลโก้ และเอฟเฟกต์หัวเว็บได้อิสระ" },
@@ -142,7 +143,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto" };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -413,7 +414,9 @@ function activeSeason(date = new Date()) {
 function effectiveTheme() {
   if (state.themeMode !== "auto") return state.themeMode;
   const season = state.seasonalAuto ? activeSeason() : null;
-  return season ? season.theme : "dark";
+  if (season) return season.theme;
+  if (state.nightAuto && isNightHour()) return "reading";
+  return "dark";
 }
 
 /* ---------- ธีมกำหนดเอง: สี เอฟเฟกต์ และสีโลโก้ตั้งได้อิสระ ---------- */
@@ -609,6 +612,40 @@ function bindLowPower() {
   byId("lowpower-off")?.addEventListener("click", () => { state.lowPower = "off"; applyLowPower(); void writeSetting("lowPower", state.lowPower); showStatus("หยุดอนิเมชันพื้นหลังตลอดเพื่อประหยัดแบตแล้ว"); });
 }
 
+/* ---------- โหมดกลางคืน: หรี่จอ และสลับธีมหรี่เองช่วงดึก ---------- */
+function isNightHour(date = new Date()) {
+  const hour = date.getHours();
+  return hour >= 22 || hour < 6;
+}
+
+/* ม่านดำบาง ๆ คลุมทั้งจอ ช่วยตอนอ่านในที่มืด ใช้ได้กับทุกธีม */
+function applyNightDim() {
+  const shade = byId("night-shade");
+  const value = Math.max(0, Math.min(60, Number(state.nightDim) || 0));
+  if (shade) {
+    shade.hidden = value <= 0;
+    shade.style.opacity = String(value / 100);
+  }
+  if (byId("night-dim")) byId("night-dim").value = String(value);
+  if (byId("night-dim-output")) byId("night-dim-output").value = `${value}%`;
+}
+
+function bindNightMode() {
+  applyNightDim();
+  if (byId("night-auto")) byId("night-auto").checked = state.nightAuto === true;
+  byId("night-dim")?.addEventListener("input", event => {
+    state.nightDim = Number(event.target.value) || 0;
+    applyNightDim();
+    void writeSetting("nightDim", state.nightDim);
+  });
+  byId("night-auto")?.addEventListener("change", event => {
+    state.nightAuto = event.target.checked;
+    void writeSetting("nightAuto", state.nightAuto);
+    applyTheme(state.themeMode);
+    showStatus(state.nightAuto ? "ช่วง 22:00–06:00 จะสลับเป็นธีมหรี่ให้เอง" : "ปิดการสลับธีมตามเวลาแล้ว");
+  });
+}
+
 function paintCustomInputs() {
   const pick = state.customTheme;
   for (const key of ["page", "text", "surface", "accent"]) {
@@ -713,9 +750,9 @@ function paintThemeHint() {
   else if (!state.seasonalAuto) hint.textContent = "ปิดธีมเทศกาลไว้ · ใช้ธีมมืดปกติและไม่มีละออง";
   else {
     const season = activeSeason();
-    hint.textContent = season
-      ? `ช่วงนี้เลือกธีม ${season.deco} ${season.label} ให้เองอัตโนมัติ`
-      : "ยังไม่ถึงช่วงเทศกาล · ใช้ธีมมืดปกติ";
+    if (season) hint.textContent = `ช่วงนี้เลือกธีม ${season.deco} ${season.label} ให้เองอัตโนมัติ`;
+    else if (state.nightAuto && isNightHour()) hint.textContent = "ช่วงกลางคืน · สลับเป็นธีมหรี่ถนอมตาให้เอง (22:00–06:00)";
+    else hint.textContent = "ยังไม่ถึงช่วงเทศกาล · ใช้ธีมมืดปกติ";
   }
 }
 
@@ -1956,6 +1993,7 @@ function bindEvents() {
   bindCustomTheme();
   bindRezeroTheme();
   bindLowPower();
+  bindNightMode();
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
   byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
   byId("launch-zoom").addEventListener("click", () => { applyLaunchStyle("zoom"); void writeSetting("launchStyle", state.launchStyle); });
@@ -2459,8 +2497,11 @@ async function initialize() {
     const savedRezero = await readSetting("rezeroTheme", null);
     if (savedRezero && typeof savedRezero === "object") state.rezeroTheme = { ...REZERO_DEFAULT, ...savedRezero };
     state.lowPower = (await readSetting("lowPower", "auto")) === "off" ? "off" : "auto";
+    state.nightDim = Math.max(0, Math.min(60, Number(await readSetting("nightDim", 0)) || 0));
+    state.nightAuto = await readSetting("nightAuto", false) === true;
     applyTheme(await readSetting("theme", "auto"));
     buildHeaderSky();
+    setInterval(() => { if (state.themeMode === "auto" && effectiveTheme() !== state.theme) applyTheme("auto"); }, 60000);
     void watchBattery();
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);
     setLineHeight(Number(await readSetting("lineHeight", 1.9)) || 1.9);
