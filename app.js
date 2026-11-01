@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.7";
+const APP_VERSION = "1.10.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.8", note: "แคชรูปตัวละครไว้ตั้งแต่เปิดครั้งแรก ภาพขึ้นทันทีไม่ต้องรอเน็ต" },
   { version: "1.10.7", note: "ฝังรูปตัวละคร 24 คนไว้ในแอป หน้าเปิดและหัวเว็บขึ้นรูปทันที" },
   { version: "1.10.6", note: "หน้าเปิดธีมรี:ซีโร่ใช้เฉพาะคนที่มีรูป และรอภาพขึ้นก่อนเปิดแอป" },
   { version: "1.10.5", note: "ธีมรี:ซีโร่ ภาพตัวละครเต็มหน้าเปิด และรูป-ชื่อหมุนบนหัวเว็บ" },
