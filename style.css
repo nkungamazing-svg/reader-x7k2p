@@ -218,19 +218,35 @@ body.scroll-mode .page-top-row { display:none; }
 .reader-content { font-family:var(--reader-font); }
 
 /* ---------- Launch splash ---------- */
-.splash { position:fixed; inset:0; z-index:120; display:grid; place-content:center; justify-items:center; gap:10px; background:radial-gradient(circle at 50% 34%,color-mix(in srgb,var(--accent) 22%,var(--page)),var(--page) 68%); color:var(--text); text-align:center; transition:opacity .45s ease,visibility .45s ease; }
-.splash img { width:96px; height:96px; border-radius:24px; box-shadow:0 18px 50px #0006; animation:splash-pop .5s ease-out both; }
+.splash { position:fixed; inset:0; z-index:120; display:grid; place-items:center; color:var(--text); text-align:center; }
+.splash::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 34%,color-mix(in srgb,var(--accent) 24%,var(--page)),var(--page) 68%); transition:opacity .28s ease; }
+.splash-core { position:relative; display:grid; justify-items:center; gap:10px; }
+.splash-logo { position:relative; display:grid; place-items:center; border-radius:26px; box-shadow:0 20px 60px #0007,0 0 46px color-mix(in srgb,var(--accent) 48%,transparent); }
+.splash-deco { position:absolute; top:-16px; right:-14px; font-size:30px; line-height:1; filter:drop-shadow(0 3px 10px #000b); }
+.splash img { display:block; width:96px; height:96px; border-radius:24px; animation:splash-pop .5s ease-out both; }
 .splash strong { font-size:20px; animation:splash-fade .5s ease-out .08s both; }
 .splash small { color:var(--muted); font-size:12px; letter-spacing:.02em; animation:splash-fade .5s ease-out .14s both; }
 .splash-bar { display:block; width:132px; height:3px; margin-top:6px; overflow:hidden; border-radius:3px; background:color-mix(in srgb,var(--text) 14%,transparent); }
 .splash-bar i { display:block; width:40%; height:100%; border-radius:3px; background:var(--accent-strong); animation:splash-run 1.1s ease-in-out infinite; }
 .splash.hide { opacity:0; visibility:hidden; pointer-events:none; }
 .settings-version { padding:14px 2px 4px; color:var(--muted); font-size:11px; text-align:center; }
-/* หน้าเปิดแอปใช้การจางปรากฏล้วน ไม่ขยายหรือเลื่อนเลย จะได้ไม่รู้สึกว่าพุ่งเข้าหา */
+/* เปิดแอปแบบ X: โลโก้ย่อเล็กน้อยแล้วขยายจนเต็มจอพร้อมจางหาย
+   ระหว่างนี้พื้นหลังของ splash จางออกเพื่อให้เห็นหน้าจออ่านด้านหลัง */
+.splash.is-launching::before { opacity:0; }
+.splash.is-launching .splash-core { animation:splash-launch .62s cubic-bezier(.4,0,.18,1) forwards; }
 @keyframes splash-pop { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-fade { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-run { 0% { transform:translateX(-110%) } 100% { transform:translateX(320%) } }
-@media(prefers-reduced-motion:reduce) { .splash img,.splash strong,.splash small,.splash-bar i { animation:none } }
+@keyframes splash-launch { 0% { transform:scale(1); opacity:1 } 22% { transform:scale(.9); opacity:1 } 100% { transform:scale(34); opacity:0 } }
+@media(prefers-reduced-motion:reduce) {
+  .splash img,.splash strong,.splash small,.splash-bar i,.splash-deco { animation:none !important; }
+  .splash.is-launching .splash-core { animation:none !important; opacity:0; transition:opacity .2s ease; }
+}
+
+/* ---------- ละอองเทศกาล (canvas เบา ๆ ปิดเองเมื่อเลื่อนอ่าน) ---------- */
+.ambient { position:fixed; inset:0; z-index:3; width:100%; height:100%; pointer-events:none; opacity:.55; transition:opacity .35s ease; }
+.ambient.dim { opacity:.08; }
+.ambient[hidden] { display:none; }
 
 /* ---------- Hide the chrome in scroll mode too ---------- */
 /* Keep the header's space in the layout while it slides away, otherwise the
@@ -245,10 +261,18 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 :root[data-theme="eye"] { color-scheme:light; --page:#e6eee1; --surface:#dde8d7; --surface-2:#d2e0cb; --text:#25321f; --muted:#5a6b52; --line:#bdcdb5; --accent:#3f7a46; --accent-strong:#2f6236; --danger:#a4433e; --reader:#e9f1e4; --reader-text:#25321f; }
 :root[data-theme="cool"] { color-scheme:light; --page:#e8edf2; --surface:#f1f5f9; --surface-2:#e2e9f0; --text:#26313a; --muted:#5d6b78; --line:#cbd6e0; --accent:#3a6382; --accent-strong:#2a4c68; --danger:#a1433e; --reader:#f4f8fb; --reader-text:#26313a; }
 :root[data-theme="dusk"] { color-scheme:dark; --page:#1b1917; --surface:#242120; --surface-2:#2c2825; --text:#d6cec2; --muted:#9a9185; --line:#3a342f; --accent:#b08a5a; --accent-strong:#d2a876; --danger:#c0655e; --reader:#1e1b19; --reader-text:#d6cec2; }
-:root[data-theme="halloween"] { color-scheme:dark; --page:#150f1f; --surface:#1e1630; --surface-2:#271c3d; --text:#f0e6ff; --muted:#b39ad6; --line:#3b2c56; --accent:#ff8a3d; --accent-strong:#ffb271; --danger:#ff5c5c; --reader:#170f22; --reader-text:#f1e8ff; }
-:root[data-theme="christmas"] { color-scheme:dark; --page:#0d1d16; --surface:#12291f; --surface-2:#183626; --text:#eaf5ee; --muted:#9fbfae; --line:#274b38; --accent:#c7353c; --accent-strong:#f08a8f; --danger:#d94b4b; --reader:#0f2219; --reader-text:#eaf5ee; }
-:root[data-theme="songkran"] { color-scheme:light; --page:#eaf6fb; --surface:#fff; --surface-2:#dceefa; --text:#123243; --muted:#4f7288; --line:#bfdcec; --accent:#1f9bc4; --accent-strong:#146d8d; --danger:#b4403f; --reader:#f4fbff; --reader-text:#123243; }
+:root[data-theme="halloween"] { color-scheme:dark; --page:#0b0713; --surface:#160f22; --surface-2:#1f1430; --text:#f2e9ff; --muted:#b49ad8; --line:#33254d; --accent:#ff7700; --accent-strong:#ffb271; --danger:#ff4d4d; --reader:#0d0817; --reader-text:#f2e9ff; --toxic:#39ff14; }
+:root[data-theme="christmas"] { color-scheme:dark; --page:#0a1826; --surface:#102132; --surface-2:#15293d; --text:#eaf3fb; --muted:#9ab4c9; --line:#24405a; --accent:#e63946; --accent-strong:#f4a261; --danger:#ff5a5f; --reader:#0c1c2b; --reader-text:#eaf3fb; --emerald:#2ec4a0; }
+:root[data-theme="songkran"] { color-scheme:dark; --page:#06223a; --surface:#0a2b48; --surface-2:#0e3556; --text:#e8f6ff; --muted:#93bcd6; --line:#17456b; --accent:#ff9f43; --accent-strong:#ffc078; --danger:#e0574f; --reader:#082b46; --reader-text:#e8f6ff; }
+:root[data-theme="newyear"] { color-scheme:dark; --page:#08080a; --surface:#111114; --surface-2:#191920; --text:#f6eeda; --muted:#b5aa8c; --line:#2e2a22; --accent:#d4af37; --accent-strong:#f0cf6b; --danger:#e0554f; --reader:#0b0b0e; --reader-text:#f6eeda; }
+:root[data-theme="isekai"] { color-scheme:dark; --page:#0a0e17; --surface:#111725; --surface-2:#171f31; --text:#e8eefc; --muted:#93a2c4; --line:#26314a; --accent:#c9a227; --accent-strong:#f2d06b; --danger:#e15c5c; --reader:#0c1120; --reader-text:#e8eefc; }
+:root[data-theme="cyberpunk"] { color-scheme:dark; --page:#04060a; --surface:#0a1018; --surface-2:#101a26; --text:#e6fbff; --muted:#7fd4e6; --line:#17303d; --accent:#00ffff; --accent-strong:#ff0055; --danger:#ff3b6b; --reader:#05080d; --reader-text:#e6fbff; }
 :root[data-theme="reading"] { color-scheme:dark; --page:#1e170f; --surface:#27201a; --surface-2:#322820; --text:#ecdfcc; --muted:#ab957a; --line:#453a2b; --accent:#e0a45c; --accent-strong:#f5c58c; --danger:#cf6a5e; --reader:#221b13; --reader-text:#eee2cf; }
+/* ไซเบอร์พังก์: เส้นกริดเรืองแสงบาง ๆ อยู่หลังเนื้อหา ไม่กินสเปก */
+:root[data-theme="cyberpunk"] body { background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px); }
+/* อิเซไก: ขอบทองเรืองแสงแบบเวทมนตร์ */
+:root[data-theme="isekai"] .settings-group, :root[data-theme="isekai"] .audio-bar, :root[data-theme="isekai"] .app-header { border-color:color-mix(in srgb,var(--accent) 42%,var(--line)); box-shadow:0 0 18px color-mix(in srgb,var(--accent) 22%,transparent); }
+.settings-group > .setting-hint { display:block; padding:6px 2px 10px; }
 .theme-row { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .theme-choice { padding:7px 8px; font-size:12px; }
 

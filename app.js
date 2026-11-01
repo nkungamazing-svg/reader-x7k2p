@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.7";
+const APP_VERSION = "1.9.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.9.8", note: "ธีมเทศกาลเลือกเองตามวัน พร้อมละอองเบา ๆ และเปิดแอปแบบซูมเข้า" },
   { version: "1.9.7", note: "ภาพเปิดแอปของ iOS ให้การซูมจากไอคอนจบที่หน้าเดียวกันกับในแอป" },
   { version: "1.9.6", note: "เปลี่ยนชื่อแอปเป็น Re:NovelTH และหน้าเปิดแอปเหลือแค่การจางปรากฏ" },
   { version: "1.9.5", note: "เพิ่มธีมฮาโลวีน คริสต์มาส ปีใหม่ไทย และโคมไฟอ่านหนังสือ" },
@@ -24,10 +25,22 @@ const CHANGELOG = [
   { version: "1.7.5", note: "รายการบทดูเป็นตารางได้" },
 ];
 
-const SPLASH_MIN_MS = 850;
+const SPLASH_MIN_MS = 1500;
 const splashStartedAt = performance.now();
-const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk", "halloween", "christmas", "songkran", "reading"];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", halloween: "#150f1f", christmas: "#0d1d16", songkran: "#eaf6fb", reading: "#1e170f" };
+const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk"];
+// "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
+const THEME_MODES = ["auto", ...THEMES];
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+
+/* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
+const SEASONS = [
+  { theme: "halloween", from: [10, 25], to: [11, 1], deco: "🎃", label: "ฮาโลวีน" },
+  { theme: "christmas", from: [12, 15], to: [12, 28], deco: "🎄", label: "คริสต์มาส" },
+  { theme: "newyear", from: [12, 31], to: [1, 2], deco: "🎆", label: "ปีใหม่" },
+  { theme: "songkran", from: [4, 12], to: [4, 16], deco: "💦", label: "สงกรานต์" },
+];
+// ตราประทับมุมโลโก้ตอนเปิดแอป ให้เข้ากับธีมที่ใช้อยู่
+const THEME_DECO = { halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔" };
 
 function renderChangelog() {
   const list = document.getElementById("changelog-list");
@@ -59,19 +72,25 @@ function paintVersionLabels() {
   renderChangelog();
 }
 
+/* เปิดแอปแบบ X: โลโก้ย่อเล็กน้อยแล้วขยายเต็มจอพร้อมจางหายให้เห็นหน้าจออ่าน
+   พออนิเมชันจบให้ลบ splash ออกทั้งก้อน จะได้ไม่บังการแตะของหน้าจอจริง */
 function hideSplash() {
   const splash = document.getElementById("splash");
-  if (!splash) return;
+  if (!splash || splash.dataset.leaving === "1") return;
   const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashStartedAt));
   setTimeout(() => {
-    if (splash.classList.contains("hide")) return;
-    splash.classList.add("hide");
-    setTimeout(() => splash.remove(), 500);
+    if (splash.dataset.leaving === "1") return;
+    splash.dataset.leaving = "1";
+    splash.style.pointerEvents = "none";
+    splash.classList.add("is-launching");
+    const done = () => splash.remove();
+    splash.addEventListener("animationend", done, { once: true });
+    setTimeout(done, 900); // เผื่อเครื่องที่ปิดอนิเมชันไว้ ไม่มี animationend
   }, wait);
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -323,11 +342,194 @@ function showStatus(message, duration = 5000) {
   if (duration > 0) state.statusTimer = setTimeout(() => { status.hidden = true; }, duration);
 }
 
-function applyTheme(theme) {
-  state.theme = THEMES.includes(theme) ? theme : "dark";
+/* ---------- ธีมเทศกาล ---------- */
+function activeSeason(date = new Date()) {
+  const today = (date.getMonth() + 1) * 100 + date.getDate();
+  for (const season of SEASONS) {
+    const from = season.from[0] * 100 + season.from[1];
+    const to = season.to[0] * 100 + season.to[1];
+    const inside = from <= to ? today >= from && today <= to : today >= from || today <= to;
+    if (inside) return season;
+  }
+  return null;
+}
+
+/* ธีมที่มีผลจริง: โหมดอัตโนมัติ = ธีมเทศกาลตามวัน (ถ้าถึงช่วงและเปิดสวิตช์ไว้) */
+function effectiveTheme() {
+  if (state.themeMode !== "auto") return state.themeMode;
+  const season = state.seasonalAuto ? activeSeason() : null;
+  return season ? season.theme : "dark";
+}
+
+function applyTheme(selection = "auto") {
+  state.themeMode = THEME_MODES.includes(selection) ? selection : "dark";
+  state.theme = effectiveTheme();
   document.documentElement.dataset.theme = state.theme;
-  for (const name of THEMES) byId(`theme-${name}`).setAttribute("aria-pressed", String(state.theme === name));
+  for (const mode of THEME_MODES) byId(`theme-${mode}`)?.setAttribute("aria-pressed", String(state.themeMode === mode));
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
+  paintThemeHint();
+  startAmbient(state.theme);
+}
+
+function paintThemeHint() {
+  const deco = byId("splash-deco");
+  const stamp = THEME_DECO[state.theme] || "";
+  if (deco) { deco.textContent = stamp; deco.hidden = !stamp; }
+  const hint = byId("seasonal-hint");
+  if (!hint) return;
+  if (state.themeMode !== "auto") hint.textContent = "เลือกธีมเองอยู่ · ระบบจะไม่สลับตามเทศกาลให้";
+  else if (!state.seasonalAuto) hint.textContent = "ปิดธีมเทศกาลไว้ · ใช้ธีมมืดปกติและไม่มีละออง";
+  else {
+    const season = activeSeason();
+    hint.textContent = season
+      ? `ช่วงนี้เลือกธีม ${season.deco} ${season.label} ให้เองอัตโนมัติ`
+      : "ยังไม่ถึงช่วงเทศกาล · ใช้ธีมมืดปกติ";
+  }
+}
+
+/* ---------- ละอองเทศกาล: canvas เบา ๆ หยุดเองเมื่อเลื่อนอ่าน ---------- */
+const AMBIENT_BY_THEME = { halloween: "bats", christmas: "snow", songkran: "drops", newyear: "sparkle", isekai: "mana" };
+const ambient = { kind: "", canvas: null, ctx: null, dots: [], raf: 0, width: 0, height: 0, paused: true, resumeTimer: 0, last: 0, reduced: false };
+
+function ambientConfig(kind) {
+  switch (kind) {
+    case "snow": return { count: 44, color: "#ffffff", vx: [.04, .22], vy: [.18, .62], size: [1, 2.4], alpha: [.25, .6], mode: "fall" };
+    case "drops": return { count: 26, color: "#9fe4ff", vx: [-.08, .08], vy: [.45, 1.3], size: [1.2, 2.4], alpha: [.18, .45], mode: "fall" };
+    case "bats": return { count: 12, color: "#ff9a4d", vx: [-.14, .14], vy: [-.16, -.4], size: [5, 9], alpha: [.18, .42], mode: "bat" };
+    case "sparkle": return { count: 30, color: "#d4af37", vx: [-.06, .06], vy: [-.06, -.3], size: [1, 2.4], alpha: [.15, .55], mode: "twinkle" };
+    case "mana": return { count: 26, color: "#e8c766", vx: [-.04, .04], vy: [-.04, -.2], size: [.9, 2], alpha: [.12, .42], mode: "twinkle" };
+    default: return null;
+  }
+}
+
+function randomBetween(min, max) { return min + Math.random() * (max - min); }
+
+function seedAmbientDots(kind, width, height) {
+  const config = ambientConfig(kind);
+  if (!config) return [];
+  const count = Math.round(config.count * (width < 480 ? .75 : 1));
+  const dots = [];
+  for (let index = 0; index < count; index += 1) {
+    dots.push({
+      x: Math.random() * width, y: Math.random() * height,
+      vx: randomBetween(config.vx[0], config.vx[1]), vy: randomBetween(config.vy[0], config.vy[1]),
+      r: randomBetween(config.size[0], config.size[1]), a: randomBetween(config.alpha[0], config.alpha[1]),
+      phase: Math.random() * Math.PI * 2, spin: randomBetween(1.2, 2.8) * (Math.random() < .5 ? -1 : 1),
+    });
+  }
+  return dots;
+}
+
+function resizeAmbient() {
+  const canvas = ambient.canvas;
+  if (!canvas || !ambient.ctx) return;
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  ambient.width = window.innerWidth;
+  ambient.height = window.innerHeight;
+  canvas.width = Math.round(ambient.width * ratio);
+  canvas.height = Math.round(ambient.height * ratio);
+  ambient.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ambient.dots = seedAmbientDots(ambient.kind, ambient.width, ambient.height);
+}
+
+function drawBat(ctx, dot) {
+  const flap = Math.sin(dot.phase * 2.4) * dot.r * .55;
+  ctx.beginPath();
+  ctx.moveTo(dot.x, dot.y);
+  ctx.quadraticCurveTo(dot.x - dot.r, dot.y - flap, dot.x - dot.r * 1.9, dot.y + dot.r * .35);
+  ctx.quadraticCurveTo(dot.x - dot.r * .9, dot.y + dot.r * .15, dot.x, dot.y + dot.r * .5);
+  ctx.quadraticCurveTo(dot.x + dot.r * .9, dot.y + dot.r * .15, dot.x + dot.r * 1.9, dot.y + dot.r * .35);
+  ctx.quadraticCurveTo(dot.x + dot.r, dot.y - flap, dot.x, dot.y);
+  ctx.fill();
+}
+
+function drawAmbient(now) {
+  const { ctx, kind } = ambient;
+  const config = ambientConfig(kind);
+  if (!ctx || !config) return;
+  const step = Math.min(48, now - (ambient.last || now));
+  ambient.last = now;
+  ctx.clearRect(0, 0, ambient.width, ambient.height);
+  ctx.globalCompositeOperation = "lighter";
+  ctx.fillStyle = config.color;
+  for (const dot of ambient.dots) {
+    dot.x += dot.vx * step * .06;
+    dot.y += dot.vy * step * .06;
+    dot.phase += dot.spin * step * .001;
+    if (dot.y < -24 || dot.y > ambient.height + 24 || dot.x < -24 || dot.x > ambient.width + 24) {
+      const falling = config.mode === "fall";
+      dot.y = falling ? -14 : ambient.height + 14;
+      dot.x = Math.random() * ambient.width;
+    }
+    const twinkle = config.mode === "twinkle" ? .4 + .6 * Math.abs(Math.sin(dot.phase)) : 1;
+    ctx.globalAlpha = dot.a * twinkle;
+    if (config.mode === "bat") drawBat(ctx, dot);
+    else { ctx.beginPath(); ctx.arc(dot.x, dot.y, dot.r * (config.mode === "twinkle" ? twinkle * 1.3 : 1), 0, Math.PI * 2); ctx.fill(); }
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
+  ambient.raf = ambient.paused ? 0 : requestAnimationFrame(drawAmbient);
+}
+
+function resumeAmbient() {
+  if (!ambient.ctx || !ambient.kind || !ambient.paused) return;
+  ambient.paused = false;
+  ambient.last = 0;
+  ambient.raf = requestAnimationFrame(drawAmbient);
+}
+
+function pauseAmbient() {
+  ambient.paused = true;
+  if (ambient.raf) cancelAnimationFrame(ambient.raf);
+  ambient.raf = 0;
+}
+
+function stopAmbient() {
+  pauseAmbient();
+  if (ambient.ctx && ambient.canvas) {
+    ambient.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ambient.ctx.clearRect(0, 0, ambient.canvas.width, ambient.canvas.height);
+  }
+  ambient.kind = "";
+  ambient.ctx = null;
+  ambient.dots = [];
+  if (ambient.canvas) ambient.canvas.hidden = true;
+}
+
+function startAmbient(theme) {
+  const canvas = byId("ambient");
+  if (!canvas) return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) ambient.reduced = true;
+  const kind = ambient.reduced ? "" : (AMBIENT_BY_THEME[theme] || "");
+  if (!kind) { stopAmbient(); return; }
+  if (kind === ambient.kind && ambient.ctx) { resumeAmbient(); return; }
+  stopAmbient();
+  ambient.kind = kind;
+  ambient.canvas = canvas;
+  ambient.ctx = canvas.getContext("2d");
+  if (!ambient.ctx) { ambient.kind = ""; return; }
+  canvas.hidden = false;
+  resizeAmbient();
+  resumeAmbient();
+}
+
+/* ลากอ่านแล้วละอองหยุดและหรี่ลง กันกวนสายตาและประหยัดแบต */
+function installAmbientGuards() {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { ambient.reduced = true; stopAmbient(); }
+  let lastY = window.scrollY;
+  window.addEventListener("scroll", () => {
+    const y = window.scrollY, delta = y - lastY;
+    lastY = y;
+    if (!ambient.kind || Math.abs(delta) < 6) return;
+    if (delta > 0) {
+      ambient.canvas?.classList.add("dim");
+      pauseAmbient();
+    }
+    clearTimeout(ambient.resumeTimer);
+    ambient.resumeTimer = setTimeout(() => { ambient.canvas?.classList.remove("dim"); resumeAmbient(); }, 900);
+  }, { passive: true });
+  window.addEventListener("resize", () => { if (ambient.kind) resizeAmbient(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) pauseAmbient(); else resumeAmbient(); });
 }
 
 function makeRemoteImageFallback(image, source) {
@@ -1281,7 +1483,15 @@ function bindEvents() {
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
-  for (const theme of THEMES) byId(`theme-${theme}`).addEventListener("click", () => { applyTheme(theme); void writeSetting("theme", theme); });
+  for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
+  byId("seasonal-toggle").addEventListener("change", event => {
+    state.seasonalAuto = event.target.checked;
+    void writeSetting("seasonalAuto", state.seasonalAuto);
+    applyTheme(state.themeMode);
+  });
+  // โหมดอัตโนมัติ: เปิดแอปข้ามวัน/ข้ามเทศกาล ให้คำนวณใหม่
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && state.themeMode === "auto") applyTheme("auto"); });
+  installAmbientGuards();
   // ปุ่มบนหน้าเริ่มต้น: เปิดหน้าตั้งค่าแล้วเลื่อนไปกลุ่มซิงก์เลย ไม่ต้อง import ไฟล์ก่อน
   const openSyncSettings = () => {
     const sheet = byId("settings-sheet");
@@ -1766,7 +1976,9 @@ function startServiceWorker() {
 async function initialize() {
   try {
     await dbReady;
-    state.theme = await readSetting("theme", "dark"); applyTheme(state.theme);
+    state.seasonalAuto = await readSetting("seasonalAuto", true) !== false;
+    byId("seasonal-toggle").checked = state.seasonalAuto;
+    applyTheme(await readSetting("theme", "auto"));
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);
     setLineHeight(Number(await readSetting("lineHeight", 1.9)) || 1.9);
     setTextWidth(Number(await readSetting("textWidth", 760)) || 760);
