@@ -553,3 +553,10 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .help-list { display:grid; grid-template-columns:auto minmax(0,1fr); gap:5px 10px; margin:10px 0 2px; color:var(--muted); font-size:11px; line-height:1.5; }
 .help-list dt { color:var(--text); font-weight:700; white-space:nowrap; }
 .help-list dd { margin:0; }
+
+/* หน้าตั้งค่า: ตารางธีมแบบกระชับ ไอคอนบนชื่อ อ่านง่ายกว่าเดิม */
+.settings-sheet .theme-row { grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+.settings-sheet .theme-tile { flex-direction:column; gap:5px; min-height:60px; padding:8px 4px; font-size:10.5px; font-weight:600; line-height:1.25; text-align:center; }
+.settings-sheet .theme-tile .theme-icon { width:22px; height:22px; border-radius:6px; }
+.theme-group-title { margin:14px 0 0; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.02em; }
+@media(prefers-reduced-motion:no-preference) { .settings-sheet .theme-tile { transition:border-color .15s ease,background .15s ease; } }

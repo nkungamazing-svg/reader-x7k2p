@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-1.11.9";
+const CACHE_NAME = "noat-mobile-reader-1.12.0";
 const APP_FILES = [
   "characters.json",
   "./characters-local.json",
