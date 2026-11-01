@@ -5,10 +5,12 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.1";
+const APP_VERSION = "1.12.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.3", note: "ธีมรี:ซีโร่ปรับสีพื้น สีเน้น สีโลโก้ และเอฟเฟกต์เองได้ โดยยังมีรูปตอนเข้าแอปและโลโก้กับชื่อที่หัวเว็บ" },
+  { version: "1.12.2", note: "เพิ่มธีมกำหนดเอง ตั้งสีพื้น ตัวอักษร การ์ด สีเน้น สีโลโก้ และเอฟเฟกต์หัวเว็บได้อิสระ" },
   { version: "1.12.1", note: "ธีมรี:ซีโร่เข้มขึ้นสำหรับอ่านก่อนนอน มีดาวตกตอนเข้าแอป และผงดาวจางในหน้าอ่าน" },
   { version: "1.12.0", note: "หน้าตั้งค่าธีมจัดใหม่เป็นตาราง 4 ช่อง แยกพื้นฐานกับธีมพิเศษให้เลือกง่ายขึ้น" },
   { version: "1.11.9", note: "ธีมรี:ซีโร่สว่างขึ้น หน้าอ่านกลืนกับหัวเว็บ และมีประกายดาวโปรยในหัวเว็บ" },
@@ -52,10 +54,10 @@ const SPLASH_MIN_MS = 1500;
 // ธีมรี:ซีโร่มีภาพต้องโหลด ให้หน้าเปิดอยู่ต่ออีกหน่อยจะได้ไม่เห็นจอเปล่า
 const SPLASH_REZERO_MS = 2400;
 const splashStartedAt = performance.now();
-const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero"];
+const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero", "custom"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
 const THEME_MODES = ["auto", ...THEMES];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#121524", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#121524", custom: "#121524", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
 
 /* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
 const SEASONS = [
@@ -139,7 +141,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true } };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -413,12 +415,202 @@ function effectiveTheme() {
   return season ? season.theme : "dark";
 }
 
+/* ---------- ธีมกำหนดเอง: สี เอฟเฟกต์ และสีโลโก้ตั้งได้อิสระ ---------- */
+const CUSTOM_DEFAULT = { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" };
+
+function clampByte(value) { return Math.max(0, Math.min(255, Math.round(value))); }
+function hexToRgb(hex) {
+  const clean = /^#[0-9a-f]{6}$/iu.test(String(hex)) ? String(hex) : "#000000";
+  return [1, 3, 5].map(start => parseInt(clean.slice(start, start + 2), 16));
+}
+function rgbToHex(list) { return `#${list.map(value => clampByte(value).toString(16).padStart(2, "0")).join("")}`; }
+function mixHex(from, to, ratio) {
+  const one = hexToRgb(from), two = hexToRgb(to);
+  return rgbToHex(one.map((value, index) => value + (two[index] - value) * ratio));
+}
+function isDarkHex(hex) {
+  const [red, green, blue] = hexToRgb(hex);
+  return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255 < 0.5;
+}
+function hslHex(hue, saturation, light) {
+  const sat = saturation / 100, lum = light / 100;
+  const chroma = (1 - Math.abs(2 * lum - 1)) * sat;
+  const second = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
+  const offset = lum - chroma / 2;
+  const table = [[chroma, second, 0], [second, chroma, 0], [0, chroma, second], [0, second, chroma], [second, 0, chroma], [chroma, 0, second]];
+  return rgbToHex(table[Math.floor(hue / 60) % 6].map(value => (value + offset) * 255));
+}
+
+/* เขียนตัวแปรสีของธีมกำหนดเองลง :root แล้วคืนค่าเมื่อเปลี่ยนไปธีมอื่น */
+function applyCustomTheme() {
+  const root = document.documentElement;
+  const editor = byId("custom-theme-editor");
+  if (editor) editor.hidden = state.themeMode !== "custom";
+  const managed = ["--page", "--surface", "--surface-2", "--text", "--muted", "--line", "--accent", "--accent-strong", "--reader", "--reader-text", "--logo-hue", "--logo-sat", "--logo-bright"];
+  if (state.theme === "custom") {
+    const pick = state.customTheme;
+    const dark = isDarkHex(pick.page);
+    root.style.setProperty("--page", pick.page);
+    root.style.setProperty("--surface", pick.surface);
+    root.style.setProperty("--surface-2", mixHex(pick.surface, pick.text, 0.07));
+    root.style.setProperty("--text", pick.text);
+    root.style.setProperty("--muted", mixHex(pick.text, pick.page, 0.45));
+    root.style.setProperty("--line", mixHex(pick.text, pick.page, 0.82));
+    root.style.setProperty("--accent", pick.accent);
+    root.style.setProperty("--accent-strong", mixHex(pick.accent, dark ? "#ffffff" : "#000000", dark ? 0.34 : 0.2));
+    root.style.setProperty("--reader", pick.page);
+    root.style.setProperty("--reader-text", pick.text);
+    root.style.setProperty("--logo-hue", `${Number(pick.hue) || 0}deg`);
+    root.style.setProperty("--logo-sat", String((Number(pick.sat) || 100) / 100));
+    root.style.setProperty("--logo-bright", String((Number(pick.bright) || 100) / 100));
+    root.style.setProperty("color-scheme", dark ? "dark" : "light");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", pick.page);
+  } else {
+    for (const name of managed) root.style.removeProperty(name);
+    root.style.removeProperty("color-scheme");
+  }
+  const sky = state.theme === "custom" ? state.customTheme.sky : state.theme === "rezero" ? state.rezeroTheme.sky : "";
+  if (sky && sky !== "none") root.dataset.sky = sky;
+  else delete root.dataset.sky;
+}
+
+/* ---------- ธีมรี:ซีโร่: สี เอฟเฟกต์ และสีโลโก้ปรับได้เอง ---------- */
+const REZERO_BASE = { page: "#121524", surface: "#1a2036", surface2: "#222a44", line: "#2e3752" };
+const REZERO_DEFAULT = { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true };
+
+/* สไลเดอร์ความสว่าง: 50 = โทนเดิมของรี:ซีโร่ ต่ำกว่านั้นมืดลง สูงกว่านั้นจางขึ้น */
+function rezeroTone(pick) {
+  const light = Number.isFinite(Number(pick.light)) ? Number(pick.light) : 50;
+  const delta = Math.max(-1, Math.min(1, (light - 50) / 50));
+  const target = delta < 0 ? "#06070e" : "#3d486e";
+  const ratio = Math.abs(delta) * (delta < 0 ? 0.8 : 0.5);
+  return {
+    page: mixHex(REZERO_BASE.page, target, ratio),
+    surface: mixHex(REZERO_BASE.surface, target, ratio * 0.85),
+    surface2: mixHex(REZERO_BASE.surface2, target, ratio * 0.7),
+    line: mixHex(REZERO_BASE.line, target, ratio * 0.45)
+  };
+}
+
+function applyRezeroTheme() {
+  const root = document.documentElement;
+  const editor = byId("rezero-theme-editor");
+  if (editor) editor.hidden = state.themeMode !== "rezero";
+  if (state.theme !== "rezero") {
+    delete root.dataset.splash;
+    delete root.dataset.dust;
+    return;
+  }
+  const pick = state.rezeroTheme;
+  const tone = rezeroTone(pick);
+  const accent = /^#[0-9a-f]{6}$/iu.test(String(pick.accent)) ? pick.accent : REZERO_DEFAULT.accent;
+  root.style.setProperty("--page", tone.page);
+  root.style.setProperty("--surface", tone.surface);
+  root.style.setProperty("--surface-2", tone.surface2);
+  root.style.setProperty("--line", tone.line);
+  root.style.setProperty("--reader", tone.page);
+  root.style.setProperty("--accent", accent);
+  root.style.setProperty("--accent-strong", mixHex(accent, "#ffffff", 0.34));
+  root.style.setProperty("--logo-hue", `${Number(pick.hue) || 0}deg`);
+  root.style.setProperty("--logo-sat", String((Number(pick.sat) || 100) / 100));
+  root.style.setProperty("--logo-bright", String((Number(pick.bright) || 100) / 100));
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", tone.page);
+  root.dataset.splash = pick.shooting === false ? "off" : "on";
+  root.dataset.dust = pick.dust === false ? "off" : "on";
+  paintRezeroInputs();
+}
+
+function paintRezeroInputs() {
+  const pick = state.rezeroTheme;
+  if (byId("rezero-accent")) byId("rezero-accent").value = pick.accent;
+  for (const key of ["light", "hue", "sat", "bright"]) {
+    const input = byId(`rezero-${key}`);
+    if (input) input.value = String(pick[key]);
+  }
+  if (byId("rezero-light-output")) byId("rezero-light-output").value = `${pick.light}%`;
+  if (byId("rezero-hue-output")) byId("rezero-hue-output").value = `${pick.hue}°`;
+  if (byId("rezero-sat-output")) byId("rezero-sat-output").value = `${pick.sat}%`;
+  if (byId("rezero-bright-output")) byId("rezero-bright-output").value = `${pick.bright}%`;
+  if (byId("rezero-sky")) byId("rezero-sky").value = pick.sky;
+  if (byId("rezero-shooting")) byId("rezero-shooting").checked = pick.shooting !== false;
+  if (byId("rezero-dust")) byId("rezero-dust").checked = pick.dust !== false;
+}
+
+function saveRezeroTheme() {
+  applyRezeroTheme();
+  void writeSetting("rezeroTheme", state.rezeroTheme);
+}
+
+function bindRezeroTheme() {
+  paintRezeroInputs();
+  byId("rezero-accent")?.addEventListener("input", event => { state.rezeroTheme.accent = event.target.value; saveRezeroTheme(); });
+  for (const key of ["light", "hue", "sat", "bright"]) {
+    byId(`rezero-${key}`)?.addEventListener("input", event => { state.rezeroTheme[key] = Number(event.target.value); saveRezeroTheme(); });
+  }
+  byId("rezero-sky")?.addEventListener("change", event => { state.rezeroTheme.sky = event.target.value; applyCustomTheme(); paintRezeroInputs(); void writeSetting("rezeroTheme", state.rezeroTheme); });
+  byId("rezero-shooting")?.addEventListener("change", event => { state.rezeroTheme.shooting = event.target.checked; saveRezeroTheme(); });
+  byId("rezero-dust")?.addEventListener("change", event => { state.rezeroTheme.dust = event.target.checked; saveRezeroTheme(); });
+  byId("rezero-reset")?.addEventListener("click", () => { state.rezeroTheme = { ...REZERO_DEFAULT }; saveRezeroTheme(); showStatus("คืนค่าเดิมของธีมรี:ซีโร่แล้ว"); });
+}
+
+function paintCustomInputs() {
+  const pick = state.customTheme;
+  for (const key of ["page", "text", "surface", "accent"]) {
+    const input = byId(`custom-${key}`);
+    if (input) input.value = pick[key];
+  }
+  for (const key of ["hue", "sat", "bright"]) {
+    const input = byId(`custom-${key}`);
+    if (input) input.value = String(pick[key]);
+  }
+  if (byId("custom-sat-output")) byId("custom-sat-output").value = `${pick.sat}%`;
+  if (byId("custom-bright-output")) byId("custom-bright-output").value = `${pick.bright}%`;
+  if (byId("custom-sky")) byId("custom-sky").value = pick.sky;
+}
+
+function saveCustomTheme() {
+  applyCustomTheme();
+  paintCustomInputs();
+  void writeSetting("customTheme", state.customTheme);
+}
+
+function randomCustomTheme() {
+  const hue = Math.floor(Math.random() * 360);
+  const dark = Math.random() < 0.72;
+  const skies = ["none", "snow", "stars", "sparks"];
+  return {
+    page: hslHex(hue, dark ? 34 : 30, dark ? 7 + Math.random() * 5 : 94),
+    text: dark ? hslHex(hue, 14, 91) : hslHex(hue, 22, 11),
+    surface: hslHex(hue, dark ? 28 : 34, dark ? 12 + Math.random() * 4 : 98),
+    accent: hslHex((hue + 150 + Math.floor(Math.random() * 120)) % 360, 62, dark ? 62 : 40),
+    hue: Math.floor(Math.random() * 360),
+    sat: 60 + Math.floor(Math.random() * 130),
+    bright: 90 + Math.floor(Math.random() * 40),
+    sky: skies[Math.floor(Math.random() * skies.length)]
+  };
+}
+
+function bindCustomTheme() {
+  paintCustomInputs();
+  for (const key of ["page", "text", "surface", "accent"]) {
+    byId(`custom-${key}`)?.addEventListener("input", event => { state.customTheme[key] = event.target.value; saveCustomTheme(); });
+  }
+  for (const key of ["hue", "sat", "bright"]) {
+    byId(`custom-${key}`)?.addEventListener("input", event => { state.customTheme[key] = Number(event.target.value); saveCustomTheme(); });
+  }
+  byId("custom-sky")?.addEventListener("change", event => { state.customTheme.sky = event.target.value; saveCustomTheme(); });
+  byId("custom-random")?.addEventListener("click", () => { state.customTheme = randomCustomTheme(); saveCustomTheme(); showStatus("สุ่มชุดสีใหม่แล้ว"); });
+  byId("custom-reset")?.addEventListener("click", () => { state.customTheme = { ...CUSTOM_DEFAULT }; saveCustomTheme(); showStatus("คืนค่าเริ่มต้นของธีมกำหนดเองแล้ว"); });
+}
+
 function applyTheme(selection = "auto") {
   state.themeMode = THEME_MODES.includes(selection) ? selection : "dark";
   state.theme = effectiveTheme();
   document.documentElement.dataset.theme = state.theme;
   for (const mode of THEME_MODES) byId(`theme-${mode}`)?.setAttribute("aria-pressed", String(state.themeMode === mode));
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
+  applyCustomTheme();
+  applyRezeroTheme();
   paintThemeLogo();
   paintThemeHint();
   startAmbient(state.theme);
@@ -1704,6 +1896,8 @@ function bindEvents() {
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
+  bindCustomTheme();
+  bindRezeroTheme();
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
   byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
   byId("launch-zoom").addEventListener("click", () => { applyLaunchStyle("zoom"); void writeSetting("launchStyle", state.launchStyle); });
@@ -2202,6 +2396,10 @@ async function initialize() {
     state.seasonalAuto = await readSetting("seasonalAuto", true) !== false;
     byId("seasonal-toggle").checked = state.seasonalAuto;
     applyLaunchStyle(await readSetting("launchStyle", "book"));
+    const savedCustom = await readSetting("customTheme", null);
+    if (savedCustom && typeof savedCustom === "object") state.customTheme = { ...CUSTOM_DEFAULT, ...savedCustom };
+    const savedRezero = await readSetting("rezeroTheme", null);
+    if (savedRezero && typeof savedRezero === "object") state.rezeroTheme = { ...REZERO_DEFAULT, ...savedRezero };
     applyTheme(await readSetting("theme", "auto"));
     buildHeaderSky();
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);

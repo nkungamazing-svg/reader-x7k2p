@@ -128,24 +128,24 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .theme-icon { flex:none; width:18px; height:18px; border-radius:5px; object-fit:cover; }
 /* หน้าเปิด: ดาวตกวิ่งผ่านตอนเข้าแอป (เฉพาะธีมรี:ซีโร่) */
 .splash-sky { display:none; }
-:root[data-theme="rezero"] .splash-sky { position:absolute; inset:0; z-index:1; display:block; overflow:hidden; pointer-events:none; }
-:root[data-theme="rezero"] .splash-sky i { position:absolute; left:0; width:150px; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,#fff); filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent-strong) 90%,transparent)); opacity:0; transform:rotate(16deg); animation:rezero-shoot var(--dur,6s) ease-in var(--delay,0.6s) infinite; }
-:root[data-theme="rezero"] .splash-sky i:nth-child(1) { top:12%; --delay:0.4s; --dur:6.5s; }
-:root[data-theme="rezero"] .splash-sky i:nth-child(2) { top:22%; width:110px; --delay:2.6s; --dur:7.5s; }
-:root[data-theme="rezero"] .splash-sky i:nth-child(3) { top:6%; width:190px; --delay:4.4s; --dur:8.5s; }
+:root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky { position:absolute; inset:0; z-index:1; display:block; overflow:hidden; pointer-events:none; }
+:root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky i { position:absolute; left:0; width:150px; height:2px; border-radius:2px; background:linear-gradient(90deg,transparent,#fff); filter:drop-shadow(0 0 6px color-mix(in srgb,var(--accent-strong) 90%,transparent)); opacity:0; transform:rotate(16deg); animation:rezero-shoot var(--dur,6s) ease-in var(--delay,0.6s) infinite; }
+:root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky i:nth-child(1) { top:12%; --delay:0.4s; --dur:6.5s; }
+:root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky i:nth-child(2) { top:22%; width:110px; --delay:2.6s; --dur:7.5s; }
+:root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky i:nth-child(3) { top:6%; width:190px; --delay:4.4s; --dur:8.5s; }
 @keyframes rezero-shoot {
   0% { opacity:0; transform:translate3d(-22vw,-6vh,0) rotate(16deg) scale(.6); }
   4% { opacity:1; }
   16% { opacity:0; transform:translate3d(86vw,30vh,0) rotate(16deg) scale(1); }
   100% { opacity:0; transform:translate3d(86vw,30vh,0) rotate(16deg) scale(1); }
 }
-@media(prefers-reduced-motion:reduce) { :root[data-theme="rezero"] .splash-sky { display:none; } }
+@media(prefers-reduced-motion:reduce) { :root:is([data-theme="rezero"],[data-sky="stars"]) .splash-sky { display:none; } }
 
 /* หัวเว็บ: ประกายดาวโปรยลงมาเฉพาะธีมรี:ซีโร่ */
 .header-sky { display:none; }
-:root[data-theme="rezero"] .header-sky { position:absolute; inset:0; z-index:0; display:block; overflow:hidden; pointer-events:none; }
-:root[data-theme="rezero"] .app-header > *:not(.header-sky) { position:relative; z-index:1; }
-:root[data-theme="rezero"] .header-sky i { position:absolute; top:-12px; border-radius:50%; background:#fff; box-shadow:0 0 9px 2px color-mix(in srgb,var(--accent-strong) 85%,transparent); opacity:0; animation:rezero-snow var(--dur,9s) linear var(--delay,0s) infinite; }
+:root:is([data-theme="rezero"],[data-sky="snow"],[data-sky="stars"],[data-sky="sparks"]) .header-sky { position:absolute; inset:0; z-index:0; display:block; overflow:hidden; pointer-events:none; }
+:root:is([data-theme="rezero"],[data-sky="snow"],[data-sky="stars"],[data-sky="sparks"]) .app-header > *:not(.header-sky) { position:relative; z-index:1; }
+:root:is([data-theme="rezero"],[data-sky="snow"],[data-sky="stars"],[data-sky="sparks"]) .header-sky i { position:absolute; top:-12px; border-radius:50%; background:#fff; box-shadow:0 0 9px 2px color-mix(in srgb,var(--accent-strong) 85%,transparent); opacity:0; animation:rezero-snow var(--dur,9s) linear var(--delay,0s) infinite; }
 @keyframes rezero-snow {
   0% { transform:translate3d(0,0,0) scale(.7); opacity:0; }
   12% { opacity:.95; }
@@ -153,7 +153,10 @@ button:disabled { opacity:.48; cursor:not-allowed; }
   88% { opacity:.5; }
   100% { transform:translate3d(calc(var(--drift,4px) * -1),84px,0) scale(.8); opacity:0; }
 }
-@media(prefers-reduced-motion:reduce) { :root[data-theme="rezero"] .header-sky i { animation:none; opacity:0; } }
+@media(prefers-reduced-motion:reduce) { :root:is([data-theme="rezero"],[data-sky="snow"],[data-sky="stars"],[data-sky="sparks"]) .header-sky i { animation:none; opacity:0; } }
+/* สวิตช์ในหน้าตั้งค่า: ปิดเอฟเฟกต์ของรี:ซีโร่ได้ทีละอย่าง */
+:root[data-splash="off"] .splash-sky { display:none; }
+:root[data-sky="none"] .header-sky { display:none; }
 
 .theme-choice[aria-pressed="true"] { border-color:var(--accent-strong); background:color-mix(in srgb,var(--accent) 25%,var(--surface-2)); }
 .switch-row { grid-template-columns:minmax(0,1fr) 46px; align-items:center; min-height:54px; cursor:pointer; }
@@ -330,6 +333,7 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 :root[data-theme="paper"] body { background-image:radial-gradient(circle at 50% 0%,color-mix(in srgb,#fff 42%,transparent),transparent 62%),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 3%,transparent) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 2.4%,transparent) 0 2px,transparent 2px 5px); }
 :root[data-theme="paper"] .reader, :root[data-theme="paper"] .reading-viewport { background-image:radial-gradient(circle at 50% 42%,transparent 52%,color-mix(in srgb,#6b5636 16%,transparent) 100%); }
 :root[data-theme="paper"] .book-face { background-image:radial-gradient(circle at 30% 18%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),linear-gradient(155deg,#f7edd8,#e8dabb); }
+:root[data-theme="custom"] { color-scheme:dark; --page:#121524; --surface:#1a2036; --surface-2:#222a44; --text:#dfe5f4; --muted:#98a3bf; --line:#2e3752; --accent:#8c82ff; --accent-strong:#c0b7ff; --danger:#dd7286; --reader:#121524; --reader-text:#dfe5f4; }
 :root[data-theme="rezero"] { color-scheme:dark; --page:#121524; --surface:#1a2036; --surface-2:#222a44; --text:#dfe5f4; --muted:#98a3bf; --line:#2e3752; --accent:#8c82ff; --accent-strong:#c0b7ff; --danger:#dd7286; --reader:#121524; --reader-text:#dfe5f4; }
 
 /* รี:ซีโร่ — ภาพตัวละครเรียงเต็มจอตอนเปิดแอป ขยับเบา ๆ ไม่นิ่ง
@@ -350,10 +354,10 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 /* พื้นหลัง: แสงม่วงจากมุมบนขวาและล่างซ้าย ให้หน้าดูมีมิติไม่แบน */
 :root[data-theme="rezero"] body { background-color:var(--page); background-image:linear-gradient(180deg,color-mix(in srgb,var(--accent) 11%,var(--page)),var(--page) 400px),radial-gradient(circle at 86% -6%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 46%),radial-gradient(circle at 4% 108%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 48%),radial-gradient(1.4px 1.4px at 24px 32px,#ffffff0f,transparent 62%),radial-gradient(1.2px 1.2px at 96px 118px,color-mix(in srgb,var(--accent-strong) 20%,transparent),transparent 62%),radial-gradient(1px 1px at 152px 58px,#ffffff0a,transparent 62%),radial-gradient(1px 1px at 58px 176px,#ffffff09,transparent 62%); background-size:auto,auto,auto,160px 160px,160px 160px,160px 160px,160px 160px; background-repeat:no-repeat,no-repeat,no-repeat,repeat,repeat,repeat,repeat; background-attachment:fixed; }
 /* ผงดาวจาง ๆ ในหน้าอ่าน: เห็นเป็นประกายลาง ๆ ไม่แย่งสายตาจากตัวอักษร */
-:root[data-theme="rezero"] .reader-content { background-image:radial-gradient(1.3px 1.3px at 30px 40px,#ffffff0d,transparent 62%),radial-gradient(1px 1px at 140px 130px,color-mix(in srgb,var(--accent-strong) 18%,transparent),transparent 62%); background-size:220px 220px,220px 220px; background-repeat:repeat; }
+:root[data-theme="rezero"]:not([data-dust="off"]) .reader-content { background-image:radial-gradient(1.3px 1.3px at 30px 40px,#ffffff0d,transparent 62%),radial-gradient(1px 1px at 140px 130px,color-mix(in srgb,var(--accent-strong) 18%,transparent),transparent 62%); background-size:220px 220px,220px 220px; background-repeat:repeat; }
 /* หน้าอ่านใช้พื้นเดียวกับหน้าเว็บ เพื่อให้หัวเว็บกับเนื้อเรื่องเป็นผืนเดียวกัน */
 :root[data-theme="rezero"] .reader-content,
-:root[data-theme="rezero"] body.page-mode .reading-viewport { background:transparent; }
+:root[data-theme="rezero"] body.page-mode .reading-viewport { background-color:transparent; }
 /* หัวเว็บ: ไล่เฉดม่วง + เส้นแสงวิ่งใต้แถบ */
 :root[data-theme="rezero"] .app-header { background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,var(--surface)),var(--surface) 62%); }
 :root[data-theme="rezero"] .app-header::after { position:absolute; inset:auto 0 -1px; height:2px; background:linear-gradient(90deg,transparent,var(--accent),#ff7ab6,var(--accent),transparent); background-size:200% 100%; content:""; animation:rezero-sheen 7s linear infinite; }
@@ -577,3 +581,18 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .settings-sheet .theme-tile .theme-icon { width:22px; height:22px; border-radius:6px; }
 .theme-group-title { margin:14px 0 0; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.02em; }
 @media(prefers-reduced-motion:no-preference) { .settings-sheet .theme-tile { transition:border-color .15s ease,background .15s ease; } }
+
+/* หัวเว็บ: รูปแบบเอฟเฟกต์ให้เลือกในธีมกำหนดเอง */
+:root[data-sky="stars"] .header-sky i { animation-duration:calc(var(--dur,9s) * .45); box-shadow:0 0 12px 3px color-mix(in srgb,var(--accent-strong) 95%,transparent); }
+:root[data-sky="sparks"] .header-sky i { animation-duration:calc(var(--dur,9s) * .55); box-shadow:0 0 10px 2px color-mix(in srgb,var(--accent) 90%,transparent); }
+/* สีโลโก้: หมุนสี/อิ่มสี/ความสว่างได้จากหน้าตั้งค่า */
+.brand-logo img, .splash-logo img { filter:hue-rotate(var(--logo-hue,0deg)) saturate(var(--logo-sat,1)) brightness(var(--logo-bright,1)); }
+/* แผงตั้งค่าธีมกำหนดเอง */
+.custom-theme { margin-top:6px; padding:10px 12px 12px; border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--accent) 6%,var(--surface)); }
+.custom-theme[hidden] { display:none; }
+.custom-theme .theme-group-title { margin:0 0 8px; }
+.custom-colors { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.custom-color { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:44px; padding:6px 10px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); font-size:12px; font-weight:600; }
+.custom-color input { flex:none; width:44px; height:32px; padding:0; border:1px solid var(--line); border-radius:8px; background:transparent; }
+.custom-theme .theme-choice { min-height:44px; }
+@media(prefers-reduced-motion:reduce) { :root[data-sky="stars"] .header-sky i, :root[data-sky="sparks"] .header-sky i { animation:none; opacity:0; } }

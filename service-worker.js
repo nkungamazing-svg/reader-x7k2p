@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-1.12.1";
+const CACHE_NAME = "noat-mobile-reader-1.12.3";
 const APP_FILES = [
   "characters.json",
   "./characters-local.json",
@@ -6,6 +6,7 @@ const APP_FILES = [
   "./icons/theme/christmas.png",
   "./icons/theme/cool.png",
   "./icons/theme/cyberpunk.png",
+  "./icons/theme/custom.png",
   "./icons/theme/dark.png",
   "./icons/theme/dusk.png",
   "./icons/theme/eye.png",
