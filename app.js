@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.9";
+const APP_VERSION = "1.10.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.0", note: "หัวเว็บและแถบล่างเปลี่ยนสีตามธีม โลโก้ NA เข้าชุดทุกธีม" },
   { version: "1.9.9", note: "เปิดแอปด้วยปกนิยายเปิดแบบ 3D และเพิ่มธีมกระดาษนิยาย" },
   { version: "1.9.8", note: "ธีมเทศกาลเลือกเองตามวัน พร้อมละอองเบา ๆ และเปิดแอปแบบซูมเข้า" },
   { version: "1.9.7", note: "ภาพเปิดแอปของ iOS ให้การซูมจากไอคอนจบที่หน้าเดียวกันกับในแอป" },
