@@ -14,11 +14,12 @@ from PIL import Image, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "icons" / "theme"
 SIZE = 384
+APP_SIZES = (512, 180)
 LETTER_RATIO = 0.5
 INK = (255, 255, 255)
 
 MOTIFS = {"halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "paper", "reading", "rezero"}
-ART = ROOT / "icons" / "icon-512.png"          # โลโก้เดิมของแอป
+ART = ROOT / "icons" / "logo-art.png"           # โลโก้เดิมของแอป (ต้นฉบับ ไม่ใช่ไอคอนที่แต่งแล้ว)
 HERO = ROOT / "characters" / "emilia.jpg"       # รูปที่ใช้เป็นเหรียญประทับมุมไอคอนธีมรี:ซีโร่
 
 
@@ -192,28 +193,29 @@ def decorate(canvas, theme, accent, surface, ink):
         canvas.alpha_composite(glow(SIZE, accent, 120, 0.22, (SIZE * 0.76, SIZE * 0.2)))
 
 
-def build(page, accent, surface, theme, ink):
-    canvas = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-    plate = Image.new("RGBA", (SIZE, SIZE), tint(page, 255))
-    plate.alpha_composite(glow(SIZE, accent, 96, 0.64, (SIZE * 0.5, SIZE * 0.3)))
-    plate.alpha_composite(glow(SIZE, accent, 52, 0.52, (SIZE * 0.8, SIZE * 0.84)))
-    mask = Image.new("L", (SIZE, SIZE), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, SIZE - 1, SIZE - 1), radius=int(SIZE * 0.225), fill=255)
+def build(page, accent, surface, theme, ink, size=SIZE):
+    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    plate = Image.new("RGBA", (size, size), tint(page, 255))
+    plate.alpha_composite(glow(size, accent, 96, 0.64, (size * 0.5, size * 0.3)))
+    plate.alpha_composite(glow(size, accent, 52, 0.52, (size * 0.8, size * 0.84)))
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size - 1, size - 1), radius=int(size * 0.225), fill=255)
     canvas.paste(plate, (0, 0), mask)
 
-    canvas.alpha_composite(shine_layer(SIZE))
+    canvas.alpha_composite(shine_layer(size))
     if theme in MOTIFS:
         decorate(canvas, theme, accent, surface, ink)
 
-    canvas.alpha_composite(art_layer(SIZE, surface, accent))
+    canvas.alpha_composite(art_layer(size, surface, accent))
     if theme == "rezero":
-        cameo = cameo_layer(SIZE, accent)
+        cameo = cameo_layer(size, accent)
         if cameo:
             canvas.alpha_composite(cameo)
 
-    ring = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-    ImageDraw.Draw(ring).rounded_rectangle((9, 9, SIZE - 10, SIZE - 10), radius=int(SIZE * 0.2),
-                                           outline=tint(accent, 205), width=4)
+    inset = int(size * 0.023)
+    ring = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    ImageDraw.Draw(ring).rounded_rectangle((inset, inset, size - inset - 1, size - inset - 1), radius=int(size * 0.2),
+                                           outline=tint(accent, 205), width=max(2, int(size / 96)))
     canvas.alpha_composite(ring)
     return canvas
 
@@ -241,6 +243,17 @@ def main():
         total += path.stat().st_size
         print(f"  {theme:<10} {path.stat().st_size / 1024:5.1f} KB")
     print(f"รวม {len(themes)} ธีม · {total / 1024:.0f} KB")
+
+    # ไอคอนแอปหลัก (หน้าจอโฮม / apple-touch-icon / manifest) ใช้ชุดแต่งเดียวกับไอคอนธีม
+    base_icon = build(rgb(base.get("--page"), "#17191f"),
+                      rgb(base.get("--accent"), "#8b5cf6"),
+                      rgb(base.get("--surface"), "#222631"),
+                      "", rgb(base.get("--accent-strong"), "#a78bfa"), APP_SIZES[0])
+    for side in APP_SIZES:
+        image = base_icon if side == APP_SIZES[0] else base_icon.resize((side, side), Image.LANCZOS)
+        image.convert("RGB").quantize(colors=256, method=Image.MEDIANCUT, dither=Image.FLOYDSTEINBERG).save(
+            ROOT / "icons" / f"icon-{side}.png", "PNG", optimize=True)
+        print(f"  icon-{side}.png  {(ROOT / 'icons' / f'icon-{side}.png').stat().st_size / 1024:5.1f} KB")
 
 
 if __name__ == "__main__":

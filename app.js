@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.7";
+const APP_VERSION = "1.11.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.8", note: "ไอคอนแอป การ์ดต้อนรับ และหน้าเปิด iOS ใช้โลโก้ชุดใหม่แล้ว" },
   { version: "1.11.7", note: "เอาเครื่องหมายอิโมจิออกจากโลโก้ และใช้รูปโลโก้ประจำธีมในหน้าตั้งค่า" },
   { version: "1.11.6", note: "ธีมรี:ซีโร่ได้ชุดแต่งพิเศษทั้งหัวเว็บ เมนู รายการบท และหน้าตั้งค่า" },
   { version: "1.11.5", note: "ไอคอนกลับมาใช้โลโก้เดิม พร้อมเอฟเฟกต์ประกายและลายธีม" },
