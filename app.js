@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.0";
+const APP_VERSION = "1.11.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.1", note: "โลโก้เหลือตัว N จากชุดสุบารุ ทาสีตามธีมทุกธีม" },
   { version: "1.11.0", note: "ภาพตัวละครบนหน้าเปิดรี:ซีโร่เห็นใบหน้าชัดขึ้น และโลโก้หัวเว็บไม่ยืดรูป" },
   { version: "1.10.9", note: "ไอคอนแอปแยกตามธีม ใช้ทั้งหน้าเปิดและโลโก้หัวเว็บ" },
   { version: "1.10.8", note: "แคชรูปตัวละครไว้ตั้งแต่เปิดครั้งแรก ภาพขึ้นทันทีไม่ต้องรอเน็ต" },

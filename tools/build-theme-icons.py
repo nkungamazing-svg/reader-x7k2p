@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-"""สร้างไอคอนแอปแยกตามธีม จากโลโก้เดิม + สีของธีมใน style.css
+"""ไอคอนแอปแยกตามธีม — ตัว "N" แบบชุดของสุบารุ (Re:Zero) ทาสีตามธีม
 
-ใช้ที่หน้าเปิดแอปและโลโก้หัวเว็บ  รันใหม่เมื่อเปลี่ยนโลโก้หรือสีธีม:
-    python3 tools/build-theme-icons.py
+รันเมื่อเปลี่ยนสีธีมหรืออยากปรับรูปทรง:  python3 tools/build-theme-icons.py
+ผลลัพธ์: icons/theme/<theme>.png (ใช้ทั้งหน้าเปิดแอปและโลโก้หัวเว็บ)
 """
 import json
 import re
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "icons" / "icon-512.png"
 OUT = ROOT / "icons" / "theme"
 SIZE = 384
-ART_RATIO = 0.56
+LETTER_RATIO = 0.52
 
 
 def parse_vars(block):
@@ -38,31 +37,41 @@ def glow(size, colour, alpha, radius_ratio, centre):
     return layer
 
 
-def build(page, accent, surface, art):
+def letter_n(size, colour):
+    """ตัว N หนาเหลี่ยม วาดเองไม่ต้องพึ่งฟอนต์"""
+    box = int(size * LETTER_RATIO)
+    origin = (size - box) // 2
+    inset = round(box * 0.05)
+    stem = round(box * 0.25)
+    top, bottom = origin + inset, origin + box - inset
+    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    radius = round(stem * 0.18)
+    draw.rounded_rectangle((origin, top, origin + stem, bottom), radius=radius, fill=colour + (255,))
+    right = origin + box - stem
+    draw.rounded_rectangle((right, top, origin + box, bottom), radius=radius, fill=colour + (255,))
+    draw.polygon([(origin, top), (origin + stem, top), (origin + box, bottom), (right, bottom)], fill=colour + (255,))
+    return layer
+
+
+def build(page, accent, letter):
     canvas = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     plate = Image.new("RGBA", (SIZE, SIZE), page + (255,))
-    plate.alpha_composite(glow(SIZE, accent, 88, 0.62, (SIZE * 0.5, SIZE * 0.32)))
-    plate.alpha_composite(glow(SIZE, accent, 46, 0.5, (SIZE * 0.78, SIZE * 0.82)))
+    plate.alpha_composite(glow(SIZE, accent, 96, 0.64, (SIZE * 0.5, SIZE * 0.3)))
+    plate.alpha_composite(glow(SIZE, accent, 52, 0.52, (SIZE * 0.8, SIZE * 0.84)))
     mask = Image.new("L", (SIZE, SIZE), 0)
     ImageDraw.Draw(mask).rounded_rectangle((0, 0, SIZE - 1, SIZE - 1), radius=int(SIZE * 0.225), fill=255)
     canvas.paste(plate, (0, 0), mask)
 
-    art_size = int(SIZE * ART_RATIO)
-    pad = int(SIZE * 0.045)
-    draw = ImageDraw.Draw(canvas)
-    draw.rounded_rectangle((SIZE // 2 - art_size // 2 - pad, SIZE // 2 - art_size // 2 - pad,
-                            SIZE // 2 + art_size // 2 + pad, SIZE // 2 + art_size // 2 + pad),
-                           radius=int(SIZE * 0.2), fill=surface + (215,))
-
-    logo = art.resize((art_size, art_size), Image.LANCZOS)
-    logo_mask = Image.new("L", (art_size, art_size), 0)
-    ImageDraw.Draw(logo_mask).rounded_rectangle((0, 0, art_size - 1, art_size - 1),
-                                                radius=int(art_size * 0.24), fill=255)
-    canvas.paste(logo, (SIZE // 2 - art_size // 2, SIZE // 2 - art_size // 2), logo_mask)
+    glyph = letter_n(SIZE, letter)
+    shadow = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    shadow.paste((0, 0, 0, 165), (0, 0), glyph.getchannel("A"))
+    canvas.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(SIZE * 0.014)), (0, int(SIZE * 0.013)))
+    canvas.alpha_composite(glyph)
 
     ring = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     ImageDraw.Draw(ring).rounded_rectangle((9, 9, SIZE - 10, SIZE - 10), radius=int(SIZE * 0.2),
-                                           outline=accent + (200,), width=4)
+                                           outline=accent + (205,), width=4)
     canvas.alpha_composite(ring)
     return canvas
 
@@ -72,7 +81,6 @@ def main():
     app = (ROOT / "app.js").read_text(encoding="utf-8")
     themes = json.loads(re.search(r"const THEMES = (\[[^\]]+\])", app).group(1).replace("'", '"'))
     base = parse_vars(re.search(r":root \{[^}]+\}", css).group(0))
-    art = Image.open(SRC).convert("RGBA")
     OUT.mkdir(parents=True, exist_ok=True)
     total = 0
     for theme in themes:
@@ -82,10 +90,8 @@ def main():
             values.update(parse_vars(block.group(0)))
         image = build(rgb(values.get("--page"), "#17191f"),
                       rgb(values.get("--accent"), "#8b5cf6"),
-                      rgb(values.get("--surface"), "#222631"),
-                      art)
+                      rgb(values.get("--accent-strong"), "#a78bfa"))
         path = OUT / f"{theme}.png"
-        # quantize ให้ไฟล์เล็กลงเยอะ (ไอคอนมีแค่ไล่เฉดไม่กี่สี) — สำคัญกับแคชมือถือ
         image.convert("RGB").quantize(colors=256, method=Image.MEDIANCUT, dither=Image.FLOYDSTEINBERG).save(path, "PNG", optimize=True)
         total += path.stat().st_size
         print(f"  {theme:<10} {path.stat().st_size / 1024:5.1f} KB")
