@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.8";
+const APP_VERSION = "1.10.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.9", note: "ไอคอนแอปแยกตามธีม ใช้ทั้งหน้าเปิดและโลโก้หัวเว็บ" },
   { version: "1.10.8", note: "แคชรูปตัวละครไว้ตั้งแต่เปิดครั้งแรก ภาพขึ้นทันทีไม่ต้องรอเน็ต" },
   { version: "1.10.7", note: "ฝังรูปตัวละคร 24 คนไว้ในแอป หน้าเปิดและหัวเว็บขึ้นรูปทันที" },
   { version: "1.10.6", note: "หน้าเปิดธีมรี:ซีโร่ใช้เฉพาะคนที่มีรูป และรอภาพขึ้นก่อนเปิดแอป" },
@@ -409,9 +410,24 @@ function applyTheme(selection = "auto") {
   document.documentElement.dataset.theme = state.theme;
   for (const mode of THEME_MODES) byId(`theme-${mode}`)?.setAttribute("aria-pressed", String(state.themeMode === mode));
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
+  paintThemeLogo();
   paintThemeHint();
   startAmbient(state.theme);
   void syncRezeroCover();
+}
+
+/* ไอคอนแอปแยกตามธีม (สร้างจาก tools/build-theme-icons.py) ใช้ทั้งหน้าเปิดและหัวเว็บ */
+function themeLogoPath(theme = state.theme) {
+  return `icons/theme/${theme}.png`;
+}
+
+function paintThemeLogo() {
+  const path = themeLogoPath();
+  const splashLogo = byId("splash-logo-img");
+  if (splashLogo) splashLogo.src = path;
+  const avatar = byId("brand-avatar");
+  // ธีมรี:ซีโร่มีรูปตัวละครหมุนอยู่แล้ว ปล่อยให้ตัวหมุนเป็นคนคุมรูป
+  if (avatar && state.theme !== "rezero") avatar.src = path;
 }
 
 function paintThemeHint() {
@@ -506,7 +522,7 @@ function waitForCoverTiles(limit = 1300) {
 function resetCoverHeader() {
   const avatar = byId("brand-avatar");
   const name = byId("brand-name");
-  if (avatar) avatar.src = "icons/icon-180.png";
+  if (avatar) avatar.src = themeLogoPath();
   if (name) name.textContent = "Re:NovelTH";
   document.querySelector(".brand-logo")?.classList.remove("swapping");
   document.querySelector(".brand")?.classList.remove("swapping");
@@ -531,7 +547,7 @@ function startCoverRotation(pool) {
   if (!avatar || !name || !logo) return;
   if (!avatar.dataset.fallback) {
     avatar.dataset.fallback = "1";
-    avatar.addEventListener("error", () => { avatar.src = "icons/icon-180.png"; });
+    avatar.addEventListener("error", () => { avatar.src = themeLogoPath(); });
   }
   let index = Math.floor(Math.random() * pool.length);
   const paint = () => {
