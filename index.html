@@ -30,6 +30,7 @@
 <body>
   <!-- หน้าเปิดแบบปกนิยาย: แตะเพื่อเปิด หรือรอโหลดเสร็จแล้วปกจะเปิดเอง -->
   <div id="splash" class="splash" role="status" aria-label="ปกหนังสือ แตะเพื่อเปิด">
+    <div id="cover-collage" class="cover-collage" aria-hidden="true"></div>
     <div class="book-stage">
       <div class="book">
         <div class="book-face">
@@ -46,8 +47,8 @@
   <canvas id="ambient" class="ambient" aria-hidden="true" hidden></canvas>
   <header class="app-header">
     <button id="menu-toggle" class="icon-button" type="button" aria-label="เปิดรายการบท">☰</button>
-    <span class="brand-logo"><img src="icons/icon-180.png" alt="" width="30" height="30"><span id="header-deco" class="brand-deco" aria-hidden="true" hidden></span></span>
-    <div class="brand"><strong>Re:NovelTH</strong><small>ใช้ส่วนตัวเท่านั้น · ข้อมูลอยู่ในเครื่อง</small></div>
+    <span class="brand-logo"><img id="brand-avatar" src="icons/icon-180.png" alt="" width="30" height="30"><span id="header-deco" class="brand-deco" aria-hidden="true" hidden></span></span>
+    <div class="brand"><strong id="brand-name">Re:NovelTH</strong><small>ใช้ส่วนตัวเท่านั้น · ข้อมูลอยู่ในเครื่อง</small></div>
     <button id="import-open" class="primary-button" type="button">นำเข้าไฟล์สำรอง</button>
     <input id="backup-file" type="file" accept="application/json,.json" hidden>
   </header>
@@ -153,7 +154,7 @@
         <h3>ธีม</h3>
         <label class="switch-row"><span>🎉 เปิดธีมเทศกาลอัตโนมัติ</span><input id="seasonal-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <small id="seasonal-hint" class="setting-hint">เช็กช่วงเทศกาลให้เอง (ฮาโลวีน คริสต์มาส ปีใหม่ สงกรานต์)</small>
-        <div class="setting-row"><span>ธีม</span><div class="theme-row"><button id="theme-auto" class="theme-choice" type="button" aria-pressed="false">🔄 อัตโนมัติ</button><button id="theme-dark" class="theme-choice" type="button" aria-pressed="true">🌙 มืด</button><button id="theme-sepia" class="theme-choice" type="button" aria-pressed="false">📖 ซีเปีย</button><button id="theme-black" class="theme-choice" type="button" aria-pressed="false">⬛ ดำสนิท</button><button id="theme-light" class="theme-choice" type="button" aria-pressed="false">☀️ สว่าง</button><button id="theme-eye" class="theme-choice" type="button" aria-pressed="false">🌿 ถนอมสายตา</button><button id="theme-cool" class="theme-choice" type="button" aria-pressed="false">🌤️ ฟ้าเทา</button><button id="theme-dusk" class="theme-choice" type="button" aria-pressed="false">🌆 พลบค่ำ</button><button id="theme-halloween" class="theme-choice" type="button" aria-pressed="false">🎃 ฮาโลวีน</button><button id="theme-christmas" class="theme-choice" type="button" aria-pressed="false">🎄 คริสต์มาส</button><button id="theme-songkran" class="theme-choice" type="button" aria-pressed="false">💦 ปีใหม่ไทย</button><button id="theme-reading" class="theme-choice" type="button" aria-pressed="false">🪔 โคมไฟอ่านหนังสือ</button><button id="theme-paper" class="theme-choice" type="button" aria-pressed="false">📃 กระดาษนิยาย</button><button id="theme-newyear" class="theme-choice" type="button" aria-pressed="false">🎆 ปีใหม่</button><button id="theme-isekai" class="theme-choice" type="button" aria-pressed="false">⚔️ อิเซไก</button><button id="theme-cyberpunk" class="theme-choice" type="button" aria-pressed="false">🔮 ไซเบอร์พังก์</button></div></div>
+        <div class="setting-row"><span>ธีม</span><div class="theme-row"><button id="theme-auto" class="theme-choice" type="button" aria-pressed="false">🔄 อัตโนมัติ</button><button id="theme-dark" class="theme-choice" type="button" aria-pressed="true">🌙 มืด</button><button id="theme-sepia" class="theme-choice" type="button" aria-pressed="false">📖 ซีเปีย</button><button id="theme-black" class="theme-choice" type="button" aria-pressed="false">⬛ ดำสนิท</button><button id="theme-light" class="theme-choice" type="button" aria-pressed="false">☀️ สว่าง</button><button id="theme-eye" class="theme-choice" type="button" aria-pressed="false">🌿 ถนอมสายตา</button><button id="theme-cool" class="theme-choice" type="button" aria-pressed="false">🌤️ ฟ้าเทา</button><button id="theme-dusk" class="theme-choice" type="button" aria-pressed="false">🌆 พลบค่ำ</button><button id="theme-halloween" class="theme-choice" type="button" aria-pressed="false">🎃 ฮาโลวีน</button><button id="theme-christmas" class="theme-choice" type="button" aria-pressed="false">🎄 คริสต์มาส</button><button id="theme-songkran" class="theme-choice" type="button" aria-pressed="false">💦 ปีใหม่ไทย</button><button id="theme-reading" class="theme-choice" type="button" aria-pressed="false">🪔 โคมไฟอ่านหนังสือ</button><button id="theme-paper" class="theme-choice" type="button" aria-pressed="false">📃 กระดาษนิยาย</button><button id="theme-rezero" class="theme-choice" type="button" aria-pressed="false">🖤 รี:ซีโร่</button><button id="theme-newyear" class="theme-choice" type="button" aria-pressed="false">🎆 ปีใหม่</button><button id="theme-isekai" class="theme-choice" type="button" aria-pressed="false">⚔️ อิเซไก</button><button id="theme-cyberpunk" class="theme-choice" type="button" aria-pressed="false">🔮 ไซเบอร์พังก์</button></div></div>
       </section>
       <section class="settings-group">
         <h3>การอ่าน</h3>

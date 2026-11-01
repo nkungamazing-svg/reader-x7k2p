@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.4";
+const APP_VERSION = "1.10.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.5", note: "ธีมรี:ซีโร่ ภาพตัวละครเต็มหน้าเปิด และรูป-ชื่อหมุนบนหัวเว็บ" },
   { version: "1.10.4", note: "โหมดซูมแบบ X แสดงป้ายเวอร์ชันที่จุดแตะแทนข้อความเดิม" },
   { version: "1.10.3", note: "เลือกซูมแบบ X แล้วหน้าเปิดจะเหลือแค่โลโก้ ไม่มีปกนิยาย" },
   { version: "1.10.2", note: "โลโก้หัวเว็บกลับมาเป็นรูปเดิม พร้อมสติกเกอร์อิโมจิและแสงเรืองตามธีม" },
@@ -33,10 +34,10 @@ const CHANGELOG = [
 
 const SPLASH_MIN_MS = 1500;
 const splashStartedAt = performance.now();
-const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk"];
+const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
 const THEME_MODES = ["auto", ...THEMES];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#0f1119", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
 
 /* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
 const SEASONS = [
@@ -46,7 +47,7 @@ const SEASONS = [
   { theme: "songkran", from: [4, 12], to: [4, 16], deco: "💦", label: "สงกรานต์" },
 ];
 // ตราประทับมุมโลโก้ตอนเปิดแอป ให้เข้ากับธีมที่ใช้อยู่
-const THEME_DECO = { paper: "📃", halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔" };
+const THEME_DECO = { paper: "📃", halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔", rezero: "🖤" };
 
 function renderChangelog() {
   const list = document.getElementById("changelog-list");
@@ -122,7 +123,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -401,6 +402,7 @@ function applyTheme(selection = "auto") {
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
   paintThemeHint();
   startAmbient(state.theme);
+  void syncRezeroCover();
 }
 
 function paintThemeHint() {
@@ -419,6 +421,108 @@ function paintThemeHint() {
       ? `ช่วงนี้เลือกธีม ${season.deco} ${season.label} ให้เองอัตโนมัติ`
       : "ยังไม่ถึงช่วงเทศกาล · ใช้ธีมมืดปกติ";
   }
+}
+
+/* ---------- ธีมรี:ซีโร่: ภาพตัวละครเต็มหน้าเปิด + รูป/ชื่อหมุนบนหัวเว็บ ---------- */
+const COVER_TILES = 9;
+const COVER_SWAP_MS = 5200;
+
+function shuffleList(list) {
+  const items = list.slice();
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const other = Math.floor(Math.random() * (index + 1));
+    const swap = items[index]; items[index] = items[other]; items[other] = swap;
+  }
+  return items;
+}
+
+/* อ่านดัชนีตัวละครครั้งเดียวแล้วใช้ซ้ำ (ไฟล์ถูก precache ไว้แล้วโดย service worker) */
+async function loadCoverPool() {
+  if (state.coverPool) return state.coverPool;
+  try {
+    const response = await fetch("characters.json", { cache: "force-cache" });
+    const data = await response.json();
+    const list = Array.isArray(data?.characters) ? data.characters : [];
+    state.coverPool = shuffleList(list.filter(item => item && item.image && item.title));
+  } catch (error) { state.coverPool = []; }
+  return state.coverPool;
+}
+
+function fillCoverCollage(pool) {
+  const collage = byId("cover-collage");
+  if (!collage || collage.childElementCount || !pool.length) return;
+  for (const item of shuffleList(pool).slice(0, COVER_TILES)) {
+    const tile = document.createElement("img");
+    tile.alt = "";
+    tile.decoding = "async";
+    // รูปบางรูปต้องใช้อินเทอร์เน็ต — ถ้าโหลดไม่ได้ให้เอาช่องนั้นออก ไม่ทิ้งกล่องดำค้าง
+    tile.addEventListener("error", () => tile.remove(), { once: true });
+    tile.src = item.image;
+    collage.append(tile);
+  }
+}
+
+function resetCoverHeader() {
+  const avatar = byId("brand-avatar");
+  const name = byId("brand-name");
+  if (avatar) avatar.src = "icons/icon-180.png";
+  if (name) name.textContent = "Re:NovelTH";
+  document.querySelector(".brand-logo")?.classList.remove("swapping");
+  document.querySelector(".brand")?.classList.remove("swapping");
+}
+
+function stopCoverRotation() {
+  clearInterval(state.coverTimer);
+  clearTimeout(state.coverSwapTimer);
+  state.coverTimer = 0;
+  state.coverSwapTimer = 0;
+  resetCoverHeader();
+}
+
+/* หัวเว็บ: รูปตัวละครสุ่มค่อย ๆ จางสลับไปเรื่อย ๆ พร้อมเปลี่ยนชื่อตามคนที่โผล่ */
+function startCoverRotation(pool) {
+  stopCoverRotation();
+  if (!pool.length) return;
+  const avatar = byId("brand-avatar");
+  const name = byId("brand-name");
+  const logo = document.querySelector(".brand-logo");
+  const brand = document.querySelector(".brand");
+  if (!avatar || !name || !logo) return;
+  if (!avatar.dataset.fallback) {
+    avatar.dataset.fallback = "1";
+    avatar.addEventListener("error", () => { avatar.src = "icons/icon-180.png"; });
+  }
+  let index = Math.floor(Math.random() * pool.length);
+  const paint = () => {
+    const item = pool[index % pool.length];
+    avatar.src = item.image;
+    name.textContent = item.title || item.name || "Re:NovelTH";
+  };
+  paint();
+  state.coverTimer = setInterval(() => {
+    if (document.hidden) return;
+    index += 1 + Math.floor(Math.random() * 3);
+    clearTimeout(state.coverSwapTimer);
+    logo.classList.add("swapping");
+    brand?.classList.add("swapping");
+    state.coverSwapTimer = setTimeout(() => {
+      paint();
+      logo.classList.remove("swapping");
+      brand?.classList.remove("swapping");
+    }, 420);
+  }, COVER_SWAP_MS);
+}
+
+async function syncRezeroCover() {
+  if (state.theme !== "rezero") {
+    stopCoverRotation();
+    byId("cover-collage")?.replaceChildren();
+    return;
+  }
+  const pool = await loadCoverPool();
+  if (state.theme !== "rezero") return;
+  fillCoverCollage(pool);
+  startCoverRotation(pool);
 }
 
 /* ---------- ละอองเทศกาล: canvas เบา ๆ หยุดเองเมื่อเลื่อนอ่าน ---------- */

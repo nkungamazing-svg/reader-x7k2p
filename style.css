@@ -17,7 +17,9 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .app-header img { flex:none; border-radius:8px; }
 /* โลโก้หัวเว็บ: รูป PNG เดิม + สติกเกอร์อิโมจิประจำธีม และเรืองแสงตามสีเน้นของธีม */
 .brand-logo { position:relative; flex:none; display:grid; place-items:center; border-radius:10px; box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent),0 0 16px color-mix(in srgb,var(--accent) 40%,transparent); transition:box-shadow .3s ease; }
-.brand-logo img { display:block; border-radius:8px; }
+.brand-logo img { display:block; border-radius:8px; transition:opacity .5s ease; }
+.brand strong { transition:opacity .4s ease; }
+.brand-logo.swapping img, .brand.swapping strong { opacity:0; }
 .brand-deco { position:absolute; top:-7px; right:-8px; font-size:13px; line-height:1; filter:drop-shadow(0 1px 3px #000c); }
 .brand { display:grid; flex:1; min-width:0; line-height:1.25; }
 .brand strong { font-size:14px; }
@@ -228,7 +230,7 @@ body.scroll-mode .page-top-row { display:none; }
 .splash { position:fixed; inset:0; z-index:120; display:grid; place-items:center; color:var(--text); text-align:center; }
 .splash::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 34%,color-mix(in srgb,var(--accent) 24%,var(--page)),var(--page) 68%); transition:opacity .28s ease; }
 /* ปกนิยาย: ตัวเล่ม ขอบทอง และสันหนังสือด้านซ้าย */
-.book-stage { position:relative; display:grid; place-items:center; perspective:1500px; }
+.book-stage { position:relative; z-index:1; display:grid; place-items:center; perspective:1500px; }
 .book { position:relative; width:min(72vw,286px); aspect-ratio:2/3; transform-origin:left center; transform-style:preserve-3d; }
 .book-face { position:absolute; inset:0; display:grid; align-content:center; justify-items:center; gap:8px; padding:24px 20px; border-radius:8px 14px 14px 8px; color:var(--text); border:1px solid color-mix(in srgb,var(--accent) 46%,var(--line)); background:radial-gradient(circle at 28% 16%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 62%),linear-gradient(155deg,color-mix(in srgb,var(--surface-2) 88%,#000),var(--surface)); box-shadow:0 28px 60px #000a,inset 0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent),inset 12px 0 18px -14px color-mix(in srgb,var(--accent) 55%,transparent); }
 .book-face::before { content:""; position:absolute; inset:11px; border:1px solid color-mix(in srgb,var(--accent) 48%,transparent); border-radius:5px; pointer-events:none; }
@@ -302,6 +304,20 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 :root[data-theme="paper"] body { background-image:radial-gradient(circle at 50% 0%,color-mix(in srgb,#fff 42%,transparent),transparent 62%),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 3%,transparent) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 2.4%,transparent) 0 2px,transparent 2px 5px); }
 :root[data-theme="paper"] .reader, :root[data-theme="paper"] .reading-viewport { background-image:radial-gradient(circle at 50% 42%,transparent 52%,color-mix(in srgb,#6b5636 16%,transparent) 100%); }
 :root[data-theme="paper"] .book-face { background-image:radial-gradient(circle at 30% 18%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),linear-gradient(155deg,#f7edd8,#e8dabb); }
+:root[data-theme="rezero"] { color-scheme:dark; --page:#0f1119; --surface:#161a26; --surface-2:#1e2433; --text:#e9ecf5; --muted:#98a2bb; --line:#2b3346; --accent:#7b6cf6; --accent-strong:#b3a7ff; --danger:#e0556b; --reader:#11141d; --reader-text:#e9ecf5; }
+
+/* รี:ซีโร่ — ภาพตัวละครเรียงเต็มจอตอนเปิดแอป ขยับเบา ๆ ไม่นิ่ง
+   มีม่านมืดคั่นไว้ให้โลโก้กับชื่อแอปอ่านชัดเสมอ */
+.cover-collage { position:absolute; inset:-6%; z-index:0; display:none; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2px; overflow:hidden; }
+:root[data-theme="rezero"] .cover-collage { display:grid; }
+.cover-collage img { width:100%; height:100%; object-fit:cover; object-position:50% 28%; opacity:0; filter:brightness(.6) saturate(1.06); animation-name:collage-in,collage-drift; animation-duration:1.1s,17s; animation-timing-function:ease,ease-in-out; animation-fill-mode:forwards,none; animation-iteration-count:1,infinite; animation-direction:normal,alternate; }
+.cover-collage img:nth-child(2n) { animation-duration:1.25s,22s; object-position:50% 22%; }
+.cover-collage img:nth-child(3n) { animation-duration:1.35s,14s; }
+.cover-collage img:nth-child(4n) { animation-duration:1.45s,26s; object-position:50% 34%; }
+.cover-collage::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#0b0d14d9,#0b0d14a6 42%,#0b0d14f2),radial-gradient(circle at 50% 46%,transparent 16%,#0b0d14c9 74%); }
+@keyframes collage-in { from { opacity:0 } to { opacity:.9 } }
+@keyframes collage-drift { 0% { transform:scale(1.04) translate3d(0,0,0) } 100% { transform:scale(1.16) translate3d(-2.5%,-3%,0) } }
+@media(prefers-reduced-motion:reduce) { .cover-collage img { animation:none; opacity:.9; } }
 /* ไซเบอร์พังก์: เส้นกริดเรืองแสงบาง ๆ อยู่หลังเนื้อหา ไม่กินสเปก */
 :root[data-theme="cyberpunk"] body { background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px); }
 /* อิเซไก: ขอบทองเรืองแสงแบบเวทมนตร์ */
