@@ -9,6 +9,7 @@ const APP_VERSION = "1.12.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.1", note: "ธีมรี:ซีโร่เข้มขึ้นสำหรับอ่านก่อนนอน มีดาวตกตอนเข้าแอป และผงดาวจางในหน้าอ่าน" },
   { version: "1.12.0", note: "หน้าตั้งค่าธีมจัดใหม่เป็นตาราง 4 ช่อง แยกพื้นฐานกับธีมพิเศษให้เลือกง่ายขึ้น" },
   { version: "1.11.9", note: "ธีมรี:ซีโร่สว่างขึ้น หน้าอ่านกลืนกับหัวเว็บ และมีประกายดาวโปรยในหัวเว็บ" },
   { version: "1.11.8", note: "ไอคอนแอป การ์ดต้อนรับ และหน้าเปิด iOS ใช้โลโก้ชุดใหม่แล้ว" },
@@ -54,7 +55,7 @@ const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
 const THEME_MODES = ["auto", ...THEMES];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#1b1f33", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#121524", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
 
 /* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
 const SEASONS = [
