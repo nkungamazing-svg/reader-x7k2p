@@ -340,15 +340,15 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
    มีม่านมืดคั่นไว้ให้โลโก้กับชื่อแอปอ่านชัดเสมอ */
 .cover-collage { position:fixed; inset:0; z-index:0; display:none; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; align-content:stretch; gap:2px; overflow:hidden; background:var(--page); }
 .collage-cell { position:relative; overflow:hidden; }
-:root[data-theme="rezero"] .cover-collage { display:grid; }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .cover-collage { display:grid; }
 .cover-collage img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 50%; opacity:0; filter:brightness(.74) saturate(1.05); transition:opacity .55s ease; animation:collage-drift 17s ease-in-out infinite alternate; }
 .cover-collage img.ready { opacity:.9; }
 /* ธีมรี:ซีโร่: ไม่ใช้การ์ดปกบังภาพ — เหลือโลโก้กับชื่อแอปลอยกลางภาพตัวละคร */
-:root[data-theme="rezero"] .book { width:auto; aspect-ratio:auto; }
-:root[data-theme="rezero"] .book-face { position:static; inset:auto; width:auto; padding:0; border:0; border-radius:0; background:none; box-shadow:none; gap:8px; }
-:root[data-theme="rezero"] .book-face::before, :root[data-theme="rezero"] .book-face::after { display:none; }
-:root[data-theme="rezero"] .book-face strong { font-size:clamp(24px,7.6vw,34px); color:#fff; text-shadow:0 2px 20px #000d,0 0 44px color-mix(in srgb,var(--accent) 70%,transparent); }
-:root[data-theme="rezero"] .book-sub, :root[data-theme="rezero"] #splash-version { color:#e6e9f5; text-shadow:0 1px 10px #000c; }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .book { width:auto; aspect-ratio:auto; }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .book-face { position:static; inset:auto; width:auto; padding:0; border:0; border-radius:0; background:none; box-shadow:none; gap:8px; }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .book-face::before, :root:is([data-theme="rezero"],[data-theme="custom"]) .book-face::after { display:none; }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .book-face strong { font-size:clamp(24px,7.6vw,34px); color:#fff; text-shadow:0 2px 20px #000d,0 0 44px color-mix(in srgb,var(--accent) 70%,transparent); }
+:root:is([data-theme="rezero"],[data-theme="custom"]) .book-sub, :root:is([data-theme="rezero"],[data-theme="custom"]) #splash-version { color:#e6e9f5; text-shadow:0 1px 10px #000c; }
 
 /* ---------- ธีมรี:ซีโร่: แต่งทั้งแอปให้เป็นธีมเฉพาะตัว ---------- */
 /* พื้นหลัง: แสงม่วงจากมุมบนขวาและล่างซ้าย ให้หน้าดูมีมิติไม่แบน */
@@ -627,3 +627,22 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .settings-fold > summary:focus-visible { outline:2px solid var(--accent-strong); outline-offset:-2px; border-radius:10px; }
 .settings-subtitle { margin:14px 1px 0; padding-top:12px; border-top:1px dashed color-mix(in srgb,var(--line) 80%,transparent); color:var(--accent-strong); font-size:10.5px; font-weight:800; letter-spacing:.06em; }
 @media(prefers-reduced-motion:reduce) { .settings-fold > summary::after { transition:none; } }
+
+/* ---------- บุ๊กมาร์ก · ทางลัด · ดูรูปเต็มจอ ---------- */
+.reader-bookmarks { display:flex; align-items:center; gap:8px; margin:0 0 10px; padding-bottom:9px; overflow-x:auto; border-bottom:1px dashed color-mix(in srgb,var(--line) 85%,transparent); scrollbar-width:none; }
+.reader-bookmarks[hidden] { display:none; }
+.reader-bookmarks::-webkit-scrollbar { display:none; }
+.bookmark-item { display:flex; align-items:stretch; flex:none; overflow:hidden; border:1px solid color-mix(in srgb,var(--accent) 34%,var(--line)); border-radius:999px; background:color-mix(in srgb,var(--accent) 10%,var(--surface)); }
+.bookmark-jump { min-height:40px; padding:0 12px; border:0; background:transparent; color:var(--text); font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+.bookmark-remove { min-width:40px; min-height:40px; border:0; border-left:1px solid color-mix(in srgb,var(--accent) 22%,var(--line)); background:transparent; color:var(--muted); font-size:15px; font-weight:800; }
+.bookmark-icon { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; }
+.reader-shortcuts { display:flex; align-items:center; gap:8px; margin:14px auto 8px; }
+.reader-shortcuts .tool-button { min-height:44px; }
+.reader-progress { margin-left:auto; padding:4px 10px; border-radius:999px; background:color-mix(in srgb,var(--accent) 16%,var(--surface)); color:var(--accent-strong); font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums; }
+body.page-mode .reader-bookmarks, body.page-mode .reader-shortcuts { display:none; }
+.reader-content img { cursor:zoom-in; }
+.image-viewer { position:fixed; inset:0; width:100%; height:100%; max-width:100vw; max-height:100dvh; margin:0; padding:0; border:0; background:#05060af2; color:#fff; }
+.image-viewer::backdrop { background:#05060ae6; }
+.image-viewer[open] { display:grid; grid-template-rows:auto minmax(0,1fr); }
+.image-viewer-head { display:flex; justify-content:flex-end; padding:calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 10px) 4px; }
+.image-viewer img { width:100%; height:100%; min-height:0; object-fit:contain; touch-action:pinch-zoom; }
