@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.6";
+const APP_VERSION = "1.10.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.7", note: "ฝังรูปตัวละคร 24 คนไว้ในแอป หน้าเปิดและหัวเว็บขึ้นรูปทันที" },
   { version: "1.10.6", note: "หน้าเปิดธีมรี:ซีโร่ใช้เฉพาะคนที่มีรูป และรอภาพขึ้นก่อนเปิดแอป" },
   { version: "1.10.5", note: "ธีมรี:ซีโร่ ภาพตัวละครเต็มหน้าเปิด และรูป-ชื่อหมุนบนหัวเว็บ" },
   { version: "1.10.4", note: "โหมดซูมแบบ X แสดงป้ายเวอร์ชันที่จุดแตะแทนข้อความเดิม" },
@@ -446,6 +447,16 @@ function shuffleList(list) {
 /* อ่านดัชนีตัวละครครั้งเดียวแล้วใช้ซ้ำ (ไฟล์ถูก precache ไว้แล้วโดย service worker) */
 async function loadCoverPool() {
   if (state.coverPool) return state.coverPool;
+  // รูปที่ฝังมากับแอปมาก่อน — ขึ้นทันทีและใช้ได้ตอนออฟไลน์
+  try {
+    const bundled = await fetch("characters-local.json", { cache: "force-cache" });
+    if (bundled.ok) {
+      const local = await bundled.json();
+      const list = Array.isArray(local?.characters) ? local.characters : [];
+      state.coverPool = shuffleList(list.filter(item => item && item.title && item.image));
+      if (state.coverPool.length) return state.coverPool;
+    }
+  } catch (error) {}
   try {
     const response = await fetch("characters.json", { cache: "force-cache" });
     const data = await response.json();

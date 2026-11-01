@@ -1,0 +1,150 @@
+{
+ "source": "bundled",
+ "count": 24,
+ "characters": [
+  {
+   "slug": "Emilia",
+   "title": "Emilia",
+   "name": "Emilia",
+   "image": "characters/emilia.jpg"
+  },
+  {
+   "slug": "Natsuki Subaru",
+   "title": "Natsuki Subaru",
+   "name": "Subaru",
+   "image": "characters/natsuki-subaru.jpg"
+  },
+  {
+   "slug": "Puck",
+   "title": "Puck",
+   "name": "Puck",
+   "image": "characters/puck.jpg"
+  },
+  {
+   "slug": "Rem",
+   "title": "Rem",
+   "name": "Rem",
+   "image": "characters/rem.jpg"
+  },
+  {
+   "slug": "Ram",
+   "title": "Ram",
+   "name": "Ram",
+   "image": "characters/ram.jpg"
+  },
+  {
+   "slug": "Roswaal L. Mathers",
+   "title": "Roswaal L. Mathers",
+   "name": "Roswaal",
+   "image": "characters/roswaal-l-mathers.jpg"
+  },
+  {
+   "slug": "Beatrice",
+   "title": "Beatrice",
+   "name": "Beatrice",
+   "image": "characters/beatrice.jpg"
+  },
+  {
+   "slug": "Felt",
+   "title": "Felt",
+   "name": "Felt",
+   "image": "characters/felt.jpg"
+  },
+  {
+   "slug": "Reinhard van Astrea",
+   "title": "Reinhard van Astrea",
+   "name": "Reinhard",
+   "image": "characters/reinhard-van-astrea.jpg"
+  },
+  {
+   "slug": "Crusch Karsten",
+   "title": "Crusch Karsten",
+   "name": "Crusch",
+   "image": "characters/crusch-karsten.jpg"
+  },
+  {
+   "slug": "Ferris",
+   "title": "Ferris",
+   "name": "Ferris",
+   "image": "characters/ferris.jpg"
+  },
+  {
+   "slug": "Wilhelm van Astrea",
+   "title": "Wilhelm van Astrea",
+   "name": "Wilhelm",
+   "image": "characters/wilhelm-van-astrea.jpg"
+  },
+  {
+   "slug": "Priscilla Barielle",
+   "title": "Priscilla Barielle",
+   "name": "Priscilla",
+   "image": "characters/priscilla-barielle.jpg"
+  },
+  {
+   "slug": "Al",
+   "title": "Al",
+   "name": "Al",
+   "image": "characters/al.jpg"
+  },
+  {
+   "slug": "Anastasia Hoshin",
+   "title": "Anastasia Hoshin",
+   "name": "Anastasia",
+   "image": "characters/anastasia-hoshin.jpg"
+  },
+  {
+   "slug": "Julius Juukulius",
+   "title": "Julius Juukulius",
+   "name": "Julius",
+   "image": "characters/julius-juukulius.jpg"
+  },
+  {
+   "slug": "Eridna",
+   "title": "Eridna",
+   "name": "Echidna",
+   "image": "characters/eridna.jpg"
+  },
+  {
+   "slug": "Garfiel Tinzel",
+   "title": "Garfiel Tinzel",
+   "name": "Garfiel",
+   "image": "characters/garfiel-tinzel.jpg"
+  },
+  {
+   "slug": "Otto Suwen",
+   "title": "Otto Suwen",
+   "name": "Otto",
+   "image": "characters/otto-suwen.jpg"
+  },
+  {
+   "slug": "Frederica Baumann",
+   "title": "Frederica Baumann",
+   "name": "Frederica",
+   "image": "characters/frederica-baumann.jpg"
+  },
+  {
+   "slug": "Petra Leyte",
+   "title": "Petra Leyte",
+   "name": "Petra",
+   "image": "characters/petra-leyte.jpg"
+  },
+  {
+   "slug": "Meili Portroute",
+   "title": "Meili Portroute",
+   "name": "Meili",
+   "image": "characters/meili-portroute.jpg"
+  },
+  {
+   "slug": "Elsa Granhiert",
+   "title": "Elsa Granhiert",
+   "name": "Elsa",
+   "image": "characters/elsa-granhiert.jpg"
+  },
+  {
+   "slug": "Satella",
+   "title": "Satella",
+   "name": "Satella",
+   "image": "characters/satella.jpg"
+  }
+ ]
+}
