@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.6";
+const APP_VERSION = "1.11.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.7", note: "เอาเครื่องหมายอิโมจิออกจากโลโก้ และใช้รูปโลโก้ประจำธีมในหน้าตั้งค่า" },
   { version: "1.11.6", note: "ธีมรี:ซีโร่ได้ชุดแต่งพิเศษทั้งหัวเว็บ เมนู รายการบท และหน้าตั้งค่า" },
   { version: "1.11.5", note: "ไอคอนกลับมาใช้โลโก้เดิม พร้อมเอฟเฟกต์ประกายและลายธีม" },
   { version: "1.11.4", note: "คอลลาจรี:ซีโร่เต็มจอจริง และภาพไม่ซ้อนทับกันแล้ว" },
@@ -59,9 +60,6 @@ const SEASONS = [
   { theme: "newyear", from: [12, 31], to: [1, 2], deco: "🎆", label: "ปีใหม่" },
   { theme: "songkran", from: [4, 12], to: [4, 16], deco: "💦", label: "สงกรานต์" },
 ];
-// ตราประทับมุมโลโก้ตอนเปิดแอป ให้เข้ากับธีมที่ใช้อยู่
-const THEME_DECO = { paper: "📃", halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔", rezero: "🖤" };
-
 function renderChangelog() {
   const list = document.getElementById("changelog-list");
   if (!list) return;
@@ -438,11 +436,6 @@ function paintThemeLogo() {
 }
 
 function paintThemeHint() {
-  const deco = byId("splash-deco");
-  const stamp = THEME_DECO[state.theme] || "";
-  if (deco) { deco.textContent = stamp; deco.hidden = !stamp; }
-  const headerDeco = byId("header-deco");
-  if (headerDeco) { headerDeco.textContent = stamp; headerDeco.hidden = !stamp; }
   const hint = byId("seasonal-hint");
   if (!hint) return;
   if (state.themeMode !== "auto") hint.textContent = "เลือกธีมเองอยู่ · ระบบจะไม่สลับตามเทศกาลให้";
