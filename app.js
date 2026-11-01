@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.3";
+const APP_VERSION = "1.11.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.4", note: "คอลลาจรี:ซีโร่เต็มจอจริง และภาพไม่ซ้อนทับกันแล้ว" },
   { version: "1.11.3", note: "ไอคอนแต่ละธีมมีลายประจำเทศกาล และรี:ซีโร่มีรูปตัวละครในโลโก้" },
   { version: "1.11.2", note: "หน้าเปิดรี:ซีโร่เห็นตัวละครเต็มใบ และไม่มีการ์ดปกบังภาพแล้ว" },
   { version: "1.11.1", note: "โลโก้เหลือตัว N จากชุดสุบารุ ทาสีตามธีมทุกธีม" },
@@ -498,6 +499,9 @@ function fillCoverCollage(pool) {
   if (!collage || collage.childElementCount || !pool.length) return;
   state.coverTilesReady = 0;
   for (const item of shuffleList(pool).slice(0, COVER_TILES)) {
+    // แต่ละภาพมีช่องของตัวเอง กันการขยับซูมไปทับช่องข้าง ๆ
+    const cell = document.createElement("span");
+    cell.className = "collage-cell";
     const tile = document.createElement("img");
     tile.alt = "";
     tile.decoding = "async";
@@ -505,9 +509,10 @@ function fillCoverCollage(pool) {
     // ค่อย ๆ ขึ้นเมื่อภาพมาถึง ไม่ใช่โชว์ช่องเปล่า
     tile.addEventListener("load", () => { tile.classList.add("ready"); state.coverTilesReady += 1; }, { once: true });
     // รูปบางรูปต้องใช้อินเทอร์เน็ต — ถ้าโหลดไม่ได้ให้เอาช่องนั้นออก ไม่ทิ้งกล่องดำค้าง
-    tile.addEventListener("error", () => tile.remove(), { once: true });
+    tile.addEventListener("error", () => cell.remove(), { once: true });
     tile.src = coverImageUrl(item.image);
-    collage.append(tile);
+    cell.append(tile);
+    collage.append(cell);
   }
 }
 

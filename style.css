@@ -308,9 +308,10 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 
 /* รี:ซีโร่ — ภาพตัวละครเรียงเต็มจอตอนเปิดแอป ขยับเบา ๆ ไม่นิ่ง
    มีม่านมืดคั่นไว้ให้โลโก้กับชื่อแอปอ่านชัดเสมอ */
-.cover-collage { position:absolute; inset:-6%; z-index:0; display:none; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(4,1fr); gap:2px; overflow:hidden; background:var(--page); }
+.cover-collage { position:fixed; inset:0; z-index:0; display:none; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; align-content:stretch; gap:2px; overflow:hidden; background:var(--page); }
+.collage-cell { position:relative; overflow:hidden; }
 :root[data-theme="rezero"] .cover-collage { display:grid; }
-.cover-collage img { width:100%; height:100%; object-fit:contain; object-position:50% 50%; opacity:0; filter:brightness(.74) saturate(1.05); transition:opacity .55s ease; animation:collage-drift 17s ease-in-out infinite alternate; }
+.cover-collage img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 50%; opacity:0; filter:brightness(.74) saturate(1.05); transition:opacity .55s ease; animation:collage-drift 17s ease-in-out infinite alternate; }
 .cover-collage img.ready { opacity:.9; }
 /* ธีมรี:ซีโร่: ไม่ใช้การ์ดปกบังภาพ — เหลือโลโก้กับชื่อแอปลอยกลางภาพตัวละคร */
 :root[data-theme="rezero"] .book { width:auto; aspect-ratio:auto; }
@@ -322,7 +323,7 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 .cover-collage img:nth-child(3n) { animation-duration:14s; }
 .cover-collage img:nth-child(4n) { animation-duration:26s; }
 .cover-collage::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#0b0d14c4,#0b0d148a 42%,#0b0d14ee),radial-gradient(circle at 50% 46%,#0b0d1470 6%,#0b0d14b8 62%,#0b0d14e6 100%); }
-@keyframes collage-drift { 0% { transform:scale(1.04) translate3d(0,0,0) } 100% { transform:scale(1.16) translate3d(-2.5%,-3%,0) } }
+@keyframes collage-drift { 0% { transform:scale(1) translate3d(0,0,0) } 100% { transform:scale(1.06) translate3d(-1.5%,-2%,0) } }
 @media(prefers-reduced-motion:reduce) { .cover-collage img { animation:none; } }
 /* ไซเบอร์พังก์: เส้นกริดเรืองแสงบาง ๆ อยู่หลังเนื้อหา ไม่กินสเปก */
 :root[data-theme="cyberpunk"] body { background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px); }
