@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.5";
+const APP_VERSION = "1.10.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.6", note: "หน้าเปิดธีมรี:ซีโร่ใช้เฉพาะคนที่มีรูป และรอภาพขึ้นก่อนเปิดแอป" },
   { version: "1.10.5", note: "ธีมรี:ซีโร่ ภาพตัวละครเต็มหน้าเปิด และรูป-ชื่อหมุนบนหัวเว็บ" },
   { version: "1.10.4", note: "โหมดซูมแบบ X แสดงป้ายเวอร์ชันที่จุดแตะแทนข้อความเดิม" },
   { version: "1.10.3", note: "เลือกซูมแบบ X แล้วหน้าเปิดจะเหลือแค่โลโก้ ไม่มีปกนิยาย" },
@@ -33,6 +34,8 @@ const CHANGELOG = [
 ];
 
 const SPLASH_MIN_MS = 1500;
+// ธีมรี:ซีโร่มีภาพต้องโหลด ให้หน้าเปิดอยู่ต่ออีกหน่อยจะได้ไม่เห็นจอเปล่า
+const SPLASH_REZERO_MS = 2400;
 const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
@@ -84,7 +87,8 @@ function paintVersionLabels() {
 function hideSplash(immediate = false) {
   const splash = document.getElementById("splash");
   if (!splash || splash.dataset.leaving === "1") return;
-  const wait = immediate ? 0 : Math.max(0, SPLASH_MIN_MS - (performance.now() - splashStartedAt));
+  const minMs = state.theme === "rezero" ? SPLASH_REZERO_MS : SPLASH_MIN_MS;
+  const wait = immediate ? 0 : Math.max(0, minMs - (performance.now() - splashStartedAt));
   setTimeout(() => {
     if (splash.dataset.leaving === "1") return;
     splash.dataset.leaving = "1";
@@ -123,7 +127,10 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0 };
+
+// เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
+void loadCoverPool();
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -443,23 +450,45 @@ async function loadCoverPool() {
     const response = await fetch("characters.json", { cache: "force-cache" });
     const data = await response.json();
     const list = Array.isArray(data?.characters) ? data.characters : [];
-    state.coverPool = shuffleList(list.filter(item => item && item.image && item.title));
+    // เอาเฉพาะคนที่มีรูปจริงและเป็นลิงก์เว็บ (บางคนในดัชนีมีแต่ชื่อ)
+    state.coverPool = shuffleList(list.filter(item => item && item.title && typeof item.image === "string" && /^https?:\/\//.test(item.image)));
   } catch (error) { state.coverPool = []; }
   return state.coverPool;
+}
+
+/* ขอภาพขนาดเล็กลง (240px) พอสำหรับช่องละ 1/3 จอ จะได้ขึ้นเร็วขึ้นมาก */
+function coverImageUrl(url) {
+  return String(url).replace(/scale-to-width-down\/\d+/, "scale-to-width-down/240");
 }
 
 function fillCoverCollage(pool) {
   const collage = byId("cover-collage");
   if (!collage || collage.childElementCount || !pool.length) return;
+  state.coverTilesReady = 0;
   for (const item of shuffleList(pool).slice(0, COVER_TILES)) {
     const tile = document.createElement("img");
     tile.alt = "";
     tile.decoding = "async";
+    tile.fetchPriority = "high";
+    // ค่อย ๆ ขึ้นเมื่อภาพมาถึง ไม่ใช่โชว์ช่องเปล่า
+    tile.addEventListener("load", () => { tile.classList.add("ready"); state.coverTilesReady += 1; }, { once: true });
     // รูปบางรูปต้องใช้อินเทอร์เน็ต — ถ้าโหลดไม่ได้ให้เอาช่องนั้นออก ไม่ทิ้งกล่องดำค้าง
     tile.addEventListener("error", () => tile.remove(), { once: true });
-    tile.src = item.image;
+    tile.src = coverImageUrl(item.image);
     collage.append(tile);
   }
+}
+
+/* รอให้มีภาพขึ้นอย่างน้อย 3 ช่อง (หรือหมดเวลา) ก่อนปิดหน้าเปิด */
+function waitForCoverTiles(limit = 1300) {
+  return new Promise(resolve => {
+    const startedAt = performance.now();
+    const tick = () => {
+      if (state.coverTilesReady >= 3 || performance.now() - startedAt > limit) { resolve(); return; }
+      setTimeout(tick, 60);
+    };
+    tick();
+  });
 }
 
 function resetCoverHeader() {
@@ -495,7 +524,7 @@ function startCoverRotation(pool) {
   let index = Math.floor(Math.random() * pool.length);
   const paint = () => {
     const item = pool[index % pool.length];
-    avatar.src = item.image;
+    avatar.src = coverImageUrl(item.image);
     name.textContent = item.title || item.name || "Re:NovelTH";
   };
   paint();
@@ -2158,6 +2187,7 @@ async function initialize() {
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
     document.fonts?.ready.then(() => { if (isPageMode() && state.activeId) schedulePaginate(0); }).catch(() => {});
+    if (state.theme === "rezero") await waitForCoverTiles();
     hideSplash();
     if (state.syncUrl && state.autoSync) void syncChapters();
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) startServiceWorker();

@@ -308,16 +308,16 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 
 /* รี:ซีโร่ — ภาพตัวละครเรียงเต็มจอตอนเปิดแอป ขยับเบา ๆ ไม่นิ่ง
    มีม่านมืดคั่นไว้ให้โลโก้กับชื่อแอปอ่านชัดเสมอ */
-.cover-collage { position:absolute; inset:-6%; z-index:0; display:none; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2px; overflow:hidden; }
+.cover-collage { position:absolute; inset:-6%; z-index:0; display:none; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); gap:2px; overflow:hidden; background:var(--page); }
 :root[data-theme="rezero"] .cover-collage { display:grid; }
-.cover-collage img { width:100%; height:100%; object-fit:cover; object-position:50% 28%; opacity:0; filter:brightness(.6) saturate(1.06); animation-name:collage-in,collage-drift; animation-duration:1.1s,17s; animation-timing-function:ease,ease-in-out; animation-fill-mode:forwards,none; animation-iteration-count:1,infinite; animation-direction:normal,alternate; }
-.cover-collage img:nth-child(2n) { animation-duration:1.25s,22s; object-position:50% 22%; }
-.cover-collage img:nth-child(3n) { animation-duration:1.35s,14s; }
-.cover-collage img:nth-child(4n) { animation-duration:1.45s,26s; object-position:50% 34%; }
+.cover-collage img { width:100%; height:100%; object-fit:cover; object-position:50% 28%; opacity:0; filter:brightness(.6) saturate(1.06); transition:opacity .55s ease; animation:collage-drift 17s ease-in-out infinite alternate; }
+.cover-collage img.ready { opacity:.9; }
+.cover-collage img:nth-child(2n) { animation-duration:22s; object-position:50% 22%; }
+.cover-collage img:nth-child(3n) { animation-duration:14s; }
+.cover-collage img:nth-child(4n) { animation-duration:26s; object-position:50% 34%; }
 .cover-collage::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,#0b0d14d9,#0b0d14a6 42%,#0b0d14f2),radial-gradient(circle at 50% 46%,transparent 16%,#0b0d14c9 74%); }
-@keyframes collage-in { from { opacity:0 } to { opacity:.9 } }
 @keyframes collage-drift { 0% { transform:scale(1.04) translate3d(0,0,0) } 100% { transform:scale(1.16) translate3d(-2.5%,-3%,0) } }
-@media(prefers-reduced-motion:reduce) { .cover-collage img { animation:none; opacity:.9; } }
+@media(prefers-reduced-motion:reduce) { .cover-collage img { animation:none; } }
 /* ไซเบอร์พังก์: เส้นกริดเรืองแสงบาง ๆ อยู่หลังเนื้อหา ไม่กินสเปก */
 :root[data-theme="cyberpunk"] body { background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 9%,transparent) 0 1px,transparent 1px 46px); }
 /* อิเซไก: ขอบทองเรืองแสงแบบเวทมนตร์ */
