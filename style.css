@@ -126,6 +126,20 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .font-size-row .tool-button,.theme-choice { min-width:48px; min-height:44px; }
 .theme-choice { display:flex; align-items:center; justify-content:center; gap:7px; flex:1; padding:7px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--text); font-weight:700; }
 .theme-icon { flex:none; width:18px; height:18px; border-radius:5px; object-fit:cover; }
+/* หัวเว็บ: ประกายดาวโปรยลงมาเฉพาะธีมรี:ซีโร่ */
+.header-sky { display:none; }
+:root[data-theme="rezero"] .header-sky { position:absolute; inset:0; z-index:0; display:block; overflow:hidden; pointer-events:none; }
+:root[data-theme="rezero"] .app-header > *:not(.header-sky) { position:relative; z-index:1; }
+:root[data-theme="rezero"] .header-sky i { position:absolute; top:-12px; border-radius:50%; background:#fff; box-shadow:0 0 9px 2px color-mix(in srgb,var(--accent-strong) 85%,transparent); opacity:0; animation:rezero-snow var(--dur,9s) linear var(--delay,0s) infinite; }
+@keyframes rezero-snow {
+  0% { transform:translate3d(0,0,0) scale(.7); opacity:0; }
+  12% { opacity:.95; }
+  50% { transform:translate3d(var(--drift,4px),34px,0) scale(1); opacity:.8; }
+  88% { opacity:.5; }
+  100% { transform:translate3d(calc(var(--drift,4px) * -1),84px,0) scale(.8); opacity:0; }
+}
+@media(prefers-reduced-motion:reduce) { :root[data-theme="rezero"] .header-sky i { animation:none; opacity:0; } }
+
 .theme-choice[aria-pressed="true"] { border-color:var(--accent-strong); background:color-mix(in srgb,var(--accent) 25%,var(--surface-2)); }
 .switch-row { grid-template-columns:minmax(0,1fr) 46px; align-items:center; min-height:54px; cursor:pointer; }
 .switch-row input { position:absolute; width:1px; height:1px; opacity:0; }
@@ -301,7 +315,7 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 :root[data-theme="paper"] body { background-image:radial-gradient(circle at 50% 0%,color-mix(in srgb,#fff 42%,transparent),transparent 62%),repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent) 3%,transparent) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 2.4%,transparent) 0 2px,transparent 2px 5px); }
 :root[data-theme="paper"] .reader, :root[data-theme="paper"] .reading-viewport { background-image:radial-gradient(circle at 50% 42%,transparent 52%,color-mix(in srgb,#6b5636 16%,transparent) 100%); }
 :root[data-theme="paper"] .book-face { background-image:radial-gradient(circle at 30% 18%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 60%),linear-gradient(155deg,#f7edd8,#e8dabb); }
-:root[data-theme="rezero"] { color-scheme:dark; --page:#0f1119; --surface:#161a26; --surface-2:#1e2433; --text:#e9ecf5; --muted:#98a2bb; --line:#2b3346; --accent:#7b6cf6; --accent-strong:#b3a7ff; --danger:#e0556b; --reader:#11141d; --reader-text:#e9ecf5; }
+:root[data-theme="rezero"] { color-scheme:dark; --page:#1b1f33; --surface:#252b45; --surface-2:#2f3653; --text:#eef1fb; --muted:#b0b9d4; --line:#3f4869; --accent:#8f86ff; --accent-strong:#c9c2ff; --danger:#e5778b; --reader:#1b1f33; --reader-text:#eef1fb; }
 
 /* รี:ซีโร่ — ภาพตัวละครเรียงเต็มจอตอนเปิดแอป ขยับเบา ๆ ไม่นิ่ง
    มีม่านมืดคั่นไว้ให้โลโก้กับชื่อแอปอ่านชัดเสมอ */
@@ -319,7 +333,10 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 
 /* ---------- ธีมรี:ซีโร่: แต่งทั้งแอปให้เป็นธีมเฉพาะตัว ---------- */
 /* พื้นหลัง: แสงม่วงจากมุมบนขวาและล่างซ้าย ให้หน้าดูมีมิติไม่แบน */
-:root[data-theme="rezero"] body { background-image:radial-gradient(circle at 86% -6%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 46%),radial-gradient(circle at 4% 106%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 48%); background-attachment:fixed; }
+:root[data-theme="rezero"] body { background-color:var(--page); background-image:linear-gradient(180deg,color-mix(in srgb,var(--accent) 13%,var(--page)),var(--page) 420px),radial-gradient(circle at 86% -6%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 46%),radial-gradient(circle at 4% 108%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 48%); background-attachment:fixed; background-repeat:no-repeat; }
+/* หน้าอ่านใช้พื้นเดียวกับหน้าเว็บ เพื่อให้หัวเว็บกับเนื้อเรื่องเป็นผืนเดียวกัน */
+:root[data-theme="rezero"] .reader-content,
+:root[data-theme="rezero"] body.page-mode .reading-viewport { background:transparent; }
 /* หัวเว็บ: ไล่เฉดม่วง + เส้นแสงวิ่งใต้แถบ */
 :root[data-theme="rezero"] .app-header { background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,var(--surface)),var(--surface) 62%); }
 :root[data-theme="rezero"] .app-header::after { position:absolute; inset:auto 0 -1px; height:2px; background:linear-gradient(90deg,transparent,var(--accent),#ff7ab6,var(--accent),transparent); background-size:200% 100%; content:""; animation:rezero-sheen 7s linear infinite; }

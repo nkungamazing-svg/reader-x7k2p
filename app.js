@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.8";
+const APP_VERSION = "1.11.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.9", note: "ธีมรี:ซีโร่สว่างขึ้น หน้าอ่านกลืนกับหัวเว็บ และมีประกายดาวโปรยในหัวเว็บ" },
   { version: "1.11.8", note: "ไอคอนแอป การ์ดต้อนรับ และหน้าเปิด iOS ใช้โลโก้ชุดใหม่แล้ว" },
   { version: "1.11.7", note: "เอาเครื่องหมายอิโมจิออกจากโลโก้ และใช้รูปโลโก้ประจำธีมในหน้าตั้งค่า" },
   { version: "1.11.6", note: "ธีมรี:ซีโร่ได้ชุดแต่งพิเศษทั้งหัวเว็บ เมนู รายการบท และหน้าตั้งค่า" },
@@ -52,7 +53,7 @@ const splashStartedAt = performance.now();
 const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "rezero"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
 const THEME_MODES = ["auto", ...THEMES];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#0f1119", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", rezero: "#1b1f33", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
 
 /* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
 const SEASONS = [
@@ -434,6 +435,24 @@ function paintThemeLogo() {
   const avatar = byId("brand-avatar");
   // ธีมรี:ซีโร่มีรูปตัวละครหมุนอยู่แล้ว ปล่อยให้ตัวหมุนเป็นคนคุมรูป
   if (avatar && state.theme !== "rezero") avatar.src = path;
+}
+
+/* หัวเว็บธีมรี:ซีโร่มีประกายดาวโปรยลงมา (สร้างครั้งเดียว แล้วให้ CSS อนิเมต) */
+function buildHeaderSky() {
+  const sky = byId("header-sky");
+  if (!sky || sky.childElementCount) return;
+  const count = 16;
+  for (let index = 0; index < count; index += 1) {
+    const flake = document.createElement("i");
+    const size = (2 + Math.random() * 2.2).toFixed(1);
+    flake.style.left = `${((index + Math.random() * 0.6) / count) * 100}%`;
+    flake.style.width = `${size}px`;
+    flake.style.height = `${size}px`;
+    flake.style.setProperty("--dur", `${(6.5 + Math.random() * 5.5).toFixed(1)}s`);
+    flake.style.setProperty("--delay", `${(-Math.random() * 11).toFixed(1)}s`);
+    flake.style.setProperty("--drift", `${(Math.random() * 14 - 7).toFixed(1)}px`);
+    sky.append(flake);
+  }
 }
 
 function paintThemeHint() {
@@ -2182,6 +2201,7 @@ async function initialize() {
     byId("seasonal-toggle").checked = state.seasonalAuto;
     applyLaunchStyle(await readSetting("launchStyle", "book"));
     applyTheme(await readSetting("theme", "auto"));
+    buildHeaderSky();
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);
     setLineHeight(Number(await readSetting("lineHeight", 1.9)) || 1.9);
     setTextWidth(Number(await readSetting("textWidth", 760)) || 760);
