@@ -15,7 +15,10 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 /* หัวเว็บใช้สีธีม: พื้นอมสีเน้น ขอบเรืองแสง และเปลี่ยนนุ่ม ๆ ตอนสลับธีม */
 .app-header { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px; min-height:60px; padding:8px max(14px,env(safe-area-inset-left)) 8px max(14px,env(safe-area-inset-right)); padding-top:max(8px,env(safe-area-inset-top)); border-bottom:1px solid color-mix(in srgb,var(--accent) 34%,var(--line)); background:color-mix(in srgb,var(--accent) 9%,var(--surface)); box-shadow:0 3px 16px #0002,0 1px 0 color-mix(in srgb,var(--accent) 22%,transparent); transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease,color .3s ease; }
 .app-header img { flex:none; border-radius:8px; }
-.brand-mark { flex:none; display:grid; place-items:center; width:32px; height:32px; border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line)); border-radius:9px; background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 74%,#000),color-mix(in srgb,var(--accent) 46%,#000)); color:#fff; font-size:11px; font-weight:800; letter-spacing:.04em; text-shadow:0 1px 2px #0007; box-shadow:0 2px 12px color-mix(in srgb,var(--accent) 38%,transparent); transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease; }
+/* โลโก้หัวเว็บ: รูป PNG เดิม + สติกเกอร์อิโมจิประจำธีม และเรืองแสงตามสีเน้นของธีม */
+.brand-logo { position:relative; flex:none; display:grid; place-items:center; border-radius:10px; box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent),0 0 16px color-mix(in srgb,var(--accent) 40%,transparent); transition:box-shadow .3s ease; }
+.brand-logo img { display:block; border-radius:8px; }
+.brand-deco { position:absolute; top:-7px; right:-8px; font-size:13px; line-height:1; filter:drop-shadow(0 1px 3px #000c); }
 .brand { display:grid; flex:1; min-width:0; line-height:1.25; }
 .brand strong { font-size:14px; }
 .brand small { color:var(--muted); font-size:10px; }
@@ -139,7 +142,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 @media(max-width:760px) {
   .app-header { gap:7px; padding-right:max(10px,env(safe-area-inset-right)); padding-left:max(10px,env(safe-area-inset-left)); }
   .app-header img { width:27px; height:27px; }
-  .brand-mark { width:28px; height:28px; font-size:10px; }
+  .brand-deco { font-size:12px; }
   .brand small { display:none; }
   .app-header .primary-button { position:relative; width:44px; min-width:44px; overflow:hidden; padding:0; font-size:0; }
   /* Drawn instead of a "＋" glyph: some iOS fallback fonts render it slanted. */

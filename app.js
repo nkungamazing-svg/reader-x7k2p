@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.1";
+const APP_VERSION = "1.10.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.2", note: "โลโก้หัวเว็บกลับมาเป็นรูปเดิม พร้อมสติกเกอร์อิโมจิและแสงเรืองตามธีม" },
   { version: "1.10.1", note: "เลือกหน้าเปิดแอปได้: ปกนิยายพลิกเปิด หรือโลโก้ซูมแบบ X" },
   { version: "1.10.0", note: "หัวเว็บและแถบล่างเปลี่ยนสีตามธีม โลโก้ NA เข้าชุดทุกธีม" },
   { version: "1.9.9", note: "เปิดแอปด้วยปกนิยายเปิดแบบ 3D และเพิ่มธีมกระดาษนิยาย" },
@@ -43,7 +44,7 @@ const SEASONS = [
   { theme: "songkran", from: [4, 12], to: [4, 16], deco: "💦", label: "สงกรานต์" },
 ];
 // ตราประทับมุมโลโก้ตอนเปิดแอป ให้เข้ากับธีมที่ใช้อยู่
-const THEME_DECO = { halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔" };
+const THEME_DECO = { paper: "📃", halloween: "🎃", christmas: "🎄", songkran: "💦", newyear: "🎆", isekai: "⚔️", cyberpunk: "🔮", reading: "🪔" };
 
 function renderChangelog() {
   const list = document.getElementById("changelog-list");
@@ -397,6 +398,8 @@ function paintThemeHint() {
   const deco = byId("splash-deco");
   const stamp = THEME_DECO[state.theme] || "";
   if (deco) { deco.textContent = stamp; deco.hidden = !stamp; }
+  const headerDeco = byId("header-deco");
+  if (headerDeco) { headerDeco.textContent = stamp; headerDeco.hidden = !stamp; }
   const hint = byId("seasonal-hint");
   if (!hint) return;
   if (state.themeMode !== "auto") hint.textContent = "เลือกธีมเองอยู่ · ระบบจะไม่สลับตามเทศกาลให้";
