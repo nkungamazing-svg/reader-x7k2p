@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.9.8";
+const APP_VERSION = "1.9.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.9.9", note: "เปิดแอปด้วยปกนิยายเปิดแบบ 3D และเพิ่มธีมกระดาษนิยาย" },
   { version: "1.9.8", note: "ธีมเทศกาลเลือกเองตามวัน พร้อมละอองเบา ๆ และเปิดแอปแบบซูมเข้า" },
   { version: "1.9.7", note: "ภาพเปิดแอปของ iOS ให้การซูมจากไอคอนจบที่หน้าเดียวกันกับในแอป" },
   { version: "1.9.6", note: "เปลี่ยนชื่อแอปเป็น Re:NovelTH และหน้าเปิดแอปเหลือแค่การจางปรากฏ" },
@@ -27,10 +28,10 @@ const CHANGELOG = [
 
 const SPLASH_MIN_MS = 1500;
 const splashStartedAt = performance.now();
-const THEMES = ["dark", "light", "sepia", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk"];
+const THEMES = ["dark", "light", "sepia", "paper", "black", "eye", "cool", "dusk", "reading", "halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk"];
 // "auto" = ให้ระบบเลือกธีมเทศกาลตามวันที่เอง (โหมดเริ่มต้น)
 const THEME_MODES = ["auto", ...THEMES];
-const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
+const THEME_COLORS = { dark: "#222631", light: "#ffffff", sepia: "#e7dbc4", paper: "#f4ecd8", black: "#080808", eye: "#dde8d7", cool: "#f1f5f9", dusk: "#242120", reading: "#1e170f", halloween: "#0b0713", christmas: "#0a1826", songkran: "#06223a", newyear: "#08080a", isekai: "#0a0e17", cyberpunk: "#04060a" };
 
 /* ช่วงเทศกาลที่สลับธีมเอง — from/to เป็น [เดือน, วัน] ครอบปีได้ (ปีใหม่ จาก ธ.ค. ไป ม.ค.) */
 const SEASONS = [
@@ -72,21 +73,32 @@ function paintVersionLabels() {
   renderChangelog();
 }
 
-/* เปิดแอปแบบ X: โลโก้ย่อเล็กน้อยแล้วขยายเต็มจอพร้อมจางหายให้เห็นหน้าจออ่าน
-   พออนิเมชันจบให้ลบ splash ออกทั้งก้อน จะได้ไม่บังการแตะของหน้าจอจริง */
-function hideSplash() {
+/* เปิดหนังสือ: ปกหมุนออกแล้วลบ splash ออกทั้งก้อนทันทีที่อนิเมชันจบ
+   เรียกซ้ำได้ปลอดภัย — แตะปก (immediate = true) จะข้ามเวลารอขั้นต่ำ */
+function hideSplash(immediate = false) {
   const splash = document.getElementById("splash");
   if (!splash || splash.dataset.leaving === "1") return;
-  const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashStartedAt));
+  const wait = immediate ? 0 : Math.max(0, SPLASH_MIN_MS - (performance.now() - splashStartedAt));
   setTimeout(() => {
     if (splash.dataset.leaving === "1") return;
     splash.dataset.leaving = "1";
     splash.style.pointerEvents = "none";
     splash.classList.add("is-launching");
-    const done = () => splash.remove();
-    splash.addEventListener("animationend", done, { once: true });
-    setTimeout(done, 900); // เผื่อเครื่องที่ปิดอนิเมชันไว้ ไม่มี animationend
+    let finished = false;
+    const done = () => { if (finished) return; finished = true; splash.remove(); };
+    // รับเฉพาะอนิเมชันของปก ไม่งั้นอนิเมชันเล็ก ๆ ข้างในจะลบ splash ก่อนเวลา
+    splash.addEventListener("animationend", event => { if (event.animationName === "book-open") done(); });
+    setTimeout(done, 1200); // เผื่อเครื่องที่ปิดอนิเมชันไว้ ไม่มี animationend
   }, wait);
+}
+
+/* แตะที่ปกหรือปุ่มบนปกเพื่อเปิดหนังสือเองได้ ไม่ต้องรอ */
+function installCoverOpen() {
+  const splash = byId("splash");
+  if (!splash) return;
+  splash.addEventListener("click", () => hideSplash(true));
+  byId("cover-open")?.addEventListener("click", event => { event.stopPropagation(); hideSplash(true); });
+  splash.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); hideSplash(true); } });
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
@@ -2024,5 +2036,6 @@ async function initialize() {
 }
 
 paintVersionLabels();
+installCoverOpen();
 initialize();
 setTimeout(hideSplash, 4000);
