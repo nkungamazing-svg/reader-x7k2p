@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.5";
+const APP_VERSION = "1.12.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.6", note: "แชร์ลิงก์ตอนที่อ่านอยู่ มีแถบแจ้งเมื่อมีเวอร์ชันใหม่ และคัดลอกค่าธีม/การอ่านไปใช้ในเครื่องอื่นได้" },
   { version: "1.12.5", note: "หรี่จอกลางคืนได้ทุกธีม และในช่วง 22:00–06:00 โหมดอัตโนมัติจะสลับเป็นธีมหรี่ถนอมตาให้เอง" },
   { version: "1.12.4", note: "พื้นหลังรี:ซีโร่รับสีเน้นที่เลือก มีปุ่มสุ่มชุดสี และหยุดอนิเมชันเองเมื่อแบตต่ำกว่า 20%" },
   { version: "1.12.3", note: "ธีมรี:ซีโร่ปรับสีพื้น สีเน้น สีโลโก้ และเอฟเฟกต์เองได้ โดยยังมีรูปตอนเข้าแอปและโลโก้กับชื่อที่หัวเว็บ" },
@@ -644,6 +645,92 @@ function bindNightMode() {
     applyTheme(state.themeMode);
     showStatus(state.nightAuto ? "ช่วง 22:00–06:00 จะสลับเป็นธีมหรี่ให้เอง" : "ปิดการสลับธีมตามเวลาแล้ว");
   });
+}
+
+/* ---------- แชร์ลิงก์ตอนที่กำลังอ่าน ---------- */
+async function shareCurrentChapter() {
+  if (!state.activeId) { showStatus("ยังไม่มีตอนที่เปิดอยู่", 3000); return; }
+  const url = `${location.origin}${location.pathname}#chapter=${encodeURIComponent(state.activeId)}`;
+  const title = byId("reader-title")?.textContent?.trim() || "Re:NovelTH";
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title, text: title, url });
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showStatus("คัดลอกลิงก์ตอนนี้แล้ว", 3000);
+  } catch {
+    showStatus("เบราว์เซอร์นี้ไม่ให้แชร์หรือคัดลอกลิงก์", 3500);
+  }
+}
+
+/* ---------- แจ้งเตือนเมื่อมีเวอร์ชันใหม่ (แทนการโหลดใหม่เงียบ ๆ) ---------- */
+function showUpdateBanner() {
+  const banner = byId("update-banner");
+  if (banner) banner.hidden = false;
+}
+
+function bindUpdateBanner() {
+  byId("update-reload")?.addEventListener("click", () => {
+    sessionStorage.setItem("noat-sw-reloaded", APP_VERSION);
+    location.reload();
+  });
+  byId("update-dismiss")?.addEventListener("click", () => {
+    const banner = byId("update-banner");
+    if (banner) banner.hidden = true;
+  });
+}
+
+/* ---------- ย้ายค่าตั้งข้ามเครื่อง: คัดลอก/วางเป็นข้อความสั้น ๆ ---------- */
+const SETTING_TRANSFER_KEYS = ["theme", "seasonalAuto", "launchStyle", "fontSize", "lineHeight", "textWidth", "pageTop", "readingMode", "indent", "highlightEnabled", "followEnabled", "fontFamily", "loadRemoteImages", "customTheme", "rezeroTheme", "lowPower", "nightDim", "nightAuto"];
+
+async function copySettings() {
+  const data = {};
+  for (const key of SETTING_TRANSFER_KEYS) data[key] = await readSetting(key, null);
+  const text = JSON.stringify({ format: "RE_NOVEL_SETTINGS", version: 1, data });
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus("คัดลอกค่าตั้งแล้ว ส่งไปวางในเครื่องอื่นได้เลย", 4000);
+  } catch {
+    showStatus("เบราว์เซอร์นี้ไม่อนุญาตให้คัดลอก ลองใช้เมนูแชร์ของระบบ", 4000);
+  }
+}
+
+async function pasteSettings() {
+  let text = "";
+  try {
+    text = await navigator.clipboard.readText();
+  } catch {
+    text = "";
+  }
+  if (!text) { showStatus("อ่านคลิปบอร์ดไม่ได้ ให้คัดลอกค่าตั้งจากเครื่องเดิมก่อน", 4000); return; }
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    parsed = null;
+  }
+  if (!parsed || parsed.format !== "RE_NOVEL_SETTINGS" || !parsed.data || typeof parsed.data !== "object") {
+    showStatus("ข้อความในคลิปบอร์ดไม่ใช่ค่าตั้งของแอปนี้", 4000);
+    return;
+  }
+  let count = 0;
+  for (const key of SETTING_TRANSFER_KEYS) {
+    if (!(key in parsed.data)) continue;
+    await writeSetting(key, parsed.data[key]);
+    count += 1;
+  }
+  showStatus(`รับค่าตั้ง ${count} รายการแล้ว กำลังโหลดใหม่`, 2500);
+  setTimeout(() => location.reload(), 900);
+}
+
+function bindSettingsTransfer() {
+  byId("settings-copy")?.addEventListener("click", () => { void copySettings(); });
+  byId("settings-paste")?.addEventListener("click", () => { void pasteSettings(); });
 }
 
 function paintCustomInputs() {
@@ -1986,6 +2073,7 @@ function bindEvents() {
   byId("view-grid").addEventListener("click", () => setChapterView("grid"));
   for (const count of CHAPTER_COLUMNS) byId(`cols-${count}`).addEventListener("click", () => setChapterColumns(count));
   byId("menu-toggle").addEventListener("click", () => setSidebarOpen(!document.body.classList.contains("sidebar-open")));
+  byId("share-chapter")?.addEventListener("click", () => { void shareCurrentChapter(); });
   byId("reader-menu").addEventListener("click", () => setSidebarOpen(true));
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
@@ -1994,6 +2082,8 @@ function bindEvents() {
   bindRezeroTheme();
   bindLowPower();
   bindNightMode();
+  bindSettingsTransfer();
+  bindUpdateBanner();
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
   byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
   byId("launch-zoom").addEventListener("click", () => { applyLaunchStyle("zoom"); void writeSetting("launchStyle", state.launchStyle); });
@@ -2460,11 +2550,8 @@ function startServiceWorker() {
     reloaded = true;
     if (sessionStorage.getItem("noat-sw-reloaded") === APP_VERSION) return;
     sessionStorage.setItem("noat-sw-reloaded", APP_VERSION);
-    // An update that lands while the splash is still up would reload the page a
-    // second time, so the app looked like it started twice. The new cache is
-    // already stored; the next launch picks it up without a second splash.
-    if (performance.now() - openedAt < 4000) return;
-    location.reload();
+    // แจ้งให้แตะเองแทนการโหลดใหม่เงียบ ๆ ไม่ให้แอปเด้งสองรอบตอนเปิด
+    showUpdateBanner();
   });
   navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" })
     .then(registration => {

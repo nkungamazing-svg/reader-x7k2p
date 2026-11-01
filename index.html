@@ -55,6 +55,7 @@
     <input id="backup-file" type="file" accept="application/json,.json" hidden>
   </header>
   <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+  <div id="update-banner" class="update-banner" role="status" hidden><span>มีเวอร์ชันใหม่</span><button id="update-reload" class="primary-button" type="button">รีเฟรช</button><button id="update-dismiss" class="icon-button" type="button" aria-label="ปิดการแจ้งเตือน">×</button></div>
   <main class="layout">
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-controls">
@@ -75,7 +76,7 @@
     <section class="reader-shell">
       <div id="welcome" class="welcome"><img src="icons/icon-512.png" alt="" width="92" height="92"><h2>อ่านบทแปลของคุณ</h2><p>เลือกไฟล์สำรอง JSON หรือซิงก์จากลิงก์ที่ส่วนขยายอัปโหลดขึ้นคลาวด์ให้ ข้อมูลจะถูกเก็บใน IndexedDB ของเบราว์เซอร์นี้</p><div class="welcome-actions"><button id="welcome-import" class="primary-button" type="button">เลือกไฟล์สำรอง</button><button id="welcome-sync" class="tool-button" type="button">ซิงก์จากลิงก์ต้นทาง</button></div></div>
       <article id="reader" class="reader" hidden>
-        <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div>
+        <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><div class="reader-topbar-actions"><button id="share-chapter" class="icon-button" type="button" aria-label="แชร์ลิงก์ตอนนี้" title="แชร์ลิงก์ตอนนี้"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="share-icon"><path d="M12 15.5V4.8M12 4.8 8.3 8.5M12 4.8l3.7 3.7M5.5 13.6v4.3a1.6 1.6 0 0 0 1.6 1.6h9.8a1.6 1.6 0 0 0 1.6-1.6v-4.3"/></svg></button><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div></div>
         <div id="speech-notice" class="speech-notice" hidden></div>
         <div id="reading-viewport" class="reading-viewport">
           <div id="reader-content" class="reader-content"></div>
@@ -223,6 +224,12 @@
         <label class="switch-row"><span>กันจอดับระหว่างอ่าน</span><input id="wake-lock-toggle" type="checkbox"><i aria-hidden="true"></i></label>
         <div class="setting-row"><span>ตารางชื่อตัวละคร</span><div class="row-actions"><button id="character-table-open" class="tool-button" type="button">นำเข้า JSON</button><button id="character-table-clear" class="tool-button" type="button">ล้าง</button></div><small id="character-table-count" class="setting-hint">ใช้จับคู่ชื่อไทยกับชื่อในวิกิ</small></div>
         <input id="character-table-file" type="file" accept="application/json,.json" hidden>
+      </section>
+      <section class="settings-group">
+        <h3>ย้ายค่าตั้งข้ามเครื่อง</h3>
+        <small class="setting-hint">คัดลอกค่าธีม ขนาดตัวอักษร โหมดอ่าน และเอฟเฟกต์ไปใช้ในเครื่องอื่นได้ ไม่เกี่ยวกับบทแปล</small>
+        <div class="row-actions"><button id="settings-copy" class="tool-button" type="button">คัดลอกค่าตั้ง</button><button id="settings-paste" class="tool-button" type="button">วางแล้วใช้</button></div>
+        <small class="setting-hint">วิธีใช้: กดคัดลอกในเครื่องเดิม → ส่งข้อความให้ตัวเอง → กดวางแล้วใช้ในเครื่องใหม่ (แอปจะโหลดใหม่เอง)</small>
       </section>
       <details id="settings-help" class="changelog settings-help">
         <summary>ปุ่มบนแถบล่างและท่าทางใช้งาน</summary>

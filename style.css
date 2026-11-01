@@ -607,3 +607,11 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .night-shade { position:fixed; inset:0; z-index:130; background:#000; opacity:0; pointer-events:none; transition:opacity .25s ease; }
 .night-shade[hidden] { display:none; }
 @media(prefers-reduced-motion:reduce) { .night-shade { transition:none; } }
+
+/* แถบแจ้งเวอร์ชันใหม่: อยู่ใต้หัวเว็บ ไม่บังเนื้อหา */
+.update-banner { position:fixed; z-index:125; top:calc(env(safe-area-inset-top) + 62px); left:50%; display:flex; align-items:center; gap:8px; max-width:min(92vw,420px); padding:8px 10px 8px 14px; border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line)); border-radius:14px; background:var(--surface); box-shadow:0 10px 26px #0007; transform:translateX(-50%); font-size:13px; font-weight:700; }
+.update-banner[hidden] { display:none; }
+.update-banner span { flex:1; }
+.update-banner .primary-button { min-height:40px; padding:0 14px; font-size:13px; }
+.reader-topbar-actions { display:flex; align-items:center; gap:8px; }
+.share-icon { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
