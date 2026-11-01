@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.11.4";
+const APP_VERSION = "1.11.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.11.5", note: "ไอคอนกลับมาใช้โลโก้เดิม พร้อมเอฟเฟกต์ประกายและลายธีม" },
   { version: "1.11.4", note: "คอลลาจรี:ซีโร่เต็มจอจริง และภาพไม่ซ้อนทับกันแล้ว" },
   { version: "1.11.3", note: "ไอคอนแต่ละธีมมีลายประจำเทศกาล และรี:ซีโร่มีรูปตัวละครในโลโก้" },
   { version: "1.11.2", note: "หน้าเปิดรี:ซีโร่เห็นตัวละครเต็มใบ และไม่มีการ์ดปกบังภาพแล้ว" },

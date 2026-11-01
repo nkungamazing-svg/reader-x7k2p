@@ -18,7 +18,8 @@ LETTER_RATIO = 0.5
 INK = (255, 255, 255)
 
 MOTIFS = {"halloween", "christmas", "songkran", "newyear", "isekai", "cyberpunk", "paper", "reading", "rezero"}
-HERO = ROOT / "characters" / "emilia.jpg"
+ART = ROOT / "icons" / "icon-512.png"          # โลโก้เดิมของแอป
+HERO = ROOT / "characters" / "emilia.jpg"       # รูปที่ใช้เป็นเหรียญประทับมุมไอคอนธีมรี:ซีโร่
 
 
 def parse_vars(block):
@@ -46,20 +47,72 @@ def glow(size, colour, alpha, radius_ratio, centre):
     return layer
 
 
-def letter_n(size, colour, scale=1.0, centre=(0.5, 0.5)):
-    box = int(size * LETTER_RATIO * scale)
-    left = int(size * centre[0] - box / 2)
-    top = int(size * centre[1] - box / 2)
-    inset = round(box * 0.05)
-    stem = round(box * 0.25)
-    y1, y2 = top + inset, top + box - inset
+def art_layer(size, surface, accent):
+    """โลโก้เดิมในการ์ดมุมมน พร้อมเงาและเส้นขอบบาง ๆ ให้ดูมีมิติ"""
+    art_size = int(size * 0.6)
+    pad = int(size * 0.05)
+    box = art_size + pad * 2
     layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(layer)
-    radius = round(stem * 0.18)
-    draw.rounded_rectangle((left, y1, left + stem, y2), radius=radius, fill=tint(colour, 255))
-    right = left + box - stem
-    draw.rounded_rectangle((right, y1, left + box, y2), radius=radius, fill=tint(colour, 255))
-    draw.polygon([(left, y1), (left + stem, y1), (left + box, y2), (right, y2)], fill=tint(colour, 255))
+    card = Image.new("RGBA", (box, box), tint(surface, 225))
+    card_mask = Image.new("L", (box, box), 0)
+    ImageDraw.Draw(card_mask).rounded_rectangle((0, 0, box - 1, box - 1), radius=int(box * 0.26), fill=255)
+    layer.paste(card, ((size - box) // 2, (size - box) // 2), card_mask)
+
+    art = Image.open(ART).convert("RGBA").resize((art_size, art_size), Image.LANCZOS)
+    art_mask = Image.new("L", (art_size, art_size), 0)
+    ImageDraw.Draw(art_mask).rounded_rectangle((0, 0, art_size - 1, art_size - 1),
+                                               radius=int(art_size * 0.24), fill=255)
+    art_card = Image.new("RGBA", (art_size, art_size), (0, 0, 0, 0))
+    art_card.paste(art, (0, 0), art_mask)
+
+    left = int(size * 0.5 - art_size / 2)
+    shadow = Image.new("RGBA", (art_size, art_size), (0, 0, 0, 0))
+    shadow.paste((0, 0, 0, 150), (0, 0), art_mask)
+    layer.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(size * 0.02)), (left, left + int(size * 0.015)))
+    layer.alpha_composite(art_card, (left, left))
+
+    hairline = Image.new("RGBA", (box, box), (0, 0, 0, 0))
+    ImageDraw.Draw(hairline).rounded_rectangle((0, 0, box - 1, box - 1), radius=int(box * 0.26),
+                                               outline=tint(accent, 150), width=2)
+    layer.alpha_composite(hairline, ((size - box) // 2, (size - box) // 2))
+    return layer
+
+
+def cameo_layer(size, accent):
+    """เหรียญรูปตัวละครมุมล่างขวา (เฉพาะธีมรี:ซีโร่)"""
+    if not HERO.exists():
+        return None
+    diameter = int(size * 0.31)
+    art = Image.open(HERO).convert("RGBA")
+    grow = max(diameter / art.width, diameter / art.height)
+    art = art.resize((round(art.width * grow), round(art.height * grow)), Image.LANCZOS)
+    left = (art.width - diameter) // 2
+    art = art.crop((left, 0, left + diameter, diameter))
+    mask = Image.new("L", (diameter, diameter), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, diameter - 1, diameter - 1), fill=255)
+    coin = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+    coin.paste(art, (0, 0), mask)
+    ring = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+    ImageDraw.Draw(ring).ellipse((3, 3, diameter - 4, diameter - 4), outline=tint(accent, 245), width=6)
+
+    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    shadow = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+    shadow.paste((0, 0, 0, 170), (0, 0), mask)
+    x = y = size - diameter - int(size * 0.055)
+    layer.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(size * 0.016)), (x, y + int(size * 0.012)))
+    layer.alpha_composite(coin, (x, y))
+    layer.alpha_composite(ring, (x, y))
+    return layer
+
+
+def shine_layer(size):
+    """แถบแสงเฉียงจาง ๆ ให้ไอคอนมีประกาย ไม่ดูแบน"""
+    shine = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    ImageDraw.Draw(shine).polygon([(0, 0), (size * 0.62, 0), (0, size * 0.62)], fill=(255, 255, 255, 20))
+    mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size - 1, size - 1), radius=int(size * 0.225), fill=255)
+    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    layer.paste(shine, (0, 0), mask)
     return layer
 
 
@@ -108,31 +161,6 @@ def rune_ring(draw, cx, cy, radius, colour):
         draw.polygon([(dx, dy - s), (dx + s, dy), (dx, dy + s), (dx - s, dy)], fill=tint(colour, 230))
 
 
-def hero_layer(size, accent):
-    """ตัวละครยืนในกรอบภาพมุมมนที่ขอบล่างของไอคอน (เฉพาะธีมรี:ซีโร่)"""
-    if not HERO.exists():
-        return None
-    card_w, card_h = int(size * 0.62), int(size * 0.46)
-    art = Image.open(HERO).convert("RGBA")
-    scale = max(card_w / art.width, card_h / art.height)
-    art = art.resize((round(art.width * scale), round(art.height * scale)), Image.LANCZOS)
-    left, top = (art.width - card_w) // 2, (art.height - card_h) // 2
-    art = art.crop((left, top, left + card_w, top + card_h))
-    radius = int(card_w * 0.16)
-    mask = Image.new("L", (card_w, card_h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, card_w - 1, card_h - 1), radius=radius, fill=255)
-    card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-    card.paste(art, (0, 0), mask)
-    border = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-    ImageDraw.Draw(border).rounded_rectangle((0, 0, card_w - 1, card_h - 1), radius=radius,
-                                             outline=tint(accent, 240), width=5)
-    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    x, y = (size - card_w) // 2, size - card_h - int(size * 0.07)
-    layer.alpha_composite(card, (x, y))
-    layer.alpha_composite(border, (x, y))
-    return layer
-
-
 def decorate(canvas, theme, accent, surface, ink):
     draw = ImageDraw.Draw(canvas)
     if theme == "halloween":
@@ -173,18 +201,15 @@ def build(page, accent, surface, theme, ink):
     ImageDraw.Draw(mask).rounded_rectangle((0, 0, SIZE - 1, SIZE - 1), radius=int(SIZE * 0.225), fill=255)
     canvas.paste(plate, (0, 0), mask)
 
-    hero = hero_layer(SIZE, accent) if theme == "rezero" else None
-    if hero:
-        canvas.alpha_composite(hero)
+    canvas.alpha_composite(shine_layer(SIZE))
     if theme in MOTIFS:
         decorate(canvas, theme, accent, surface, ink)
 
-    scale, centre = (0.6, (0.5, 0.28)) if hero else (1.0, (0.5, 0.5))
-    glyph = letter_n(SIZE, ink, scale, centre)
-    shadow = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-    shadow.paste((0, 0, 0, 150), (0, 0), glyph.getchannel("A"))
-    canvas.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(SIZE * 0.014)), (0, int(SIZE * 0.012)))
-    canvas.alpha_composite(glyph)
+    canvas.alpha_composite(art_layer(SIZE, surface, accent))
+    if theme == "rezero":
+        cameo = cameo_layer(SIZE, accent)
+        if cameo:
+            canvas.alpha_composite(cameo)
 
     ring = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     ImageDraw.Draw(ring).rounded_rectangle((9, 9, SIZE - 10, SIZE - 10), radius=int(SIZE * 0.2),
