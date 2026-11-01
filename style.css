@@ -248,6 +248,8 @@ body.scroll-mode .page-top-row { display:none; }
 .splash.is-launching::before { opacity:0; }
 .splash.is-launching .cover-open, .splash.is-launching .splash-bar { opacity:0; transition:opacity .18s ease; }
 .splash.is-launching .book { animation:book-open .95s cubic-bezier(.45,0,.2,1) forwards; }
+/* แบบซูมเหมือนเปิดแอป X: ย่อเล็กน้อยแล้วขยายเข้าจอจากกลางปก */
+:root[data-launch="zoom"] .splash.is-launching .book { transform-origin:center center; animation:splash-launch .62s cubic-bezier(.4,0,.18,1) forwards; }
 @keyframes splash-pop { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-fade { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-run { 0% { transform:translateX(-110%) } 100% { transform:translateX(320%) } }
@@ -256,6 +258,7 @@ body.scroll-mode .page-top-row { display:none; }
   16% { transform:rotateY(-5deg) scale(1.02); opacity:1; }
   100% { transform:rotateY(-118deg) translateZ(30px) scale(1.05); opacity:.1; }
 }
+@keyframes splash-launch { 0% { transform:scale(1); opacity:1; } 22% { transform:scale(.9); opacity:1; } 100% { transform:scale(28); opacity:0; } }
 @media(prefers-reduced-motion:reduce) {
   .splash img,.splash strong,.splash small,.splash-bar i,.splash-deco { animation:none !important; }
   .splash.is-launching .book { animation:none !important; opacity:0; transition:opacity .2s ease; }

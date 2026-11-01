@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.0";
+const APP_VERSION = "1.10.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.1", note: "เลือกหน้าเปิดแอปได้: ปกนิยายพลิกเปิด หรือโลโก้ซูมแบบ X" },
   { version: "1.10.0", note: "หัวเว็บและแถบล่างเปลี่ยนสีตามธีม โลโก้ NA เข้าชุดทุกธีม" },
   { version: "1.9.9", note: "เปิดแอปด้วยปกนิยายเปิดแบบ 3D และเพิ่มธีมกระดาษนิยาย" },
   { version: "1.9.8", note: "ธีมเทศกาลเลือกเองตามวัน พร้อมละอองเบา ๆ และเปิดแอปแบบซูมเข้า" },
@@ -88,9 +89,17 @@ function hideSplash(immediate = false) {
     let finished = false;
     const done = () => { if (finished) return; finished = true; splash.remove(); };
     // รับเฉพาะอนิเมชันของปก ไม่งั้นอนิเมชันเล็ก ๆ ข้างในจะลบ splash ก่อนเวลา
-    splash.addEventListener("animationend", event => { if (event.animationName === "book-open") done(); });
+    splash.addEventListener("animationend", event => { if (event.target.classList?.contains("book")) done(); });
     setTimeout(done, 1200); // เผื่อเครื่องที่ปิดอนิเมชันไว้ ไม่มี animationend
   }, wait);
+}
+
+/* เลือกท่าเปิดแอป: "book" = ปกนิยายพลิกเปิด, "zoom" = โลโก้พุ่งเข้าจอแบบแอป X */
+function applyLaunchStyle(style) {
+  state.launchStyle = style === "zoom" ? "zoom" : "book";
+  document.documentElement.dataset.launch = state.launchStyle;
+  byId("launch-book")?.setAttribute("aria-pressed", String(state.launchStyle === "book"));
+  byId("launch-zoom")?.setAttribute("aria-pressed", String(state.launchStyle === "zoom"));
 }
 
 /* แตะที่ปกหรือปุ่มบนปกเพื่อเปิดหนังสือเองได้ ไม่ต้องรอ */
@@ -103,7 +112,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0 };
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -1497,6 +1506,8 @@ function bindEvents() {
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
+  byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
+  byId("launch-zoom").addEventListener("click", () => { applyLaunchStyle("zoom"); void writeSetting("launchStyle", state.launchStyle); });
   byId("seasonal-toggle").addEventListener("change", event => {
     state.seasonalAuto = event.target.checked;
     void writeSetting("seasonalAuto", state.seasonalAuto);
@@ -1991,6 +2002,7 @@ async function initialize() {
     await dbReady;
     state.seasonalAuto = await readSetting("seasonalAuto", true) !== false;
     byId("seasonal-toggle").checked = state.seasonalAuto;
+    applyLaunchStyle(await readSetting("launchStyle", "book"));
     applyTheme(await readSetting("theme", "auto"));
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);
     setLineHeight(Number(await readSetting("lineHeight", 1.9)) || 1.9);
