@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.10.2";
+const APP_VERSION = "1.10.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.10.3", note: "เลือกซูมแบบ X แล้วหน้าเปิดจะเหลือแค่โลโก้ ไม่มีปกนิยาย" },
   { version: "1.10.2", note: "โลโก้หัวเว็บกลับมาเป็นรูปเดิม พร้อมสติกเกอร์อิโมจิและแสงเรืองตามธีม" },
   { version: "1.10.1", note: "เลือกหน้าเปิดแอปได้: ปกนิยายพลิกเปิด หรือโลโก้ซูมแบบ X" },
   { version: "1.10.0", note: "หัวเว็บและแถบล่างเปลี่ยนสีตามธีม โลโก้ NA เข้าชุดทุกธีม" },
@@ -101,6 +102,12 @@ function applyLaunchStyle(style) {
   document.documentElement.dataset.launch = state.launchStyle;
   byId("launch-book")?.setAttribute("aria-pressed", String(state.launchStyle === "book"));
   byId("launch-zoom")?.setAttribute("aria-pressed", String(state.launchStyle === "zoom"));
+  const zoom = state.launchStyle === "zoom";
+  const open = byId("cover-open");
+  if (open) open.textContent = zoom ? "แตะเพื่อเข้าแอป" : "แตะเพื่อเปิดหนังสือ";
+  byId("splash")?.setAttribute("aria-label", zoom ? "โลโก้แอป แตะเพื่อเข้าแอป" : "ปกหนังสือ แตะเพื่อเปิด");
+  // เก็บสำเนาไว้อ่านแบบ synchronous ตอนเปิดหน้า ไม่งั้นผู้ใช้โหมดซูมจะเห็นปกแวบหนึ่ง
+  try { localStorage.setItem("renovel-launch", state.launchStyle); } catch (error) {}
 }
 
 /* แตะที่ปกหรือปุ่มบนปกเพื่อเปิดหนังสือเองได้ ไม่ต้องรอ */

@@ -253,6 +253,11 @@ body.scroll-mode .page-top-row { display:none; }
 .splash.is-launching .book { animation:book-open .95s cubic-bezier(.45,0,.2,1) forwards; }
 /* แบบซูมเหมือนเปิดแอป X: ย่อเล็กน้อยแล้วขยายเข้าจอจากกลางปก */
 :root[data-launch="zoom"] .splash.is-launching .book { transform-origin:center center; animation:splash-launch .62s cubic-bezier(.4,0,.18,1) forwards; }
+/* โหมดซูมไม่ต้องมีรูปเล่ม ขอบทอง หรือสันหนังสือ — เหลือโลโก้ลอย ๆ เหมือน splash เดิม */
+:root[data-launch="zoom"] .book { width:auto; aspect-ratio:auto; }
+:root[data-launch="zoom"] .book-face { position:static; inset:auto; width:auto; padding:0; border:0; border-radius:0; background:none; box-shadow:none; gap:10px; }
+:root[data-launch="zoom"] .book-face::before, :root[data-launch="zoom"] .book-face::after { display:none; }
+:root[data-launch="zoom"] .book-sub { display:none; }
 @keyframes splash-pop { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-fade { from { opacity:0 } to { opacity:1 } }
 @keyframes splash-run { 0% { transform:translateX(-110%) } 100% { transform:translateX(320%) } }
