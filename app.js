@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.3";
+const APP_VERSION = "1.12.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.4", note: "พื้นหลังรี:ซีโร่รับสีเน้นที่เลือก มีปุ่มสุ่มชุดสี และหยุดอนิเมชันเองเมื่อแบตต่ำกว่า 20%" },
   { version: "1.12.3", note: "ธีมรี:ซีโร่ปรับสีพื้น สีเน้น สีโลโก้ และเอฟเฟกต์เองได้ โดยยังมีรูปตอนเข้าแอปและโลโก้กับชื่อที่หัวเว็บ" },
   { version: "1.12.2", note: "เพิ่มธีมกำหนดเอง ตั้งสีพื้น ตัวอักษร การ์ด สีเน้น สีโลโก้ และเอฟเฟกต์หัวเว็บได้อิสระ" },
   { version: "1.12.1", note: "ธีมรี:ซีโร่เข้มขึ้นสำหรับอ่านก่อนนอน มีดาวตกตอนเข้าแอป และผงดาวจางในหน้าอ่าน" },
@@ -141,7 +142,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true } };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto" };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -479,16 +480,17 @@ const REZERO_BASE = { page: "#121524", surface: "#1a2036", surface2: "#222a44", 
 const REZERO_DEFAULT = { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true };
 
 /* สไลเดอร์ความสว่าง: 50 = โทนเดิมของรี:ซีโร่ ต่ำกว่านั้นมืดลง สูงกว่านั้นจางขึ้น */
-function rezeroTone(pick) {
+function rezeroTone(pick, accent = REZERO_DEFAULT.accent) {
   const light = Number.isFinite(Number(pick.light)) ? Number(pick.light) : 50;
   const delta = Math.max(-1, Math.min(1, (light - 50) / 50));
   const target = delta < 0 ? "#06070e" : "#3d486e";
   const ratio = Math.abs(delta) * (delta < 0 ? 0.8 : 0.5);
+  /* พื้นรับอารมณ์จากสีเน้นนิดหน่อย จะได้ไม่ขัดกันเมื่อเปลี่ยนสีเน้น และความทึบต่ำพอให้ตัวอักษรยังอ่านชัด */
   return {
-    page: mixHex(REZERO_BASE.page, target, ratio),
-    surface: mixHex(REZERO_BASE.surface, target, ratio * 0.85),
-    surface2: mixHex(REZERO_BASE.surface2, target, ratio * 0.7),
-    line: mixHex(REZERO_BASE.line, target, ratio * 0.45)
+    page: mixHex(mixHex(REZERO_BASE.page, target, ratio), accent, 0.06),
+    surface: mixHex(mixHex(REZERO_BASE.surface, target, ratio * 0.85), accent, 0.05),
+    surface2: mixHex(mixHex(REZERO_BASE.surface2, target, ratio * 0.7), accent, 0.04),
+    line: mixHex(mixHex(REZERO_BASE.line, target, ratio * 0.45), accent, 0.12)
   };
 }
 
@@ -502,8 +504,8 @@ function applyRezeroTheme() {
     return;
   }
   const pick = state.rezeroTheme;
-  const tone = rezeroTone(pick);
   const accent = /^#[0-9a-f]{6}$/iu.test(String(pick.accent)) ? pick.accent : REZERO_DEFAULT.accent;
+  const tone = rezeroTone(pick, accent);
   root.style.setProperty("--page", tone.page);
   root.style.setProperty("--surface", tone.surface);
   root.style.setProperty("--surface-2", tone.surface2);
@@ -541,6 +543,18 @@ function saveRezeroTheme() {
   void writeSetting("rezeroTheme", state.rezeroTheme);
 }
 
+function randomRezeroTheme() {
+  const hue = Math.floor(Math.random() * 360);
+  return {
+    ...state.rezeroTheme,
+    accent: hslHex(hue, 62 + Math.floor(Math.random() * 26), 62),
+    light: 35 + Math.floor(Math.random() * 32),
+    hue: Math.floor(Math.random() * 360),
+    sat: 70 + Math.floor(Math.random() * 110),
+    bright: 92 + Math.floor(Math.random() * 28)
+  };
+}
+
 function bindRezeroTheme() {
   paintRezeroInputs();
   byId("rezero-accent")?.addEventListener("input", event => { state.rezeroTheme.accent = event.target.value; saveRezeroTheme(); });
@@ -550,7 +564,49 @@ function bindRezeroTheme() {
   byId("rezero-sky")?.addEventListener("change", event => { state.rezeroTheme.sky = event.target.value; applyCustomTheme(); paintRezeroInputs(); void writeSetting("rezeroTheme", state.rezeroTheme); });
   byId("rezero-shooting")?.addEventListener("change", event => { state.rezeroTheme.shooting = event.target.checked; saveRezeroTheme(); });
   byId("rezero-dust")?.addEventListener("change", event => { state.rezeroTheme.dust = event.target.checked; saveRezeroTheme(); });
+  byId("rezero-random")?.addEventListener("click", () => { state.rezeroTheme = randomRezeroTheme(); saveRezeroTheme(); showStatus("สุ่มชุดสีของรี:ซีโร่แล้ว"); });
   byId("rezero-reset")?.addEventListener("click", () => { state.rezeroTheme = { ...REZERO_DEFAULT }; saveRezeroTheme(); showStatus("คืนค่าเดิมของธีมรี:ซีโร่แล้ว"); });
+}
+
+/* ---------- ประหยัดแบต: หยุดอนิเมชันพื้นหลังที่กินซีพียูตลอดเวลา ---------- */
+const batteryWatch = { level: 1, charging: true, supported: false };
+
+function lowPowerActive() {
+  if (state.lowPower === "off") return true;
+  if (state.lowPower !== "auto") return false;
+  return batteryWatch.supported ? batteryWatch.level <= 0.2 && !batteryWatch.charging : false;
+}
+
+function applyLowPower() {
+  const root = document.documentElement;
+  const active = lowPowerActive();
+  if (active) root.dataset.lowPower = "on"; else delete root.dataset.lowPower;
+  byId("lowpower-auto")?.setAttribute("aria-pressed", String(state.lowPower !== "off"));
+  byId("lowpower-off")?.setAttribute("aria-pressed", String(state.lowPower === "off"));
+  if (active) stopAmbient(); else startAmbient(state.theme);
+}
+
+async function watchBattery() {
+  if (typeof navigator.getBattery !== "function") { applyLowPower(); return; }
+  try {
+    const battery = await navigator.getBattery();
+    const sync = () => {
+      batteryWatch.supported = true;
+      batteryWatch.level = Number(battery.level) || 0;
+      batteryWatch.charging = battery.charging === true;
+      applyLowPower();
+    };
+    sync();
+    battery.addEventListener?.("levelchange", sync);
+    battery.addEventListener?.("chargingchange", sync);
+  } catch {
+    applyLowPower();
+  }
+}
+
+function bindLowPower() {
+  byId("lowpower-auto")?.addEventListener("click", () => { state.lowPower = "auto"; applyLowPower(); void writeSetting("lowPower", state.lowPower); showStatus("หยุดอนิเมชันเองเมื่อแบตต่ำกว่า 20% แล้ว"); });
+  byId("lowpower-off")?.addEventListener("click", () => { state.lowPower = "off"; applyLowPower(); void writeSetting("lowPower", state.lowPower); showStatus("หยุดอนิเมชันพื้นหลังตลอดเพื่อประหยัดแบตแล้ว"); });
 }
 
 function paintCustomInputs() {
@@ -614,6 +670,7 @@ function applyTheme(selection = "auto") {
   paintThemeLogo();
   paintThemeHint();
   startAmbient(state.theme);
+  applyLowPower();
   void syncRezeroCover();
 }
 
@@ -1898,6 +1955,7 @@ function bindEvents() {
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
   bindCustomTheme();
   bindRezeroTheme();
+  bindLowPower();
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
   byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
   byId("launch-zoom").addEventListener("click", () => { applyLaunchStyle("zoom"); void writeSetting("launchStyle", state.launchStyle); });
@@ -2400,8 +2458,10 @@ async function initialize() {
     if (savedCustom && typeof savedCustom === "object") state.customTheme = { ...CUSTOM_DEFAULT, ...savedCustom };
     const savedRezero = await readSetting("rezeroTheme", null);
     if (savedRezero && typeof savedRezero === "object") state.rezeroTheme = { ...REZERO_DEFAULT, ...savedRezero };
+    state.lowPower = (await readSetting("lowPower", "auto")) === "off" ? "off" : "auto";
     applyTheme(await readSetting("theme", "auto"));
     buildHeaderSky();
+    void watchBattery();
     setFontSize(Number(await readSetting("fontSize", 19)) || 19);
     setLineHeight(Number(await readSetting("lineHeight", 1.9)) || 1.9);
     setTextWidth(Number(await readSetting("textWidth", 760)) || 760);

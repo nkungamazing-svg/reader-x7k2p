@@ -596,3 +596,9 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .custom-color input { flex:none; width:44px; height:32px; padding:0; border:1px solid var(--line); border-radius:8px; background:transparent; }
 .custom-theme .theme-choice { min-height:44px; }
 @media(prefers-reduced-motion:reduce) { :root[data-sky="stars"] .header-sky i, :root[data-sky="sparks"] .header-sky i { animation:none; opacity:0; } }
+
+/* ประหยัดแบต / แบตต่ำ: ปิดอนิเมชันพื้นหลังที่กินซีพียูตลอดเวลา */
+:root[data-low-power="on"] .splash-sky,
+:root[data-low-power="on"] .header-sky,
+:root[data-low-power="on"] .ambient { display:none; }
+:root[data-low-power="on"] .app-header::after { animation:none; }
