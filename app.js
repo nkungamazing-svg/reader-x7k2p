@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.5";
+const APP_VERSION = "1.13.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.6", note: "เปิดให้ลากเลือกข้อความในหน้าอ่านได้จริง เพื่อไฮไลต์และจดโน้ต โดยไม่ชนกับการแตะอ่านเสียงหรือการพลิกหน้า" },
   { version: "1.13.5", note: "ทางลัดจากไอคอนแอป สถิติการอ่านรายวัน คลังคำอ่าน/ชื่อตัวละคร และเครื่องมือดู–ลบพื้นที่เก็บข้อมูล" },
   { version: "1.13.4", note: "ลากเลือกข้อความเพื่อไฮไลต์และจดโน้ตส่วนตัว ดูรายการทั้งหมดและกระโดดกลับไปยังข้อความได้" },
   { version: "1.13.3", note: "ค้นข้อความในทุกบทแล้วกระโดดไปยังย่อหน้าที่พบ และฟังเสียงจบตอนแล้วไปตอนถัดไปอัตโนมัติ" },
@@ -2454,6 +2455,8 @@ function installParagraphTapTargets() {
   content.addEventListener("click", event => {
     if (isPageMode() || !state.tapSpeech || Date.now() < state.suppressTapUntil) return;
     const target = event.target;
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
     if (target.closest?.("a,button,input,select,textarea,[contenteditable=true],img")) return;
     const block = target.closest?.("p,li,blockquote,h1,h2,h3,h4,h5,h6");
     if (!block) return;
@@ -3081,6 +3084,8 @@ function installPageGestures() {
   viewport.addEventListener("pointerup", event => {
     const origin = start; start = null;
     if (!origin || !isPageMode()) return;
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
     hideTapHint();
     if (document.body.classList.contains("sidebar-open")) { setSidebarOpen(false); return; }
     const dx = event.clientX - origin.x, dy = event.clientY - origin.y;
