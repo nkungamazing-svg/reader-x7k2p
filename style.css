@@ -790,17 +790,74 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .cc-tab.is-active { background:var(--surface); box-shadow:0 1px 3px #0003; color:var(--accent-strong); }
 .cc-panel { display:grid; gap:0; max-height:min(30dvh,220px); overflow-y:auto; overscroll-behavior:contain; }
 .cc-panel[hidden] { display:none!important; }
-.cc-row { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:7px 2px; border-bottom:1px dashed color-mix(in srgb,var(--line) 72%,transparent); font-size:12.5px; }
-.cc-row:last-child { border-bottom:0; }
-.cc-key { flex:none; color:var(--muted); font-size:11.5px; font-weight:700; }
-.cc-value { flex:1 1 auto; text-align:right; color:var(--text); line-height:1.5; overflow-wrap:anywhere; }
 .cc-empty { margin:0; padding:4px 2px; color:var(--muted); font-size:12px; line-height:1.65; }
-.cc-list { margin:0; padding:0; list-style:none; display:grid; gap:6px; }
-.cc-list li { position:relative; padding:8px 10px 8px 24px; border-radius:12px; background:color-mix(in srgb,var(--character-color,var(--accent)) 12%,transparent); color:var(--text); font-size:12.5px; line-height:1.5; overflow-wrap:anywhere; }
-.cc-list li::before { content:"•"; position:absolute; left:9px; color:color-mix(in srgb,var(--character-color,var(--accent)) 80%,var(--text)); font-weight:700; }
 .cc-link { justify-self:start; min-height:44px; margin-top:8px; padding:8px 14px; border:1px solid color-mix(in srgb,var(--character-color,var(--accent)) 45%,var(--line)); border-radius:999px; background:transparent; color:var(--text); font-size:12px; font-weight:700; }
 @media(max-width:360px) {
   .character-card { padding:12px; border-radius:20px; }
   .character-card .character-card-figure { width:72px; height:72px; }
   .character-card .character-card-body strong { font-size:18px; }
+}
+
+/* ---------- การ์ดตัวละครแบบใหม่: รูปใหญ่ ค่ายชัด แท็บพรีเมียม ---------- */
+.character-card {
+  gap:12px; width:min(420px,calc(100vw - 18px));
+  padding:16px 16px 18px; border-radius:26px;
+  background:var(--surface);
+}
+.character-card.has-faction {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--character-color) 9%,var(--surface)),var(--surface) 58%);
+}
+.cc-top { align-items:flex-start; }
+.cc-camp { padding:5px 12px; font-size:10px; letter-spacing:.08em; }
+.cc-camp-dot { width:7px; height:7px; }
+.character-card .cc-close { width:36px; height:36px; min-height:36px; border-radius:50%; background:var(--surface-2); font-size:22px; line-height:1; }
+
+.cc-head { align-items:center; gap:14px; }
+.character-card .character-card-figure {
+  width:104px; height:104px;
+  border:2px solid color-mix(in srgb,var(--character-color,var(--line)) 55%,transparent);
+  box-shadow:0 0 0 5px color-mix(in srgb,var(--character-color,#8b8b8b) 14%,transparent);
+}
+.cc-name-line { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; min-width:0; }
+.character-card .character-card-body { gap:0; }
+.character-card .character-card-body strong { font-size:23px; line-height:1.2; letter-spacing:-.01em; }
+.character-card .character-card-en { font-size:13px; font-weight:600; }
+.cc-badges { flex-wrap:wrap; gap:6px; margin-top:7px; }
+.cc-tag { padding:3px 11px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 34%,var(--line)); border-radius:999px; background:color-mix(in srgb,var(--character-color,#8b8b8b) 10%,var(--surface)); color:var(--text); font-size:10.5px; font-weight:700; line-height:1.7; }
+.cc-actions { gap:12px; margin-top:12px; }
+.character-card .cc-icon.cc-round { width:44px; height:44px; border-radius:50%; background:var(--surface-2); }
+.cc-svg { width:19px; height:19px; }
+.character-card .cc-note { margin:0 2px; font-size:10.5px; text-align:left; }
+
+.cc-tabs { gap:2px; padding:4px; border-radius:999px; background:color-mix(in srgb,var(--line) 30%,var(--surface-2)); }
+.cc-tab { min-height:44px; padding:0 4px; border-radius:999px; font-size:12.5px; }
+.cc-tab.is-active { background:var(--surface); box-shadow:0 2px 8px #0000001a; color:var(--text); }
+
+.cc-panel { padding:2px; max-height:min(38dvh,300px); }
+.cc-bio { margin:0; color:var(--text); font-size:13px; line-height:1.85; white-space:pre-wrap; overflow-wrap:anywhere; }
+.cc-highlight { display:grid; gap:2px; margin-top:12px; padding:10px 13px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 22%,transparent); border-radius:15px; background:color-mix(in srgb,var(--character-color,var(--accent)) 9%,var(--surface-2)); }
+.cc-highlight b { color:color-mix(in srgb,var(--character-color,var(--accent)) 76%,var(--text)); font-size:10.5px; font-weight:800; letter-spacing:.02em; }
+.cc-highlight span { color:var(--text); font-size:12.5px; line-height:1.6; }
+
+.cc-ability { display:flex; align-items:flex-start; gap:10px; padding:11px 12px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 18%,transparent); border-radius:16px; background:color-mix(in srgb,var(--character-color,var(--accent)) 7%,var(--surface-2)); }
+.cc-ability + .cc-ability { margin-top:8px; }
+.cc-ability-icon { flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:11px; background:var(--surface); color:color-mix(in srgb,var(--character-color,var(--accent)) 82%,var(--text)); }
+.cc-ability-icon svg { width:18px; height:18px; }
+.cc-ability-text { display:grid; gap:1px; min-width:0; }
+.cc-ability-text b { color:var(--text); font-size:13px; font-weight:800; line-height:1.5; overflow-wrap:anywhere; }
+.cc-ability-text small { color:var(--muted); font-size:11px; line-height:1.55; }
+
+.cc-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cc-field { padding:10px 12px; border:1px solid color-mix(in srgb,var(--line) 70%,transparent); border-radius:15px; background:var(--surface-2); }
+.cc-field span { display:block; margin-bottom:3px; color:var(--muted); font-size:10.5px; }
+.cc-field b { color:var(--text); font-size:12.5px; font-weight:800; line-height:1.5; overflow-wrap:anywhere; }
+.cc-field.is-camp b { text-transform:uppercase; letter-spacing:.03em; }
+
+@media(max-width:360px) {
+  .character-card { padding:13px 13px 15px; border-radius:22px; }
+  .character-card .character-card-figure { width:88px; height:88px; }
+  .character-card .character-card-body strong { font-size:20px; }
+  .cc-actions { gap:8px; }
+  .character-card .cc-icon.cc-round { width:44px; height:44px; }
+  .cc-tab { font-size:11.5px; }
 }

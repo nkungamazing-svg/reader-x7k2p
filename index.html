@@ -130,28 +130,27 @@
     <div class="cc-head">
       <div id="character-card-figure" class="character-card-figure"></div>
       <div class="character-card-body">
-        <strong id="character-card-name"></strong>
-        <small id="character-card-title" class="character-card-en"></small>
-        <div class="cc-badges">
-          <span id="character-card-faction" class="character-card-faction" hidden></span>
+        <div class="cc-name-line">
+          <strong id="character-card-name"></strong>
+          <small id="character-card-title" class="character-card-en"></small>
         </div>
-        <small id="character-card-note" class="cc-note"></small>
+        <div id="character-card-tags" class="cc-badges"></div>
         <div class="cc-actions">
-          <button id="character-card-external" class="cc-icon" type="button" title="วิกิในแอป" aria-label="เปิดวิกิของตัวละครในแอป" hidden>◎</button>
-          <button id="character-card-zoom" class="cc-icon" type="button" title="ดูรูปเต็มจอ" aria-label="ดูรูปเต็มจอ" hidden>⤢</button>
-          <button id="character-card-copy" class="cc-icon" type="button" title="คัดลอกชื่อ" aria-label="คัดลอกชื่อตัวละคร">⧉</button>
-          <button id="character-card-edit" class="cc-icon" type="button" title="แก้ชื่อที่จับคู่ไว้" aria-label="แก้ชื่อภาษาอังกฤษที่จับคู่ไว้" hidden>✎</button>
+          <button id="character-card-external" class="cc-icon cc-round" type="button" title="วิกิในแอป" aria-label="เปิดวิกิของตัวละครในแอป" hidden><svg class="cc-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.1" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.9 12h16.2M12 3.9c2.4 2.3 3.6 5 3.6 8.1s-1.2 5.8-3.6 8.1c-2.4-2.3-3.6-5-3.6-8.1S9.6 6.2 12 3.9Z" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+          <button id="character-card-edit" class="cc-icon cc-round" type="button" title="แก้ชื่อที่จับคู่ไว้" aria-label="แก้ชื่อภาษาอังกฤษที่จับคู่ไว้" hidden><svg class="cc-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 19l.9-4.2L15.6 5a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L9.2 18.1 5 19Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+          <button id="character-card-copy" class="cc-icon cc-round" type="button" title="คัดลอกชื่อ" aria-label="คัดลอกชื่อตัวละคร"><svg class="cc-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="10" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15 6.5A2.5 2.5 0 0 0 12.5 4H6.4A2.4 2.4 0 0 0 4 6.4v6.1A2.5 2.5 0 0 0 6.5 15" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
         </div>
       </div>
     </div>
+    <small id="character-card-note" class="cc-note"></small>
     <div class="cc-tabs" role="tablist" aria-label="ข้อมูลตัวละคร">
-      <button class="cc-tab" type="button" role="tab" id="cc-tab-info" data-cc-tab="info" aria-controls="cc-panel-info" aria-selected="true">ข้อมูล</button>
+      <button class="cc-tab" type="button" role="tab" id="cc-tab-wiki" data-cc-tab="wiki" aria-controls="cc-panel-wiki" aria-selected="true">ชีวประวัติ</button>
       <button class="cc-tab" type="button" role="tab" id="cc-tab-power" data-cc-tab="power" aria-controls="cc-panel-power" aria-selected="false">ความสามารถ</button>
-      <button class="cc-tab" type="button" role="tab" id="cc-tab-wiki" data-cc-tab="wiki" aria-controls="cc-panel-wiki" aria-selected="false">เรื่องย่อ</button>
+      <button class="cc-tab" type="button" role="tab" id="cc-tab-info" data-cc-tab="info" aria-controls="cc-panel-info" aria-selected="false">ข้อมูลทั่วไป</button>
     </div>
-    <div id="cc-panel-info" class="cc-panel" role="tabpanel" aria-labelledby="cc-tab-info"></div>
+    <div id="cc-panel-wiki" class="cc-panel" role="tabpanel" aria-labelledby="cc-tab-wiki"></div>
     <div id="cc-panel-power" class="cc-panel" role="tabpanel" aria-labelledby="cc-tab-power" hidden></div>
-    <div id="cc-panel-wiki" class="cc-panel" role="tabpanel" aria-labelledby="cc-tab-wiki" hidden></div>
+    <div id="cc-panel-info" class="cc-panel" role="tabpanel" aria-labelledby="cc-tab-info" hidden></div>
     <form id="character-card-form" class="character-card-form" hidden>
       <input id="character-card-input" type="search" placeholder="ชื่อในวิกิ เช่น Otto Suwen" autocomplete="off" enterkeyhint="search" aria-label="ชื่อตัวละครภาษาอังกฤษ">
       <button id="character-card-save" class="tool-button" type="submit">บันทึก</button>
