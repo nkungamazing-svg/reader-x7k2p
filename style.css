@@ -691,3 +691,14 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .note-actions { display:flex; gap:6px; margin-top:2px; }
 .note-actions .tool-button { flex:1; min-height:44px; }
 @media(prefers-reduced-motion:reduce) { .note-tools { transition:none; } }
+
+/* ---------- สถิติการอ่าน · คลังคำอ่าน ---------- */
+.reading-stats { margin:8px 0 0; padding:8px 10px; border:1px dashed color-mix(in srgb,var(--accent) 30%,var(--line)); border-radius:10px; color:var(--muted); font-size:11px; line-height:1.5; font-variant-numeric:tabular-nums; }
+.reading-stats[hidden] { display:none; }
+.glossary-sheet[open] { display:grid; gap:10px; }
+.glossary-list { display:grid; gap:6px; max-height:52dvh; overflow-y:auto; }
+.glossary-row { display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); }
+.glossary-text { display:grid; gap:1px; flex:1; min-width:0; }
+.glossary-text strong { font-size:13px; }
+.glossary-text small { color:var(--accent-strong); font-size:11px; font-weight:700; }
+.glossary-row .tool-button { flex:none; min-height:44px; }

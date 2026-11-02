@@ -10,7 +10,55 @@
   "background_color": "#17191f",
   "theme_color": "#222631",
   "icons": [
-    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "อ่านต่อจากที่ค้างไว้",
+      "short_name": "อ่านต่อ",
+      "url": "./?go=resume",
+      "icons": [
+        {
+          "src": "icons/icon-180.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "กลับไปตอนล่าสุด",
+      "short_name": "ตอนล่าสุด",
+      "url": "./?go=recent",
+      "icons": [
+        {
+          "src": "icons/icon-180.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "บุ๊กมาร์กของตอนนี้",
+      "short_name": "บุ๊กมาร์ก",
+      "url": "./?go=bookmarks",
+      "icons": [
+        {
+          "src": "icons/icon-180.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

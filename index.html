@@ -69,6 +69,7 @@
         <label class="sort-label" for="sort">เรียงตาม</label>
         <select id="sort" class="select-input"><option value="asc">Arc / ตอน · เก่าไปใหม่</option><option value="desc">Arc / ตอน · ใหม่ไปเก่า</option><option value="recent">บันทึกล่าสุด</option></select>
         <div id="grid-columns" class="grid-columns" hidden><span>คอลัมน์</span><button id="cols-2" class="cols-button" type="button" aria-pressed="true" aria-label="สองคอลัมน์">2</button><button id="cols-4" class="cols-button" type="button" aria-pressed="false" aria-label="สี่คอลัมน์">4</button><button id="cols-6" class="cols-button" type="button" aria-pressed="false" aria-label="หกคอลัมน์">6</button></div>
+        <p id="reading-stats" class="reading-stats" hidden></p>
       </div>
       <div id="chapter-list" class="chapter-list"></div>
       <div id="empty-state" class="empty-state"><strong>ยังไม่มีบทแปล</strong><span>นำเข้าไฟล์ JSON จากปุ่ม “สำรอง/ย้ายข้อมูล” ในส่วนขยาย</span></div>
@@ -155,6 +156,15 @@
       <button id="note-save" class="tool-button" type="button">บันทึกโน้ต</button>
       <button id="note-skip" class="tool-button" type="button">ไฮไลต์อย่างเดียว</button>
     </div>
+  </dialog>
+  <dialog id="glossary-sheet" class="bookmark-sheet glossary-sheet" aria-label="คลังคำอ่านและชื่อตัวละคร">
+    <div class="bookmark-sheet-head">
+      <div><h3>คลังคำอ่าน</h3><p id="glossary-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดคลังคำอ่าน">×</button></form>
+    </div>
+    <input id="glossary-search" class="search-input" type="search" placeholder="ค้นคำหรือชื่อ…" autocomplete="off" aria-label="ค้นในคลังคำอ่าน">
+    <div id="glossary-list" class="glossary-list"></div>
+    <p id="glossary-empty" class="settings-hint">คำอ่านมาจากตารางคำอ่านในไฟล์สำรอง และชื่อตัวละครจะถูกจดเมื่อคุณแก้ชื่อในการ์ดตัวละคร</p>
   </dialog>
   <dialog id="notes-sheet" class="bookmark-sheet notes-sheet" aria-label="ไฮไลต์และโน้ต">
     <div class="bookmark-sheet-head">
@@ -251,6 +261,7 @@
       <details class="settings-group settings-fold" data-fold="voice">
         <summary><h3>เสียงอ่าน</h3></summary>
         <label class="setting-row" for="voice-select"><span>เสียงภาษาไทย</span><select id="voice-select"><option value="">กำลังค้นหาเสียง…</option></select><small class="setting-hint">รายการเสียงขึ้นกับเสียงที่ Safari เปิดให้เว็บใช้งาน อาจไม่แสดงเสียงที่ติดตั้งไว้ทั้งหมด</small></label>
+        <div class="setting-row"><span>คลังคำอ่านและชื่อตัวละคร</span><button id="glossary-open" class="tool-button" type="button">เปิดคลัง</button><small class="setting-hint">คำอ่านที่ใช้อ่านออกเสียง และชื่อญี่ปุ่นที่จับคู่กับการ์ดตัวละคร</small></div>
         <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div><small class="setting-hint">0.6× ช้า ถึง 1.6× เร็ว</small></div>
       </details>
       <details class="settings-group settings-fold" data-fold="sync">
@@ -267,6 +278,8 @@
       </details>
       <details class="settings-group settings-fold" data-fold="misc">
         <summary><h3>อื่น ๆ</h3></summary>
+        <div class="setting-row"><span>พื้นที่เก็บข้อมูลบนเครื่อง</span><button id="storage-check" class="tool-button" type="button">ตรวจสอบ</button><small id="storage-hint" class="setting-hint">ดูขนาดข้อมูลที่บทแปลและค่าตั้งใช้อยู่</small></div>
+        <div class="setting-row"><span>ลบตอนที่อ่านจบแล้ว</span><button id="storage-prune" class="tool-button" type="button">ลบตอนที่จบแล้ว</button><small class="setting-hint">ลบเฉพาะตอนที่อ่านถึง 98% ขึ้นไป บุ๊กมาร์กและโน้ตไม่ถูกลบ</small></div>
         <div class="setting-row"><span>หน้าเปิดแอป</span><div class="theme-row"><button id="launch-book" class="theme-choice" type="button" aria-pressed="true">📖 เปิดปกนิยาย</button><button id="launch-zoom" class="theme-choice" type="button" aria-pressed="false">🚀 ซูมแบบ X</button></div><small class="setting-hint">แบบปกนิยาย: ปกพลิกเปิดเข้าหาบทแรก · แบบซูม: โลโก้ขยายเต็มจอเหมือนเปิดแอป X</small></div>
         <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>กันจอดับระหว่างอ่าน</span><input id="wake-lock-toggle" type="checkbox"><i aria-hidden="true"></i></label>

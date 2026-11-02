@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.4";
+const APP_VERSION = "1.13.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.5", note: "ทางลัดจากไอคอนแอป สถิติการอ่านรายวัน คลังคำอ่าน/ชื่อตัวละคร และเครื่องมือดู–ลบพื้นที่เก็บข้อมูล" },
   { version: "1.13.4", note: "ลากเลือกข้อความเพื่อไฮไลต์และจดโน้ตส่วนตัว ดูรายการทั้งหมดและกระโดดกลับไปยังข้อความได้" },
   { version: "1.13.3", note: "ค้นข้อความในทุกบทแล้วกระโดดไปยังย่อหน้าที่พบ และฟังเสียงจบตอนแล้วไปตอนถัดไปอัตโนมัติ" },
   { version: "1.13.2", note: "หน้าตั้งค่าเปิดทุกหมวดไว้ให้เห็นตั้งแต่แรก และจำว่าย่อหมวดไหนไว้ ไม่ต้องไล่เปิดใหม่ทุกครั้ง" },
@@ -151,7 +152,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -223,6 +224,7 @@ async function syncWakeLock() {
 async function refreshChapters() {
   state.chapters = await readAllChapters();
   renderChapterList();
+  paintReadingStats();
   byId("chapter-count").textContent = state.chapters.length.toLocaleString("th-TH");
   byId("empty-state").hidden = state.chapters.length > 0;
   if (state.activeId && !state.chapters.some(item => item.id === state.activeId)) closeReader();
@@ -752,6 +754,139 @@ function bindSettingsTransfer() {
     event.preventDefault();
     openImageViewer(image.currentSrc || image.src, image.alt);
   });
+}
+
+/* ---------- สถิติการอ่าน ---------- */
+function dayKey(date = new Date()) {
+  const pad = value => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function addReadingSeconds(seconds) {
+  const key = dayKey();
+  state.readStats.days[key] = (state.readStats.days[key] || 0) + seconds;
+  clearTimeout(state.statsSaveTimer);
+  state.statsSaveTimer = setTimeout(() => { void writeSetting("readStats", state.readStats).catch(() => {}); }, 30000);
+  paintReadingStats();
+}
+
+function readingStreak(days) {
+  let streak = 0;
+  const cursor = new Date();
+  for (let step = 0; step < 400; step += 1) {
+    const key = dayKey(cursor);
+    if ((days[key] || 0) < 60) {
+      if (step === 0) { cursor.setDate(cursor.getDate() - 1); continue; }
+      break;
+    }
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function paintReadingStats() {
+  const box = byId("reading-stats");
+  if (!box) return;
+  const days = state.readStats.days || {};
+  const todaySeconds = days[dayKey()] || 0;
+  if (!Object.keys(days).length) { box.hidden = true; return; }
+  box.hidden = false;
+  let week = 0;
+  const cursor = new Date();
+  for (let step = 0; step < 7; step += 1) {
+    week += days[dayKey(cursor)] || 0;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  const finished = state.chapters.filter(item => Number(item.lastReadProgress || 0) >= 0.98).length;
+  const minutes = Math.round(todaySeconds / 60);
+  box.textContent = `วันนี้ ${minutes.toLocaleString("th-TH")} น. · 7 วัน ${Math.round(week / 60).toLocaleString("th-TH")} น. · อ่านจบ ${finished.toLocaleString("th-TH")} ตอน · ต่อเนื่อง ${readingStreak(days).toLocaleString("th-TH")} วัน`;
+}
+
+function startReadingClock() {
+  clearInterval(state.statsTick);
+  state.statsTick = setInterval(() => {
+    if (!state.activeId || document.visibilityState !== "visible") return;
+    addReadingSeconds(15);
+  }, 15000);
+}
+
+/* ---------- คลังคำอ่านและชื่อตัวละคร ---------- */
+async function paintGlossary() {
+  const list = byId("glossary-list");
+  if (!list) return;
+  const query = (byId("glossary-search")?.value || "").trim().toLocaleLowerCase();
+  const names = await characterNameTable();
+  const rows = [
+    ...state.pronunciation
+      .filter(entry => entry && entry.word && entry.reading)
+      .map(entry => ({ kind: "reading", word: entry.word, reading: entry.reading, extra: "" })),
+    ...Object.entries(names).map(([thai, original]) => ({ kind: "name", word: thai, reading: String(original || ""), extra: "" }))
+  ].filter(row => !query || `${row.word} ${row.reading}`.toLocaleLowerCase().includes(query));
+  list.replaceChildren();
+  const sub = byId("glossary-sub");
+  if (sub) sub.textContent = rows.length ? `${rows.length.toLocaleString("th-TH")} รายการ · คำอ่าน ${state.pronunciation.length.toLocaleString("th-TH")} · ชื่อ ${Object.keys(names).length.toLocaleString("th-TH")}` : "ยังไม่มีรายการ";
+  byId("glossary-empty").hidden = rows.length > 0;
+  for (const row of rows) {
+    const item = document.createElement("div"); item.className = "glossary-row";
+    const text = document.createElement("div"); text.className = "glossary-text";
+    const word = document.createElement("strong"); word.textContent = row.word;
+    const reading = document.createElement("small"); reading.textContent = row.kind === "reading" ? `อ่านว่า ${row.reading}` : `ชื่อญี่ปุ่น ${row.reading}`;
+    text.append(word, reading);
+    item.append(text);
+    if (row.kind === "reading") {
+      const remove = document.createElement("button"); remove.type = "button"; remove.className = "tool-button";
+      remove.textContent = "ลบ"; remove.setAttribute("aria-label", `ลบคำอ่าน ${row.word}`);
+      remove.addEventListener("click", async () => {
+        state.pronunciation = state.pronunciation.filter(entry => entry.word !== row.word);
+        await writeSetting("pronunciation", state.pronunciation);
+        await paintGlossary();
+        showStatus(`ลบคำอ่าน “${row.word}” แล้ว`, 2500);
+      });
+      item.append(remove);
+    }
+    list.append(item);
+  }
+}
+
+async function openGlossary() {
+  const sheet = byId("glossary-sheet");
+  if (!sheet) return;
+  byId("glossary-search").value = "";
+  await paintGlossary();
+  if (typeof sheet.showModal === "function") sheet.showModal();
+  else sheet.setAttribute("open", "");
+}
+
+/* ---------- พื้นที่เก็บข้อมูล ---------- */
+async function paintStorageUsage() {
+  const hint = byId("storage-hint");
+  if (!hint) return;
+  if (!navigator.storage?.estimate) { hint.textContent = "เบราว์เซอร์นี้ไม่รายงานพื้นที่เก็บข้อมูล"; return; }
+  try {
+    const { usage = 0, quota = 0 } = await navigator.storage.estimate();
+    const usedMb = (usage / 1048576).toFixed(1);
+    const quotaGb = quota ? (quota / 1073741824).toFixed(1) : "?";
+    const biggest = [...state.chapters].sort((one, two) => (two.html?.length || 0) - (one.html?.length || 0))[0];
+    hint.textContent = `ใช้ไป ${usedMb} MB จากราว ${quotaGb} GB · ${state.chapters.length.toLocaleString("th-TH")} ตอน${biggest ? ` · ตอนใหญ่สุด ${(((biggest.html || "").length) / 1048576).toFixed(2)} MB` : ""}`;
+  } catch (error) {
+    hint.textContent = `ตรวจพื้นที่ไม่สำเร็จ: ${error.message}`;
+  }
+}
+
+async function pruneFinishedChapters() {
+  const finished = state.chapters.filter(item => Number(item.lastReadProgress || 0) >= 0.98);
+  if (!finished.length) { showStatus("ยังไม่มีตอนที่อ่านจบให้ลบ", 3500); return; }
+  const okay = window.confirm(`ลบ ${finished.length.toLocaleString("th-TH")} ตอนที่อ่านจบแล้วออกจากเครื่อง?
+บุ๊กมาร์กและโน้ตยังอยู่ แต่ต้องนำเข้าไฟล์สำรองใหม่ถ้าจะอ่านตอนเหล่านี้ซ้ำ`);
+  if (!okay) return;
+  const db = await dbReady;
+  const tx = db.transaction(CHAPTERS, "readwrite");
+  for (const item of finished) tx.objectStore(CHAPTERS).delete(item.id);
+  await transactionDone(tx);
+  await refreshChapters();
+  showStatus(`ลบ ${finished.length.toLocaleString("th-TH")} ตอนที่อ่านจบแล้ว`, 4000);
+  await paintStorageUsage();
 }
 
 /* ---------- ไฮไลต์และโน้ตส่วนตัว ---------- */
@@ -2530,6 +2665,10 @@ function bindEvents() {
   byId("search").addEventListener("input", scheduleChapterRender);
   byId("search").addEventListener("input", scheduleContentSearch);
   byId("notes-open")?.addEventListener("click", openNotesSheet);
+  byId("glossary-open")?.addEventListener("click", () => { void openGlossary(); });
+  byId("glossary-search")?.addEventListener("input", () => { void paintGlossary(); });
+  byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
+  byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
   byId("note-highlight")?.addEventListener("click", () => addNote(""));
   byId("note-add")?.addEventListener("click", () => {
     const dialog = byId("note-dialog");
@@ -3066,6 +3205,8 @@ async function initialize() {
     if (Array.isArray(savedRecent)) state.recentChapters = savedRecent.filter(id => typeof id === "string");
     const savedNotes = await readSetting("notes", []);
     if (Array.isArray(savedNotes)) state.notes = savedNotes.filter(entry => entry && typeof entry.chapterId === "string" && typeof entry.text === "string" && entry.text.trim());
+    const savedStats = await readSetting("readStats", null);
+    if (savedStats && typeof savedStats === "object" && savedStats.days && typeof savedStats.days === "object") state.readStats = { days: savedStats.days };
     state.speechContinue = await readSetting("speechContinue", false) === true;
     byId("speech-continue").checked = state.speechContinue;
     const savedFolds = await readSetting("settingsFolds", null);
@@ -3109,10 +3250,17 @@ async function initialize() {
     byId("follow-toggle").checked = state.followEnabled;
     byId("remote-images-toggle").checked = state.loadRemoteImages;
     byId("wake-lock-toggle").checked = state.keepScreenAwake;
-    await refreshChapters(); bindEvents();
+    await refreshChapters(); bindEvents(); startReadingClock(); paintReadingStats();
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
+    // ทางลัดจากไอคอนแอป (manifest shortcuts): ?go=resume|recent|bookmarks
+    const go = new URLSearchParams(location.search).get("go");
+    if (go) {
+      history.replaceState(null, "", `${location.pathname}${location.hash}`);
+      if (go === "recent") openRecentChapter();
+      else if (go === "bookmarks") openBookmarkSheet();
+    }
     document.fonts?.ready.then(() => { if (isPageMode() && state.activeId) schedulePaginate(0); }).catch(() => {});
     if (state.theme === "rezero") await waitForCoverTiles();
     hideSplash();
