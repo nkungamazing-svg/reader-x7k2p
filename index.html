@@ -142,6 +142,28 @@
   <div id="page-progress" class="page-progress" aria-hidden="true"></div>
   <div id="page-footer" class="page-footer" aria-hidden="true"><span id="page-position">หน้า 1 / 1</span><span id="page-chapter-title" class="page-chapter-title"></span><span id="page-percent">0%</span></div>
   <div id="scroll-progress" class="scroll-progress" aria-hidden="true" hidden><i id="scroll-progress-fill"></i><span id="scroll-percent">0%</span></div>
+  <div id="note-tools" class="note-tools" role="toolbar" aria-label="ข้อความที่เลือก" hidden>
+    <button id="note-highlight" class="tool-button" type="button">ไฮไลต์</button>
+    <button id="note-add" class="tool-button" type="button">ไฮไลต์ + โน้ต</button>
+    <button id="note-cancel" class="icon-button" type="button" aria-label="ยกเลิกการเลือก">×</button>
+  </div>
+  <dialog id="note-dialog" class="bookmark-sheet note-dialog" aria-label="โน้ตของข้อความที่เลือก">
+    <h3>โน้ตของข้อความนี้</h3>
+    <p id="note-quote" class="settings-hint"></p>
+    <textarea id="note-text" rows="4" placeholder="พิมพ์โน้ต…"></textarea>
+    <div class="bookmark-sheet-actions">
+      <button id="note-save" class="tool-button" type="button">บันทึกโน้ต</button>
+      <button id="note-skip" class="tool-button" type="button">ไฮไลต์อย่างเดียว</button>
+    </div>
+  </dialog>
+  <dialog id="notes-sheet" class="bookmark-sheet notes-sheet" aria-label="ไฮไลต์และโน้ต">
+    <div class="bookmark-sheet-head">
+      <div><h3>ไฮไลต์และโน้ต</h3><p id="notes-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดรายการไฮไลต์และโน้ต">×</button></form>
+    </div>
+    <div id="notes-list" class="notes-list"></div>
+    <p id="notes-empty" class="settings-hint">ลากเลือกข้อความในหน้าอ่าน แล้วกด “ไฮไลต์” หรือ “ไฮไลต์ + โน้ต”</p>
+  </dialog>
   <dialog id="bookmark-sheet" class="bookmark-sheet" aria-label="บุ๊กมาร์กของตอนนี้">
     <div class="bookmark-sheet-head">
       <div>
@@ -222,6 +244,7 @@
         <label class="switch-row"><span>ไฮไลต์ย่อหน้าที่กำลังอ่าน</span><input id="highlight-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>เลื่อนจอตามเสียงอ่าน</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>ฟังจบตอนแล้วไปตอนถัดไปอัตโนมัติ</span><input id="speech-continue" type="checkbox"><i aria-hidden="true"></i></label>
+        <div class="setting-row"><span>ไฮไลต์และโน้ต</span><button id="notes-open" class="tool-button" type="button">เปิดรายการ</button><small class="setting-hint">ลากเลือกข้อความในหน้าอ่าน แล้วเลือก “ไฮไลต์” หรือ “ไฮไลต์ + โน้ต”</small></div>
         <label class="switch-row"><span>แตะข้อความเพื่ออ่านออกเสียง</span><input id="tap-speech-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>คำแนะนำการแตะจอ (ขึ้นครั้งแรก)</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </details>

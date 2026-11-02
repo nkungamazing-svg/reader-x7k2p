@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.3";
+const APP_VERSION = "1.13.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.4", note: "ลากเลือกข้อความเพื่อไฮไลต์และจดโน้ตส่วนตัว ดูรายการทั้งหมดและกระโดดกลับไปยังข้อความได้" },
   { version: "1.13.3", note: "ค้นข้อความในทุกบทแล้วกระโดดไปยังย่อหน้าที่พบ และฟังเสียงจบตอนแล้วไปตอนถัดไปอัตโนมัติ" },
   { version: "1.13.2", note: "หน้าตั้งค่าเปิดทุกหมวดไว้ให้เห็นตั้งแต่แรก และจำว่าย่อหมวดไหนไว้ ไม่ต้องไล่เปิดใหม่ทุกครั้ง" },
   { version: "1.13.1", note: "หมุดอัตโนมัติจำจุดที่อ่านค้างไว้ตอนออกจากแอป กลับมาแล้วอ่านต่อได้ทันที และย้ายปุ่มบุ๊กมาร์กไปแทนปุ่มซ่อนในแถบล่าง" },
@@ -150,7 +151,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -692,7 +693,7 @@ function bindUpdateBanner() {
 }
 
 /* ---------- ย้ายค่าตั้งข้ามเครื่อง: คัดลอก/วางเป็นข้อความสั้น ๆ ---------- */
-const SETTING_TRANSFER_KEYS = ["theme", "seasonalAuto", "launchStyle", "fontSize", "lineHeight", "textWidth", "pageTop", "readingMode", "indent", "highlightEnabled", "followEnabled", "fontFamily", "loadRemoteImages", "customTheme", "rezeroTheme", "lowPower", "nightDim", "nightAuto"];
+const SETTING_TRANSFER_KEYS = ["notes", "theme", "seasonalAuto", "launchStyle", "fontSize", "lineHeight", "textWidth", "pageTop", "readingMode", "indent", "highlightEnabled", "followEnabled", "fontFamily", "loadRemoteImages", "customTheme", "rezeroTheme", "lowPower", "nightDim", "nightAuto"];
 
 async function copySettings() {
   const data = {};
@@ -751,6 +752,152 @@ function bindSettingsTransfer() {
     event.preventDefault();
     openImageViewer(image.currentSrc || image.src, image.alt);
   });
+}
+
+/* ---------- ไฮไลต์และโน้ตส่วนตัว ---------- */
+function unwrapNoteMarks(content) {
+  for (const mark of content.querySelectorAll("mark.note-mark")) {
+    const parent = mark.parentNode;
+    if (!parent) continue;
+    while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
+function markTextOccurrence(root, needle, id) {
+  const query = String(needle || "").toLocaleLowerCase();
+  if (query.length < 2) return false;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const value = node.nodeValue || "";
+    const index = value.toLocaleLowerCase().indexOf(query);
+    if (index < 0) continue;
+    if (node.parentElement?.closest("mark.note-mark, script, style")) continue;
+    const range = document.createRange();
+    range.setStart(node, index);
+    range.setEnd(node, index + query.length);
+    const mark = document.createElement("mark");
+    mark.className = "note-mark";
+    mark.dataset.noteId = id;
+    try {
+      range.surroundContents(mark);
+    } catch {
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function applyNoteMarks(chapterId) {
+  const content = byId("reader-content");
+  if (!content) return;
+  unwrapNoteMarks(content);
+  for (const entry of state.notes) {
+    if (entry.chapterId !== chapterId) continue;
+    markTextOccurrence(content, entry.text, entry.id);
+  }
+}
+
+function updateNoteTools() {
+  const tools = byId("note-tools");
+  if (!tools) return;
+  const selection = window.getSelection();
+  const anchor = selection?.anchorNode;
+  const text = selection && !selection.isCollapsed ? selection.toString().replace(/\s+/gu, " ").trim() : "";
+  const inside = Boolean(anchor && byId("reader-content").contains(anchor));
+  if (!inside || text.length < 2 || text.length > 600) {
+    tools.hidden = true;
+    state.pendingSelection = "";
+    return;
+  }
+  state.pendingSelection = text;
+  tools.hidden = false;
+}
+
+function addNote(noteText = "") {
+  const text = state.pendingSelection;
+  if (!text || !state.activeId) return;
+  state.notes.unshift({ id: `nt-${Date.now().toString(36)}`, chapterId: state.activeId, text, note: String(noteText || "").trim(), at: Date.now() });
+  void writeSetting("notes", state.notes);
+  window.getSelection()?.removeAllRanges();
+  byId("note-tools").hidden = true;
+  state.pendingSelection = "";
+  applyNoteMarks(state.activeId);
+  paintNotesSheet();
+  showStatus(noteText ? "บันทึกไฮไลต์พร้อมโน้ตแล้ว" : "ไฮไลต์ข้อความแล้ว", 2800);
+}
+
+function removeNote(id) {
+  state.notes = state.notes.filter(entry => entry.id !== id);
+  void writeSetting("notes", state.notes);
+  byId("reader-content")?.querySelectorAll(`mark.note-mark[data-note-id="${id}"]`).forEach(mark => {
+    const parent = mark.parentNode;
+    if (!parent) return;
+    while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  });
+  paintNotesSheet();
+  showStatus("ลบรายการแล้ว", 2200);
+}
+
+async function openNoteAt(entry) {
+  byId("notes-sheet")?.close();
+  if (entry.chapterId !== state.activeId) await openChapter(entry.chapterId);
+  const mark = byId("reader-content")?.querySelector(`mark.note-mark[data-note-id="${entry.id}"]`);
+  if (!mark) { showStatus("ตำแหน่งไฮไลต์นี้ไม่พบในบทแล้ว", 3000); return; }
+  const block = mark.closest("[data-block-index]");
+  if (isPageMode() && block) {
+    const page = state.blockPages.get(Number(block.dataset.blockIndex));
+    if (Number.isFinite(page)) { setPage(page, { animate: false }); mark.classList.add("note-flash"); setTimeout(() => mark.classList.remove("note-flash"), 4000); return; }
+  }
+  mark.scrollIntoView({ block: "center", behavior: "smooth" });
+  mark.classList.add("note-flash");
+  setTimeout(() => mark.classList.remove("note-flash"), 4000);
+}
+
+function paintNotesSheet() {
+  const list = byId("notes-list");
+  if (!list) return;
+  list.replaceChildren();
+  const sub = byId("notes-sub");
+  const empty = byId("notes-empty");
+  const total = state.notes.length;
+  if (sub) sub.textContent = total ? `${total.toLocaleString("th-TH")} รายการ` : "ยังไม่มีรายการ";
+  if (empty) empty.hidden = total > 0;
+  for (const entry of state.notes) {
+    const chapter = state.chapters.find(item => item.id === entry.chapterId);
+    const row = document.createElement("div"); row.className = "note-row";
+    const quote = document.createElement("p"); quote.className = "note-quote"; quote.textContent = `“${entry.text}”`;
+    const meta = document.createElement("small"); meta.className = "note-meta"; meta.textContent = chapter ? normalizeTitle(chapter) : "ตอนที่ถูกลบแล้ว";
+    row.append(quote, meta);
+    if (entry.note) {
+      const body = document.createElement("p"); body.className = "note-body"; body.textContent = entry.note;
+      row.append(body);
+    }
+    const actions = document.createElement("div"); actions.className = "note-actions";
+    const go = document.createElement("button"); go.type = "button"; go.className = "tool-button";
+    go.textContent = "ไปที่ข้อความ"; go.setAttribute("aria-label", `ไปที่ไฮไลต์ใน ${meta.textContent}`);
+    go.disabled = !chapter;
+    go.addEventListener("click", () => { void openNoteAt(entry); });
+    const del = document.createElement("button"); del.type = "button"; del.className = "tool-button";
+    del.textContent = "ลบ"; del.setAttribute("aria-label", "ลบไฮไลต์นี้");
+    del.addEventListener("click", () => removeNote(entry.id));
+    actions.append(go, del);
+    row.append(actions);
+    list.append(row);
+  }
+}
+
+function openNotesSheet() {
+  const sheet = byId("notes-sheet");
+  if (!sheet) return;
+  paintNotesSheet();
+  if (typeof sheet.showModal === "function") sheet.showModal();
+  else sheet.setAttribute("open", "");
 }
 
 /* ---------- ค้นหาข้อความในทุกบท ---------- */
@@ -1552,6 +1699,7 @@ function renderChapterContent(item) {
   state.currentBlockIndex = -1;
   markSmallImages(content);
   decorateSpeakerLabels(content);
+  applyNoteMarks(item.id);
   for (const image of content.querySelectorAll("img")) {
     // Paged mode needs the real height before splitting pages; scroll mode keeps
     // images lazy so a long chapter does not download everything at once.
@@ -2381,6 +2529,26 @@ function bindEvents() {
   });
   byId("search").addEventListener("input", scheduleChapterRender);
   byId("search").addEventListener("input", scheduleContentSearch);
+  byId("notes-open")?.addEventListener("click", openNotesSheet);
+  byId("note-highlight")?.addEventListener("click", () => addNote(""));
+  byId("note-add")?.addEventListener("click", () => {
+    const dialog = byId("note-dialog");
+    byId("note-quote").textContent = `“${state.pendingSelection}”`;
+    byId("note-text").value = "";
+    byId("note-tools").hidden = true;
+    if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
+  });
+  byId("note-save")?.addEventListener("click", () => {
+    const value = byId("note-text").value.trim();
+    byId("note-dialog").close();
+    addNote(value);
+  });
+  byId("note-skip")?.addEventListener("click", () => { byId("note-dialog").close(); addNote(""); });
+  byId("note-cancel")?.addEventListener("click", () => { window.getSelection()?.removeAllRanges(); byId("note-tools").hidden = true; state.pendingSelection = ""; });
+  document.addEventListener("selectionchange", () => {
+    clearTimeout(state.selectionTimer);
+    state.selectionTimer = setTimeout(updateNoteTools, 220);
+  });
   byId("speech-continue")?.addEventListener("change", event => { state.speechContinue = event.target.checked; void writeSetting("speechContinue", state.speechContinue); });
   byId("sort").addEventListener("change", () => { renderChapterList(); updateChapterNavigation(); });
   byId("view-list").addEventListener("click", () => setChapterView("list"));
@@ -2896,6 +3064,8 @@ async function initialize() {
       .map(mark => ({ ...mark, ratio: Math.max(0, Math.min(1, Number(mark.ratio))) }));
     const savedRecent = await readSetting("recentChapters", []);
     if (Array.isArray(savedRecent)) state.recentChapters = savedRecent.filter(id => typeof id === "string");
+    const savedNotes = await readSetting("notes", []);
+    if (Array.isArray(savedNotes)) state.notes = savedNotes.filter(entry => entry && typeof entry.chapterId === "string" && typeof entry.text === "string" && entry.text.trim());
     state.speechContinue = await readSetting("speechContinue", false) === true;
     byId("speech-continue").checked = state.speechContinue;
     const savedFolds = await readSetting("settingsFolds", null);
