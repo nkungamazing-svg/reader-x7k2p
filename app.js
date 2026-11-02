@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.3";
+const APP_VERSION = "1.14.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.4", note: "แก้การ์ดตัวละครค้างข้อมูลคนก่อนหน้า: ล้างชื่อและรูปทุกครั้งที่เปิดการ์ดใหม่ และกันคำตอบวิกิรอบเก่ามาเขียนทับ พร้อมโหลดเรื่องย่อของชื่อใหม่อีกครั้ง" },
   { version: "1.14.3", note: "การ์ดตัวละครดีไซน์ใหม่: รูปโปรไฟล์ใหญ่มีวงแหวนสีค่าย ป้ายเผ่าพันธุ์–อาชีพใต้ชื่อ ปุ่มกลม 3 ปุ่ม และแท็บชีวประวัติ–ความสามารถ–ข้อมูลทั่วไปแบบการ์ด" },
   { version: "1.14.2", note: "การ์ดตัวละครเล็กลง: เรื่องย่อเอาแค่ย่อหน้าแรก ข้อมูลเหลือสังกัด–เผ่าพันธุ์–อายุ–สถานะ และความสามารถแสดงเป็นรายการสั้น ๆ" },
   { version: "1.14.1", note: "การ์ดตัวละครโฉมใหม่: สีตามค่าย รูปใหญ่กดซูมได้ ไอคอนลัด และแท็บข้อมูล–ความสามารถ–เรื่องย่อ" },
@@ -2484,12 +2485,15 @@ async function loadCharacterBrief() {
   if (!title) { panel.replaceChildren(characterPanelMessage("ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน")); return; }
   if (state.characterCardIntro || state.characterCardIntroThai) { renderCharacterBrief(); return; }
   const token = state.characterCardToken;
+  // กันผลลัพธ์รอบเก่ามาเขียนทับ เช่น กดคนใหม่หรือแก้ชื่อระหว่างรอวิกิ
+  const briefToken = (state.characterCardBriefToken || 0) + 1;
+  state.characterCardBriefToken = briefToken;
   panel.replaceChildren(characterPanelMessage("กำลังดึงเรื่องย่อจากวิกิ…"));
   try {
     const cache = (await readSetting("wikiCache", {})) || {};
     const cached = cache[title];
     const page = await fetchWikiPage(title);
-    if (token !== state.characterCardToken) return;
+    if (token !== state.characterCardToken || briefToken !== state.characterCardBriefToken) return;
     state.characterCardIntro = page.intro || cached?.extract || "";
     state.characterCardIntroThai = cached && cached.extract === state.characterCardIntro ? cached.thai || "" : "";
     if (!(state.characterCardFields || []).length && page.fields.length) {
@@ -2880,11 +2884,14 @@ async function applyCharacterName(title) {
   state.characterCardFields = [];
   state.characterCardIntro = "";
   state.characterCardIntroThai = "";
+  state.characterCardQuery = title;
+  state.characterCardWiki = title;
   const fields = await fetchCharacterFields(title);
+  if (byId("character-card").hidden || token !== state.characterCardToken) return;
   state.characterCardFields = fields;
   renderCharacterPanels();
-  renderCharacterBrief();
   applyCharacterFaction(null, fields);
+  void loadCharacterBrief();
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
 }
 
@@ -2902,6 +2909,10 @@ async function openCharacterCard(label) {
   state.characterCardFields = [];
   state.characterCardIntro = "";
   state.characterCardIntroThai = "";
+  // ล้างชื่อ/รูปของคนก่อนหน้า ไม่งั้นแท็บชีวประวัติจะดึงเรื่องย่อของคนเก่ามาแสดง
+  state.characterCardQuery = "";
+  state.characterCardWiki = "";
+  state.characterCardImage = "";
   renderCharacterPanels();
   renderCharacterTags([]);
   selectCharacterTab("wiki");
@@ -2912,6 +2923,7 @@ async function openCharacterCard(label) {
   state.characterCardQuery = query;
   state.characterCardThai = thai;
   state.characterCardWiki = query;
+  void loadCharacterBrief();
   const external = byId("character-card-external");
   if (external) {
     external.hidden = !query;
@@ -2936,6 +2948,7 @@ async function openCharacterCard(label) {
   state.characterCardFields = fields;
   renderCharacterPanels();
   applyCharacterFaction(portrait.entry, fields);
+  if (state.characterCardIntro || state.characterCardIntroThai) renderCharacterBrief();
   if (!image) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
