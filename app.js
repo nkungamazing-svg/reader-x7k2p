@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.1";
+const APP_VERSION = "1.13.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.2", note: "หน้าตั้งค่าเปิดทุกหมวดไว้ให้เห็นตั้งแต่แรก และจำว่าย่อหมวดไหนไว้ ไม่ต้องไล่เปิดใหม่ทุกครั้ง" },
   { version: "1.13.1", note: "หมุดอัตโนมัติจำจุดที่อ่านค้างไว้ตอนออกจากแอป กลับมาแล้วอ่านต่อได้ทันที และย้ายปุ่มบุ๊กมาร์กไปแทนปุ่มซ่อนในแถบล่าง" },
   { version: "1.12.8", note: "บุ๊กมาร์กหลายจุดต่อบท แตะรูปดูเต็มจอ ทางลัดสลับโหมด/ตอนล่าสุด ความคืบหน้าต่อบท และแนบค่าตั้งไปกับไฟล์สำรอง" },
   { version: "1.12.7", note: "หน้าตั้งค่าจัดเป็นหมวดพับได้ เหลือหัวข้อให้แตะทีละหมวด ปุ่มไม่รกอีก" },
@@ -148,7 +149,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -749,6 +750,26 @@ function bindSettingsTransfer() {
     event.preventDefault();
     openImageViewer(image.currentSrc || image.src, image.alt);
   });
+}
+
+/* ---------- หน้าตั้งค่า: เปิดทุกหมวดไว้ แล้วจำว่าผู้ใช้ย่อหมวดไหน ---------- */
+function bindSettingsFolds() {
+  const folds = [...document.querySelectorAll("#settings-sheet .settings-fold")];
+  for (const fold of folds) {
+    const key = fold.dataset.fold;
+    if (!key) continue;
+    // ครั้งแรกที่ยังไม่เคยเลือก: กางไว้ให้เห็นทุกหมวด ไม่ต้องมาไล่เปิดทีละอัน
+    fold.open = state.settingsFolds[key] !== false;
+  }
+  for (const fold of folds) {
+    const key = fold.dataset.fold;
+    if (!key) continue;
+    fold.addEventListener("toggle", () => {
+      state.settingsFolds[key] = fold.open;
+      clearTimeout(state.settingsFoldTimer);
+      state.settingsFoldTimer = setTimeout(() => { void writeSetting("settingsFolds", state.settingsFolds); }, 300);
+    });
+  }
 }
 
 /* ---------- บุ๊กมาร์กหลายจุดต่อบท ---------- */
@@ -2263,6 +2284,7 @@ function bindEvents() {
   bindLowPower();
   bindNightMode();
   bindSettingsTransfer();
+  bindSettingsFolds();
   bindUpdateBanner();
   for (const mode of THEME_MODES) byId(`theme-${mode}`).addEventListener("click", () => { applyTheme(mode); void writeSetting("theme", mode); });
   byId("launch-book").addEventListener("click", () => { applyLaunchStyle("book"); void writeSetting("launchStyle", state.launchStyle); });
@@ -2761,6 +2783,8 @@ async function initialize() {
       .map(mark => ({ ...mark, ratio: Math.max(0, Math.min(1, Number(mark.ratio))) }));
     const savedRecent = await readSetting("recentChapters", []);
     if (Array.isArray(savedRecent)) state.recentChapters = savedRecent.filter(id => typeof id === "string");
+    const savedFolds = await readSetting("settingsFolds", null);
+    if (savedFolds && typeof savedFolds === "object") state.settingsFolds = savedFolds;
     const savedAuto = await readSetting("autoBookmark", null);
     if (savedAuto && typeof savedAuto === "object" && typeof savedAuto.chapterId === "string" && Number.isFinite(Number(savedAuto.ratio))) state.autoBookmark = { ...savedAuto, ratio: Math.max(0, Math.min(1, Number(savedAuto.ratio))) };
     applyTheme(await readSetting("theme", "auto"));

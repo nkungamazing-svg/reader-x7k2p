@@ -164,7 +164,7 @@
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-heading"><h2 id="settings-title">ตั้งค่าการอ่าน</h2><button id="settings-close" class="icon-button" type="button" aria-label="ปิดการตั้งค่า">×</button></div>
     <div class="settings-groups">
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="font">
         <summary><h3>ตัวอักษร</h3></summary>
         <div class="type-preview" aria-hidden="true"><span class="type-preview-sample">กาลครั้งหนึ่งนานมาแล้ว มีเรื่องเล่าที่ถูกส่งต่อกันมา</span><span class="type-preview-note">ตัวอย่างฟอนต์ ขนาด และระยะบรรทัดที่จะใช้จริง</span></div>
         <div class="setting-row"><label for="font-family">ฟอนต์ข้อความ</label><select id="font-family"><option value="noto">Noto Sans Thai (มาตรฐาน)</option><option value="system">ฟอนต์ระบบ iOS</option><option value="sarabun">Sarabun (หัวกลม)</option><option value="noto-serif">Noto Serif Thai (มีเชิง)</option></select><small class="setting-hint">iPhone ไม่ให้เว็บติดตั้งฟอนต์เองได้ แอปจึงฝังฟอนต์ SIL OFL มาให้เลือก</small></div>
@@ -173,7 +173,7 @@
         <div class="setting-row text-width-row"><label for="text-width">ความกว้างข้อความ</label><div class="range-row"><input id="text-width" type="range" min="320" max="900" step="20" value="760"><output id="text-width-output">760px</output></div></div>
         <div class="setting-row page-top-row"><label for="page-top">ระยะขอบบน (กันติ่ง/กล้อง)</label><div class="range-row"><input id="page-top" type="range" min="0" max="90" step="2" value="0"><output id="page-top-output">0px</output></div><small class="setting-hint">ใช้เมื่อข้อความหรือแถบความคืบหน้าชนติ่ง/กล้องหน้าในโหมดพลิกหน้า</small></div>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="theme">
         <summary><h3>ธีม</h3></summary>
         <label class="switch-row"><span>🎉 เปิดธีมเทศกาลอัตโนมัติ</span><input id="seasonal-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <small id="seasonal-hint" class="setting-hint">เช็กช่วงเทศกาลให้เอง (ฮาโลวีน คริสต์มาส ปีใหม่ สงกรานต์)</small>
@@ -208,13 +208,13 @@
           <div class="theme-row"><button id="rezero-random" class="theme-choice" type="button">🎲 สุ่มชุดสี</button><button id="rezero-reset" class="theme-choice" type="button">↺ คืนค่าเดิม</button></div>
         </div>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="display">
         <summary><h3>จอและเอฟเฟกต์</h3></summary>
         <div class="setting-row"><span>อนิเมชันพื้นหลัง</span><div class="theme-row"><button id="lowpower-auto" class="theme-choice" type="button" aria-pressed="true">🔋 อัตโนมัติ</button><button id="lowpower-off" class="theme-choice" type="button" aria-pressed="false">⏸ หยุดตลอด</button></div><small class="setting-hint">อัตโนมัติ: แบตต่ำกว่า 20% และไม่ได้ชาร์จอยู่ แอปจะหยุดดาวตก หิมะ และเส้นแสงวิ่งให้เอง · หยุดตลอด: ประหยัดแบตที่สุด</small></div>
         <div class="setting-row"><label for="night-dim">หรี่จอกลางคืน</label><div class="range-row"><input id="night-dim" type="range" min="0" max="60" step="5" value="0"><output id="night-dim-output">0%</output></div><small class="setting-hint">ม่านดำบาง ๆ คลุมทั้งจอ ช่วยตอนอ่านในที่มืด ใช้ได้ทุกธีม (0% = ปิด)</small></div>
         <label class="switch-row"><span>🌙 สลับธีมหรี่เอง 22:00–06:00</span><input id="night-auto" type="checkbox"><i aria-hidden="true"></i></label>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="reading">
         <summary><h3>การอ่าน</h3></summary>
         <div class="setting-row"><span>โหมดการอ่าน</span><div class="theme-row"><button id="mode-page" class="theme-choice" type="button" aria-pressed="true">📖 พลิกหน้า</button><button id="mode-scroll" class="theme-choice" type="button" aria-pressed="false">📜 เลื่อนต่อเนื่อง</button></div><small class="setting-hint">โหมดพลิกหน้า: ปัดซ้าย/ขวาหรือแตะขอบจอเพื่อเปลี่ยนหน้า แตะกลางจอเพื่อซ่อนแถบเครื่องมือ</small></div>
         <label class="switch-row"><span>ย่อหน้าถอยร่นแบบหนังสือ</span><input id="indent-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
@@ -223,12 +223,12 @@
         <label class="switch-row"><span>แตะข้อความเพื่ออ่านออกเสียง</span><input id="tap-speech-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>คำแนะนำการแตะจอ (ขึ้นครั้งแรก)</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="voice">
         <summary><h3>เสียงอ่าน</h3></summary>
         <label class="setting-row" for="voice-select"><span>เสียงภาษาไทย</span><select id="voice-select"><option value="">กำลังค้นหาเสียง…</option></select><small class="setting-hint">รายการเสียงขึ้นกับเสียงที่ Safari เปิดให้เว็บใช้งาน อาจไม่แสดงเสียงที่ติดตั้งไว้ทั้งหมด</small></label>
         <div class="setting-row"><label for="rate">ความเร็วอ่าน</label><div class="range-row"><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value="1"><output id="rate-output">1×</output></div><small class="setting-hint">0.6× ช้า ถึง 1.6× เร็ว</small></div>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="sync">
         <summary><h3>ซิงก์กับต้นทาง</h3></summary>
         <label class="setting-row" for="sync-url"><span>ลิงก์ไฟล์สำรอง JSON</span>
           <input id="sync-url" class="search-input" type="url" inputmode="url" placeholder="https://…/backup.json" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -240,7 +240,7 @@
         </div>
         <label class="switch-row"><span>ซิงก์อัตโนมัติเมื่อเปิดแอป</span><input id="sync-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </details>
-      <details class="settings-group settings-fold">
+      <details class="settings-group settings-fold" data-fold="misc">
         <summary><h3>อื่น ๆ</h3></summary>
         <div class="setting-row"><span>หน้าเปิดแอป</span><div class="theme-row"><button id="launch-book" class="theme-choice" type="button" aria-pressed="true">📖 เปิดปกนิยาย</button><button id="launch-zoom" class="theme-choice" type="button" aria-pressed="false">🚀 ซูมแบบ X</button></div><small class="setting-hint">แบบปกนิยาย: ปกพลิกเปิดเข้าหาบทแรก · แบบซูม: โลโก้ขยายเต็มจอเหมือนเปิดแอป X</small></div>
         <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
