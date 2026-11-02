@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.7";
+const APP_VERSION = "1.13.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.8", note: "การ์ดตัวละครมีปุ่มเปิดหน้าวิกิ และแตะรูปเพื่อดูเต็มจอได้" },
   { version: "1.13.7", note: "หน้าตั้งค่าธีมมีตัวอย่างสีจริง จัดธีมเป็น 4 กลุ่ม และมีเครื่องหมายถูกที่ธีมที่ใช้อยู่ ชัดขึ้นทั้งธีมปกติและรี:ซีโร่" },
   { version: "1.13.6", note: "เปิดให้ลากเลือกข้อความในหน้าอ่านได้จริง เพื่อไฮไลต์และจดโน้ต โดยไม่ชนกับการแตะอ่านเสียงหรือการพลิกหน้า" },
   { version: "1.13.5", note: "ทางลัดจากไอคอนแอป สถิติการอ่านรายวัน คลังคำอ่าน/ชื่อตัวละคร และเครื่องมือดู–ลบพื้นที่เก็บข้อมูล" },
@@ -154,7 +155,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -1270,6 +1271,7 @@ function toggleBookmark() {
 function openImageViewer(src, alt = "") {
   const viewer = byId("image-viewer"), image = byId("image-viewer-img");
   if (!viewer || !image || !src) return;
+  image.referrerPolicy = "no-referrer";
   image.src = src;
   image.alt = alt || "รูปประกอบ";
   if (typeof viewer.showModal === "function") viewer.showModal();
@@ -2309,10 +2311,24 @@ function closeCharacterCard() {
 
 function setCharacterFigure(image, thai) {
   const figure = byId("character-card-figure");
+  const zoom = byId("character-card-zoom");
+  state.characterCardImage = image || "";
+  state.characterCardThai = thai || state.characterCardThai;
+  if (zoom) zoom.hidden = !image;
   if (!image) { figure.replaceChildren(); return; }
   const img = document.createElement("img");
   img.alt = thai; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = image;
+  img.classList.add("zoomable");
+  img.addEventListener("click", () => openImageViewer(image, thai));
   figure.replaceChildren(img);
+}
+
+/* เปิดหน้าวิกิของตัวละคร (Re:Zero Wiki) ในแท็บใหม่ */
+function openCharacterWiki() {
+  const name = state.characterCardWiki || state.characterCardQuery;
+  if (!name) { showStatus("ยังไม่รู้ชื่อภาษาอังกฤษของตัวละครนี้", 3000); return; }
+  const slug = encodeURIComponent(String(name).trim().replace(/\s+/gu, "_"));
+  window.open(`https://rezero.fandom.com/wiki/${slug}`, "_blank", "noopener,noreferrer");
 }
 
 async function applyCharacterName(title) {
@@ -2345,6 +2361,14 @@ async function openCharacterCard(label) {
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
   setCharacterTitle(query);
+  state.characterCardQuery = query;
+  state.characterCardThai = thai;
+  state.characterCardWiki = query;
+  const external = byId("character-card-external");
+  if (external) {
+    external.hidden = !query;
+    if (query) external.setAttribute("aria-label", `เปิดหน้าวิกิของ ${query}`);
+  }
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
@@ -2369,6 +2393,7 @@ async function openCharacterCard(label) {
     return;
   }
   setCharacterFigure(image, thai);
+  if (portrait.entry?.title) state.characterCardWiki = portrait.entry.title;
   byId("character-card-note").textContent = characterFactionLabel(portrait.entry);
   armCharacterCardTimer();
 }
@@ -2389,6 +2414,10 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
+  byId("character-card-external")?.addEventListener("click", openCharacterWiki);
+  byId("character-card-zoom")?.addEventListener("click", () => {
+    if (state.characterCardImage) openImageViewer(state.characterCardImage, state.characterCardThai);
+  });
   // ชื่อที่เคยจับคู่ไว้อาจพิมพ์ผิด แก้ทับได้โดยไม่ต้องล้างตารางชื่อทั้งไฟล์
   byId("character-card-edit").addEventListener("click", () => {
     const input = byId("character-card-input");

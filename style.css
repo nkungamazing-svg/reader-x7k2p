@@ -723,3 +723,9 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .custom-theme { border-radius:16px; }
 .custom-theme .custom-color { border-color:color-mix(in srgb,var(--accent) 22%,var(--line)); }
 .custom-theme .custom-color span { color:var(--muted); font-size:11.5px; font-weight:700; }
+
+/* ---------- การ์ดตัวละคร: เปิดวิกิ + ดูรูปเต็มจอ ---------- */
+.character-card-actions { display:flex; gap:8px; margin-top:8px; }
+.character-card-actions .tool-button { flex:1; min-height:44px; }
+.character-card-actions .tool-button[hidden] { display:none; }
+.character-card-figure img { cursor:zoom-in; }
