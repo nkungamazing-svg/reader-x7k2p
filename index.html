@@ -110,19 +110,16 @@
       <svg class="audio-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.6 4.4h8.9L19 7.9v11.7H6.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15.5 4.4v3.5H19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.6 12.2h6.2M9.6 15.6h4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span class="audio-label">โหมด</span>
     </button>
-    <button id="chrome-toggle" class="audio-button audio-chrome" type="button" aria-label="ซ่อนแถบเครื่องมือ" title="ซ่อนแถบเครื่องมือ">
-      <svg class="audio-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.4 9.6 12 15l5.6-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="audio-label">ซ่อน</span>
+    <button id="bookmark-open" class="audio-button audio-bookmark" type="button" aria-label="บุ๊กมาร์กของตอนนี้" title="บุ๊กมาร์กของตอนนี้">
+      <svg class="audio-icon bookmark-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.8h10a1.2 1.2 0 0 1 1.2 1.2v13.2L12 15.6l-6.2 3.6V6A1.2 1.2 0 0 1 7 4.8Z"/></svg>
+      <span class="audio-label">หมุด</span>
+      <span class="bookmark-count" id="bookmark-count" hidden></span>
     </button>
     <button id="settings-open" class="audio-button audio-settings" type="button" aria-label="ตั้งค่าการอ่าน" title="ตั้งค่าการอ่าน">
       <svg class="audio-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 4.6v2.2M12 17.2v2.2M4.6 12h2.2M17.2 12h2.2M6.8 6.8l1.6 1.6M15.6 15.6l1.6 1.6M17.2 6.8l-1.6 1.6M8.4 15.6l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span class="audio-label">ตั้งค่า</span>
     </button>
   </nav>
-  <button id="bookmark-open" class="bookmark-fab" type="button" aria-label="บุ๊กมาร์กของตอนนี้" title="บุ๊กมาร์กของตอนนี้">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="bookmark-icon"><path d="M7 4.8h10a1.2 1.2 0 0 1 1.2 1.2v13.2L12 15.6l-6.2 3.6V6A1.2 1.2 0 0 1 7 4.8Z"/></svg>
-    <span class="bookmark-fab-count" id="bookmark-count" hidden></span>
-  </button>
   <div id="character-card" class="character-card" role="dialog" aria-labelledby="character-card-name" hidden>
     <button id="character-card-close" class="character-card-close" type="button" aria-label="ปิดการ์ดตัวละคร">×</button>
     <button id="character-card-edit" class="character-card-edit" type="button" aria-label="แก้ชื่อภาษาอังกฤษที่จับคู่ไว้" title="แก้ชื่อที่จับคู่ไว้" hidden>✎</button>

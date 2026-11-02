@@ -5,11 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.9";
+const APP_VERSION = "1.13.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
-  { version: "1.12.9", note: "ปุ่มบุ๊กมาร์กลอยติดจอ เปิดแผงดู/ปักหมุดได้จากทุกตำแหน่งที่อ่าน พร้อมปุ่มกลับตอนล่าสุด" },
+  { version: "1.13.1", note: "หมุดอัตโนมัติจำจุดที่อ่านค้างไว้ตอนออกจากแอป กลับมาแล้วอ่านต่อได้ทันที และย้ายปุ่มบุ๊กมาร์กไปแทนปุ่มซ่อนในแถบล่าง" },
   { version: "1.12.8", note: "บุ๊กมาร์กหลายจุดต่อบท แตะรูปดูเต็มจอ ทางลัดสลับโหมด/ตอนล่าสุด ความคืบหน้าต่อบท และแนบค่าตั้งไปกับไฟล์สำรอง" },
   { version: "1.12.7", note: "หน้าตั้งค่าจัดเป็นหมวดพับได้ เหลือหัวข้อให้แตะทีละหมวด ปุ่มไม่รกอีก" },
   { version: "1.12.6", note: "แชร์ลิงก์ตอนที่อ่านอยู่ มีแถบแจ้งเมื่อมีเวอร์ชันใหม่ และคัดลอกค่าธีม/การอ่านไปใช้ในเครื่องอื่นได้" },
@@ -148,7 +148,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [] };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -739,6 +739,8 @@ function bindSettingsTransfer() {
   byId("bookmark-add")?.addEventListener("click", toggleBookmark);
   byId("bookmark-open")?.addEventListener("click", openBookmarkSheet);
   byId("recent-chapter")?.addEventListener("click", () => { byId("bookmark-sheet")?.close(); openRecentChapter(); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushReadingPosition(); });
+  window.addEventListener("pagehide", flushReadingPosition);
   const viewer = byId("image-viewer");
   viewer?.addEventListener("click", event => { if (event.target === viewer) viewer.close(); });
   byId("reader-content").addEventListener("click", event => {
@@ -766,12 +768,23 @@ function renderBookmarks() {
   const wrap = byId("reader-bookmarks");
   if (!wrap) return;
   const marks = state.activeId ? bookmarksFor(state.activeId) : [];
+  const auto = state.autoBookmark && state.autoBookmark.chapterId === state.activeId && state.autoBookmark.ratio > 0.02 ? state.autoBookmark : null;
   wrap.replaceChildren();
-  wrap.hidden = marks.length === 0;
+  if (auto) {
+    const percent = Math.round(auto.ratio * 100);
+    const row = document.createElement("div"); row.className = "bookmark-item auto";
+    const jump = document.createElement("button"); jump.type = "button"; jump.className = "bookmark-jump";
+    jump.textContent = `⏱ อ่านค้างไว้ ${percent}%`;
+    jump.setAttribute("aria-label", `อ่านต่อจากจุดที่ค้างไว้ ${percent}%`);
+    jump.addEventListener("click", () => jumpToRatio(auto.ratio));
+    row.append(jump);
+    wrap.append(row);
+  }
+  wrap.hidden = marks.length === 0 && !auto;
   const count = byId("bookmark-count");
   if (count) { count.textContent = String(marks.length); count.hidden = marks.length === 0; }
   const empty = byId("bookmark-empty");
-  if (empty) empty.hidden = marks.length > 0;
+  if (empty) empty.hidden = marks.length > 0 || Boolean(auto);
   byId("bookmark-open")?.setAttribute("aria-label", marks.length ? `บุ๊กมาร์กของตอนนี้ (${marks.length} จุด)` : "บุ๊กมาร์กของตอนนี้");
   for (const mark of marks) {
     const percent = Math.round(mark.ratio * 100);
@@ -787,6 +800,21 @@ function renderBookmarks() {
     row.append(jump, remove);
     wrap.append(row);
   }
+}
+
+/* ---------- หมุดอัตโนมัติ: จำจุดที่อ่านค้างไว้ตอนออกจากแอป ---------- */
+function rememberAutoBookmark() {
+  const item = activeChapter();
+  if (!item) return;
+  state.autoBookmark = { chapterId: item.id, ratio: readingRatio(), at: Date.now(), title: normalizeTitle(item) };
+  void writeSetting("autoBookmark", state.autoBookmark).catch(() => {});
+  paintBookmarkSheet();
+}
+
+function flushReadingPosition() {
+  if (!state.activeId) return;
+  void persistReadingPosition().catch(() => {});
+  rememberAutoBookmark();
 }
 
 function paintBookmarkSheet() {
@@ -1369,6 +1397,7 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
 }
 
 function closeReader() {
+  rememberAutoBookmark();
   document.body.classList.remove("reading");
   toggleChrome(true);
   stopSpeech(false); state.activeId = ""; updateScrollProgress(); byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
@@ -2298,7 +2327,6 @@ function bindEvents() {
   byId("font-family").addEventListener("change", event => setFontFamily(event.target.value));
   byId("tap-speech-toggle").addEventListener("change", event => setTapSpeech(event.target.checked));
   byId("tap-hint-toggle").addEventListener("change", event => setTapHint(event.target.checked));
-  byId("chrome-toggle").addEventListener("click", () => toggleChrome());
   installParagraphTapTargets();
   installCharacterCards();
   installPageGestures();
@@ -2369,7 +2397,6 @@ function applyReadingMode(mode, { persist = true, relayout = true } = {}) {
   modeToggle.setAttribute("aria-label", modeLabel);
   if (!state.activeId) toggleChrome(true);
   if (persist) void writeSetting("readingMode", state.mode);
-  updateChromeToggle();
   updateScrollProgress();
   if (!relayout || !state.activeId) return;
   toggleChrome(!page);
@@ -2531,7 +2558,6 @@ function toggleChrome(show, { auto = true } = {}) {
   document.body.classList.toggle("chrome-hidden", !shouldShow);
   clearTimeout(state.chromeTimer); state.chromeTimer = 0;
   if (shouldShow && auto) armChromeAutoHide();
-  updateChromeToggle();
 }
 
 function armChromeAutoHide(delay = CHROME_HIDE_MS) {
@@ -2572,14 +2598,6 @@ function installChromeAutoHide() {
     if (!event.target.closest?.(".app-header, .audio-bar, .page-footer")) return;
     armChromeAutoHide();
   }, { capture: true, passive: true });
-}
-
-function updateChromeToggle() {
-  const button = byId("chrome-toggle");
-  if (!button) return;
-  const label = document.body.classList.contains("chrome-hidden") ? "แสดงแถบเครื่องมือ" : "ซ่อนแถบเครื่องมือ";
-  button.setAttribute("aria-label", label);
-  button.title = label;
 }
 
 function installChromeRestore() {
@@ -2743,6 +2761,8 @@ async function initialize() {
       .map(mark => ({ ...mark, ratio: Math.max(0, Math.min(1, Number(mark.ratio))) }));
     const savedRecent = await readSetting("recentChapters", []);
     if (Array.isArray(savedRecent)) state.recentChapters = savedRecent.filter(id => typeof id === "string");
+    const savedAuto = await readSetting("autoBookmark", null);
+    if (savedAuto && typeof savedAuto === "object" && typeof savedAuto.chapterId === "string" && Number.isFinite(Number(savedAuto.ratio))) state.autoBookmark = { ...savedAuto, ratio: Math.max(0, Math.min(1, Number(savedAuto.ratio))) };
     applyTheme(await readSetting("theme", "auto"));
     buildHeaderSky();
     setInterval(() => { if (state.themeMode === "auto" && effectiveTheme() !== state.theme) applyTheme("auto"); }, 60000);
