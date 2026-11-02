@@ -729,3 +729,17 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .character-card-actions .tool-button { flex:1; min-height:44px; }
 .character-card-actions .tool-button[hidden] { display:none; }
 .character-card-figure img { cursor:zoom-in; }
+
+/* ---------- วิกิตัวละครในแอป ---------- */
+.wiki-sheet[open] { display:grid; gap:10px; max-height:86dvh; overflow-y:auto; }
+.wiki-hero { display:flex; align-items:center; gap:12px; padding:10px; border:1px solid var(--line); border-radius:14px; background:var(--surface-2); }
+.wiki-hero img { flex:none; width:84px; height:84px; border-radius:12px; object-fit:cover; object-position:top center; background:var(--surface); }
+.wiki-hero img[hidden] { display:none; }
+.wiki-hero-text { display:grid; gap:2px; min-width:0; }
+.wiki-hero-text strong { font-size:15px; }
+.wiki-fields { display:grid; grid-template-columns:auto 1fr; gap:6px 10px; margin:0; padding:10px; border:1px solid var(--line); border-radius:12px; background:color-mix(in srgb,var(--accent) 5%,var(--surface)); font-size:12px; }
+.wiki-fields[hidden] { display:none; }
+.wiki-fields dt { color:var(--muted); font-weight:700; }
+.wiki-fields dd { margin:0; color:var(--text); }
+.wiki-body { display:grid; gap:8px; max-height:42dvh; overflow-y:auto; font-size:13px; line-height:1.75; }
+.wiki-body p { margin:0; }

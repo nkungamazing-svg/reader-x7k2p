@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.8";
+const APP_VERSION = "1.13.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.9", note: "วิกิในแอป: ดึงข้อมูลย่อและกล่องข้อมูลตัวละครจาก Re:Zero Wiki มาแปลเป็นไทย พร้อมเก็บคำแปลไว้ใช้ซ้ำ" },
   { version: "1.13.8", note: "การ์ดตัวละครมีปุ่มเปิดหน้าวิกิ และแตะรูปเพื่อดูเต็มจอได้" },
   { version: "1.13.7", note: "หน้าตั้งค่าธีมมีตัวอย่างสีจริง จัดธีมเป็น 4 กลุ่ม และมีเครื่องหมายถูกที่ธีมที่ใช้อยู่ ชัดขึ้นทั้งธีมปกติและรี:ซีโร่" },
   { version: "1.13.6", note: "เปิดให้ลากเลือกข้อความในหน้าอ่านได้จริง เพื่อไฮไลต์และจดโน้ต โดยไม่ชนกับการแตะอ่านเสียงหรือการพลิกหน้า" },
@@ -155,7 +156,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", wikiTitle: "", wikiExtract: "", wikiThai: "", wikiFields: [], wikiShowThai: true, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -2323,6 +2324,192 @@ function setCharacterFigure(image, thai) {
   figure.replaceChildren(img);
 }
 
+/* ---------- วิกิในแอป: ดึงข้อมูลย่อ + กล่องข้อมูลจาก Re:Zero Wiki แล้วแปลไทย ---------- */
+const WIKI_FIELD_LABELS = { kanji: "ชื่อญี่ปุ่น", romaji: "โรมาจิ", race: "เผ่าพันธุ์", gender: "เพศ", age: "อายุ", birthday: "วันเกิด", height: "ส่วนสูง", weight: "น้ำหนัก", affiliation: "สังกัด", occupation: "อาชีพ", status: "สถานะ", relatives: "ญาติ", va: "นักพากย์", eye_color: "สีตา", hair_color: "สีผม", weapon: "อาวุธ", authority: "Authority" };
+const WIKI_API = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*";
+
+function cleanWikiMarkup(value) {
+  return String(value || "")
+    .replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "")
+    .replace(/<ref[^>]*\/>/gi, "")
+    .replace(/\{\{ruby\|([^|}]+)\|[^}]*\}\}/gi, "$1")
+    .replace(/\{\{[^}]*\}\}/g, "")
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2")
+    .replace(/\[\[([^\]]+)\]\]/g, "$1")
+    .replace(/'{2,}/g, "")
+    .replace(/\[https?:\/\/[^\s\]]+\s+([^\]]+)\]/g, "$1")
+    .replace(/\s+/gu, " ")
+    .trim();
+}
+
+function parseWikiInfobox(wikitext) {
+  const start = String(wikitext || "").indexOf("{{");
+  if (start < 0) return [];
+  const body = String(wikitext).slice(start, start + 6000);
+  const rows = [];
+  const seen = new Set();
+  const pattern = /\|\s*([a-z_]+)\s*=\s*([^\n|]*)/gi;
+  let match;
+  while ((match = pattern.exec(body))) {
+    const key = match[1].toLocaleLowerCase();
+    if (!WIKI_FIELD_LABELS[key] || seen.has(key)) continue;
+    const value = cleanWikiMarkup(match[2]);
+    if (!value) continue;
+    seen.add(key);
+    rows.push({ label: WIKI_FIELD_LABELS[key], value });
+    if (rows.length >= 8) break;
+  }
+  return rows;
+}
+
+async function fetchWikiExtract(title) {
+  const url = `${WIKI_API}&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}`;
+  const response = await fetch(url, { referrerPolicy: "no-referrer" });
+  if (!response.ok) throw new Error(`วิกิตอบ ${response.status}`);
+  const payload = await response.json();
+  const page = Object.values(payload?.query?.pages || {})[0] || {};
+  return String(page.extract || "").trim();
+}
+
+async function fetchWikiFields(title) {
+  const url = `https://rezero.fandom.com/api.php?action=parse&format=json&origin=*&prop=wikitext&section=0&page=${encodeURIComponent(title)}`;
+  const response = await fetch(url, { referrerPolicy: "no-referrer" });
+  if (!response.ok) return [];
+  const payload = await response.json();
+  return parseWikiInfobox(payload?.parse?.wikitext?.["*"] || "");
+}
+
+async function translateWikiText(text) {
+  const clean = String(text || "").replace(/\s+/gu, " ").trim();
+  if (!clean) return "";
+  const chunks = [];
+  let rest = clean;
+  while (rest.length && chunks.length < 6) {
+    let piece = rest.slice(0, 460);
+    if (rest.length > 460) {
+      const boundary = Math.max(piece.lastIndexOf(". "), piece.lastIndexOf("! "), piece.lastIndexOf("? "));
+      if (boundary > 120) piece = rest.slice(0, boundary + 1);
+    }
+    chunks.push(piece.trim());
+    rest = rest.slice(piece.length).trim();
+  }
+  const parts = [];
+  for (const chunk of chunks) {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=en%7Cth`;
+    const response = await fetch(url, { referrerPolicy: "no-referrer" });
+    if (!response.ok) throw new Error(`ตัวแปลตอบ ${response.status}`);
+    const payload = await response.json();
+    const translated = payload?.responseData?.translatedText;
+    if (!translated || /MYMEMORY WARNING|QUERY LENGTH LIMIT/i.test(translated)) throw new Error("โควตาการแปลหมดชั่วคราว");
+    parts.push(String(translated).trim());
+  }
+  return parts.join(" ");
+}
+
+function renderWikiBody() {
+  const body = byId("wiki-body");
+  if (!body) return;
+  const text = state.wikiShowThai && state.wikiThai ? state.wikiThai : state.wikiExtract;
+  body.replaceChildren();
+  if (text) {
+    for (const block of text.split(/\n{2,}/)) {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = block.replace(/\s+/gu, " ").trim();
+      if (paragraph.textContent) body.append(paragraph);
+    }
+  }
+  const toggle = byId("wiki-original");
+  if (toggle) {
+    toggle.hidden = !state.wikiThai;
+    toggle.textContent = state.wikiShowThai ? "ดูต้นฉบับ" : "กลับไปดูคำแปล";
+    toggle.setAttribute("aria-pressed", String(!state.wikiShowThai));
+  }
+}
+
+function applyWikiContent(extract, thai, fields) {
+  state.wikiExtract = extract || "";
+  state.wikiThai = thai || "";
+  state.wikiFields = Array.isArray(fields) ? fields : [];
+  const list = byId("wiki-fields");
+  if (list) {
+    list.replaceChildren();
+    for (const row of state.wikiFields) {
+      const term = document.createElement("dt"); term.textContent = row.label;
+      const detail = document.createElement("dd"); detail.textContent = row.value;
+      list.append(term, detail);
+    }
+    list.hidden = state.wikiFields.length === 0;
+  }
+  renderWikiBody();
+}
+
+async function runWikiTranslate() {
+  const status = byId("wiki-status");
+  const button = byId("wiki-translate");
+  if (!state.wikiExtract) return;
+  if (button) button.disabled = true;
+  if (status) status.textContent = "กำลังแปลเป็นไทย…";
+  try {
+    const thai = await translateWikiText(state.wikiExtract);
+    state.wikiShowThai = true;
+    applyWikiContent(state.wikiExtract, thai, state.wikiFields);
+    if (status) status.textContent = "ข้อมูลย่อจากวิกิ (แปลอัตโนมัติ)";
+    const credit = byId("wiki-credit");
+    if (credit) { credit.hidden = false; credit.textContent = "คำแปลจาก MyMemory ซึ่งเป็นบริการแปลฟรี อาจคลาดเคลื่อน · ข้อมูลต้นฉบับจาก Re:Zero Wiki"; }
+    const cache = (await readSetting("wikiCache", {})) || {};
+    cache[state.wikiTitle] = { extract: state.wikiExtract, thai, fields: state.wikiFields, at: Date.now() };
+    await writeSetting("wikiCache", cache);
+  } catch (error) {
+    if (status) status.textContent = `แปลอัตโนมัติไม่สำเร็จ (${error.message}) — แสดงต้นฉบับภาษาอังกฤษ`;
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function openWikiPanel() {
+  const sheet = byId("wiki-sheet");
+  if (!sheet) return;
+  const title = state.characterCardWiki || state.characterCardQuery;
+  if (!title) { showStatus("ยังไม่รู้ชื่อภาษาอังกฤษของตัวละครนี้ — แก้ชื่อในการ์ดก่อน", 4000); return; }
+  state.wikiTitle = title;
+  state.wikiShowThai = true;
+  byId("character-card").hidden = true;
+  byId("wiki-title").textContent = state.characterCardThai || title;
+  byId("wiki-name").textContent = state.characterCardThai || title;
+  byId("wiki-en").textContent = title;
+  const image = byId("wiki-image");
+  if (image) { image.hidden = !state.characterCardImage; if (state.characterCardImage) image.src = state.characterCardImage; }
+  const faction = byId("wiki-faction");
+  if (faction) {
+    const source = byId("character-card-faction");
+    const label = source?.textContent || "";
+    faction.hidden = Boolean(source?.hidden) || !label;
+    faction.textContent = label;
+  }
+  applyWikiContent("", "", []);
+  const credit = byId("wiki-credit"); if (credit) credit.hidden = true;
+  const status = byId("wiki-status"); if (status) status.textContent = "กำลังดึงข้อมูลจากวิกิ…";
+  const toggle = byId("wiki-original"); if (toggle) toggle.hidden = true;
+  if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
+
+  const cache = (await readSetting("wikiCache", {})) || {};
+  const cached = cache[title];
+  if (cached?.extract) {
+    applyWikiContent(cached.extract, cached.thai || "", cached.fields || []);
+    if (status) status.textContent = cached.thai ? "คำแปลที่บันทึกไว้" : "ข้อมูลย่อจากวิกิ";
+  }
+  try {
+    const [extract, fields] = await Promise.all([fetchWikiExtract(title), fetchWikiFields(title)]);
+    const same = Boolean(cached && cached.extract === extract);
+    const thai = same ? cached.thai || "" : "";
+    applyWikiContent(extract || cached?.extract || "", thai, fields.length ? fields : cached?.fields || []);
+    if (status) status.textContent = extract ? "ข้อมูลย่อจากวิกิ" : "ไม่พบข้อมูลย่อในวิกิ";
+    if (!thai && extract) void runWikiTranslate();
+  } catch (error) {
+    if (status) status.textContent = `ดึงข้อมูลไม่สำเร็จ (${error.message})`;
+  }
+}
+
 /* เปิดหน้าวิกิของตัวละคร (Re:Zero Wiki) ในแท็บใหม่ */
 function openCharacterWiki() {
   const name = state.characterCardWiki || state.characterCardQuery;
@@ -2414,7 +2601,10 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
-  byId("character-card-external")?.addEventListener("click", openCharacterWiki);
+  byId("character-card-external")?.addEventListener("click", () => { void openWikiPanel(); });
+  byId("wiki-translate")?.addEventListener("click", () => { state.wikiShowThai = true; void runWikiTranslate(); });
+  byId("wiki-original")?.addEventListener("click", () => { state.wikiShowThai = !state.wikiShowThai; renderWikiBody(); });
+  byId("wiki-external")?.addEventListener("click", openCharacterWiki);
   byId("character-card-zoom")?.addEventListener("click", () => {
     if (state.characterCardImage) openImageViewer(state.characterCardImage, state.characterCardThai);
   });

@@ -130,7 +130,7 @@
       <div class="character-card-body"><span class="character-card-line"><strong id="character-card-name"></strong><small id="character-card-title" class="character-card-en"></small></span><span class="character-card-line"><span id="character-card-faction" class="character-card-faction" hidden></span><small id="character-card-note"></small></span></div>
     </div>
     <div class="character-card-actions">
-      <button id="character-card-external" class="tool-button" type="button" hidden>เปิดในวิกิ</button>
+      <button id="character-card-external" class="tool-button" type="button" hidden>เปิดวิกิในแอป</button>
       <button id="character-card-zoom" class="tool-button" type="button" hidden>ดูรูปเต็มจอ</button>
     </div>
     <form id="character-card-form" class="character-card-form" hidden>
@@ -159,6 +159,29 @@
     <div class="bookmark-sheet-actions">
       <button id="note-save" class="tool-button" type="button">บันทึกโน้ต</button>
       <button id="note-skip" class="tool-button" type="button">ไฮไลต์อย่างเดียว</button>
+    </div>
+  </dialog>
+  <dialog id="wiki-sheet" class="bookmark-sheet wiki-sheet" aria-label="วิกิตัวละคร">
+    <div class="bookmark-sheet-head">
+      <div><h3 id="wiki-title">วิกิตัวละคร</h3><p id="wiki-sub" class="settings-hint">ดึงข้อมูลย่อจาก Re:Zero Wiki แล้วแปลเป็นไทยให้</p></div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดวิกิ">×</button></form>
+    </div>
+    <div class="wiki-hero">
+      <img id="wiki-image" alt="" width="84" height="84" referrerpolicy="no-referrer" hidden>
+      <div class="wiki-hero-text">
+        <strong id="wiki-name"></strong>
+        <small id="wiki-en" class="settings-hint"></small>
+        <span id="wiki-faction" class="character-card-faction" hidden></span>
+      </div>
+    </div>
+    <p id="wiki-status" class="settings-hint">กำลังดึงข้อมูลจากวิกิ…</p>
+    <dl id="wiki-fields" class="wiki-fields"></dl>
+    <div id="wiki-body" class="wiki-body"></div>
+    <p id="wiki-credit" class="settings-hint" hidden></p>
+    <div class="bookmark-sheet-actions">
+      <button id="wiki-translate" class="tool-button" type="button">แปลเป็นไทย</button>
+      <button id="wiki-original" class="tool-button" type="button" hidden>ดูต้นฉบับ</button>
+      <button id="wiki-external" class="tool-button" type="button">เปิดหน้าวิกิเต็ม</button>
     </div>
   </dialog>
   <dialog id="glossary-sheet" class="bookmark-sheet glossary-sheet" aria-label="คลังคำอ่านและชื่อตัวละคร">
