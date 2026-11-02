@@ -76,16 +76,10 @@
     <section class="reader-shell">
       <div id="welcome" class="welcome"><img src="icons/icon-512.png" alt="" width="92" height="92"><h2>อ่านบทแปลของคุณ</h2><p>เลือกไฟล์สำรอง JSON หรือซิงก์จากลิงก์ที่ส่วนขยายอัปโหลดขึ้นคลาวด์ให้ ข้อมูลจะถูกเก็บใน IndexedDB ของเบราว์เซอร์นี้</p><div class="welcome-actions"><button id="welcome-import" class="primary-button" type="button">เลือกไฟล์สำรอง</button><button id="welcome-sync" class="tool-button" type="button">ซิงก์จากลิงก์ต้นทาง</button></div></div>
       <article id="reader" class="reader" hidden>
-        <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><div class="reader-topbar-actions"><button id="bookmark-add" class="icon-button" type="button" aria-label="ปักหมุดตำแหน่งนี้" title="ปักหมุดตำแหน่งนี้"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="bookmark-icon"><path d="M7 4.8h10a1.2 1.2 0 0 1 1.2 1.2v13.2L12 15.6l-6.2 3.6V6A1.2 1.2 0 0 1 7 4.8Z"/></svg></button><button id="share-chapter" class="icon-button" type="button" aria-label="แชร์ลิงก์ตอนนี้" title="แชร์ลิงก์ตอนนี้"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="share-icon"><path d="M12 15.5V4.8M12 4.8 8.3 8.5M12 4.8l3.7 3.7M5.5 13.6v4.3a1.6 1.6 0 0 0 1.6 1.6h9.8a1.6 1.6 0 0 0 1.6-1.6v-4.3"/></svg></button><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div></div>
-        <div id="reader-bookmarks" class="reader-bookmarks" aria-label="บุ๊กมาร์กในตอนนี้" hidden></div>
+        <div class="reader-topbar"><div><div id="reader-novel" class="reader-novel"></div><h2 id="reader-title"></h2></div><div class="reader-topbar-actions"><button id="share-chapter" class="icon-button" type="button" aria-label="แชร์ลิงก์ตอนนี้" title="แชร์ลิงก์ตอนนี้"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="share-icon"><path d="M12 15.5V4.8M12 4.8 8.3 8.5M12 4.8l3.7 3.7M5.5 13.6v4.3a1.6 1.6 0 0 0 1.6 1.6h9.8a1.6 1.6 0 0 0 1.6-1.6v-4.3"/></svg></button><button id="reader-menu" class="icon-button" type="button" aria-label="กลับไปรายการตอน">☰</button></div></div>
         <div id="speech-notice" class="speech-notice" hidden></div>
         <div id="reading-viewport" class="reading-viewport">
           <div id="reader-content" class="reader-content"></div>
-        </div>
-        <div id="reader-shortcuts" class="reader-shortcuts">
-          <button id="quick-mode" class="tool-button" type="button">📖 สลับโหมด</button>
-          <button id="quick-recent" class="tool-button" type="button">↩ ตอนล่าสุด</button>
-          <span id="reader-progress" class="reader-progress">0%</span>
         </div>
         <nav id="chapter-navigation" class="chapter-navigation" aria-label="เปลี่ยนตอน">
           <button id="chapter-previous" class="chapter-nav-button" type="button">← ตอนก่อนหน้า</button>
@@ -125,6 +119,10 @@
       <span class="audio-label">ตั้งค่า</span>
     </button>
   </nav>
+  <button id="bookmark-open" class="bookmark-fab" type="button" aria-label="บุ๊กมาร์กของตอนนี้" title="บุ๊กมาร์กของตอนนี้">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="bookmark-icon"><path d="M7 4.8h10a1.2 1.2 0 0 1 1.2 1.2v13.2L12 15.6l-6.2 3.6V6A1.2 1.2 0 0 1 7 4.8Z"/></svg>
+    <span class="bookmark-fab-count" id="bookmark-count" hidden></span>
+  </button>
   <div id="character-card" class="character-card" role="dialog" aria-labelledby="character-card-name" hidden>
     <button id="character-card-close" class="character-card-close" type="button" aria-label="ปิดการ์ดตัวละคร">×</button>
     <button id="character-card-edit" class="character-card-edit" type="button" aria-label="แก้ชื่อภาษาอังกฤษที่จับคู่ไว้" title="แก้ชื่อที่จับคู่ไว้" hidden>✎</button>
@@ -146,6 +144,21 @@
   <div id="page-progress" class="page-progress" aria-hidden="true"></div>
   <div id="page-footer" class="page-footer" aria-hidden="true"><span id="page-position">หน้า 1 / 1</span><span id="page-chapter-title" class="page-chapter-title"></span><span id="page-percent">0%</span></div>
   <div id="scroll-progress" class="scroll-progress" aria-hidden="true" hidden><i id="scroll-progress-fill"></i><span id="scroll-percent">0%</span></div>
+  <dialog id="bookmark-sheet" class="bookmark-sheet" aria-label="บุ๊กมาร์กของตอนนี้">
+    <div class="bookmark-sheet-head">
+      <div>
+        <h3>บุ๊กมาร์ก</h3>
+        <p id="bookmark-sheet-sub" class="settings-hint">อ่านไป 0% ของตอนนี้</p>
+      </div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดรายการบุ๊กมาร์ก">×</button></form>
+    </div>
+    <div class="bookmark-sheet-actions">
+      <button id="bookmark-add" class="tool-button bookmark-pin" type="button">ปักหมุดตรงนี้</button>
+      <button id="recent-chapter" class="tool-button" type="button">↩ ตอนล่าสุด</button>
+    </div>
+    <div id="reader-bookmarks" class="reader-bookmarks" aria-label="บุ๊กมาร์กในตอนนี้"></div>
+    <p id="bookmark-empty" class="settings-hint">ยังไม่มีบุ๊กมาร์กในตอนนี้ เลื่อนไปจุดที่ต้องการแล้วกด “ปักหมุดตรงนี้”</p>
+  </dialog>
   <dialog id="image-viewer" class="image-viewer" aria-label="ดูรูปประกอบเต็มจอ">
     <form method="dialog" class="image-viewer-head"><button class="icon-button" value="cancel" aria-label="ปิดรูป">×</button></form>
     <img id="image-viewer-img" alt="">

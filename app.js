@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.12.8";
+const APP_VERSION = "1.12.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.12.9", note: "ปุ่มบุ๊กมาร์กลอยติดจอ เปิดแผงดู/ปักหมุดได้จากทุกตำแหน่งที่อ่าน พร้อมปุ่มกลับตอนล่าสุด" },
   { version: "1.12.8", note: "บุ๊กมาร์กหลายจุดต่อบท แตะรูปดูเต็มจอ ทางลัดสลับโหมด/ตอนล่าสุด ความคืบหน้าต่อบท และแนบค่าตั้งไปกับไฟล์สำรอง" },
   { version: "1.12.7", note: "หน้าตั้งค่าจัดเป็นหมวดพับได้ เหลือหัวข้อให้แตะทีละหมวด ปุ่มไม่รกอีก" },
   { version: "1.12.6", note: "แชร์ลิงก์ตอนที่อ่านอยู่ มีแถบแจ้งเมื่อมีเวอร์ชันใหม่ และคัดลอกค่าธีม/การอ่านไปใช้ในเครื่องอื่นได้" },
@@ -736,8 +737,8 @@ function bindSettingsTransfer() {
   byId("settings-paste")?.addEventListener("click", () => { void pasteSettings(); });
   byId("backup-export")?.addEventListener("click", () => { void exportBackup(); });
   byId("bookmark-add")?.addEventListener("click", toggleBookmark);
-  byId("quick-mode")?.addEventListener("click", toggleReadingModeQuick);
-  byId("quick-recent")?.addEventListener("click", openRecentChapter);
+  byId("bookmark-open")?.addEventListener("click", openBookmarkSheet);
+  byId("recent-chapter")?.addEventListener("click", () => { byId("bookmark-sheet")?.close(); openRecentChapter(); });
   const viewer = byId("image-viewer");
   viewer?.addEventListener("click", event => { if (event.target === viewer) viewer.close(); });
   byId("reader-content").addEventListener("click", event => {
@@ -754,6 +755,7 @@ function bookmarksFor(chapterId) {
 }
 
 function jumpToRatio(ratio) {
+  byId("bookmark-sheet")?.close();
   const value = Math.max(0, Math.min(1, Number(ratio) || 0));
   if (isPageMode()) setPage(Math.round(value * Math.max(0, state.pageTotal - 1)), { animate: false });
   else window.scrollTo({ top: value * Math.max(0, document.documentElement.scrollHeight - innerHeight), behavior: "smooth" });
@@ -766,6 +768,11 @@ function renderBookmarks() {
   const marks = state.activeId ? bookmarksFor(state.activeId) : [];
   wrap.replaceChildren();
   wrap.hidden = marks.length === 0;
+  const count = byId("bookmark-count");
+  if (count) { count.textContent = String(marks.length); count.hidden = marks.length === 0; }
+  const empty = byId("bookmark-empty");
+  if (empty) empty.hidden = marks.length > 0;
+  byId("bookmark-open")?.setAttribute("aria-label", marks.length ? `บุ๊กมาร์กของตอนนี้ (${marks.length} จุด)` : "บุ๊กมาร์กของตอนนี้");
   for (const mark of marks) {
     const percent = Math.round(mark.ratio * 100);
     const row = document.createElement("div"); row.className = "bookmark-item";
@@ -782,10 +789,28 @@ function renderBookmarks() {
   }
 }
 
+function paintBookmarkSheet() {
+  const percent = state.activeId ? Math.round(readingRatio() * 100) : 0;
+  const sub = byId("bookmark-sheet-sub");
+  if (sub) sub.textContent = state.activeId ? `อ่านไป ${percent}% ของตอนนี้` : "ยังไม่ได้เปิดตอน";
+  const pin = byId("bookmark-add");
+  if (pin) { pin.textContent = state.activeId ? `ปักหมุดตรงนี้ (${percent}%)` : "ปักหมุดตรงนี้"; pin.disabled = !state.activeId; }
+  renderBookmarks();
+}
+
+function openBookmarkSheet() {
+  const sheet = byId("bookmark-sheet");
+  if (!sheet) return;
+  if (!state.activeId) { showStatus("เปิดตอนก่อนแล้วค่อยปักหมุด", 3000); return; }
+  paintBookmarkSheet();
+  if (typeof sheet.showModal === "function") sheet.showModal();
+  else sheet.setAttribute("open", "");
+}
+
 function removeBookmark(id) {
   state.bookmarks = state.bookmarks.filter(mark => mark.id !== id);
   void writeSetting("bookmarks", state.bookmarks);
-  renderBookmarks();
+  paintBookmarkSheet();
   showStatus("ลบบุ๊กมาร์กแล้ว", 2200);
 }
 
@@ -797,7 +822,7 @@ function toggleBookmark() {
   if (near) { removeBookmark(near.id); return; }
   state.bookmarks.push({ id: `bm-${Date.now().toString(36)}`, chapterId: state.activeId, ratio, createdAt: Date.now() });
   void writeSetting("bookmarks", state.bookmarks);
-  renderBookmarks();
+  paintBookmarkSheet();
   showStatus(`ปักหมุดที่ ${Math.round(ratio * 100)}% แล้ว`, 2500);
 }
 
@@ -811,19 +836,7 @@ function openImageViewer(src, alt = "") {
   else viewer.setAttribute("open", "");
 }
 
-/* ---------- ทางลัดในหน้าอ่าน: ความคืบหน้า สลับโหมด กลับตอนล่าสุด ---------- */
-function paintReaderProgress() {
-  const label = byId("reader-progress");
-  if (!label) return;
-  label.textContent = state.activeId ? `${Math.round(readingRatio() * 100)}%` : "0%";
-}
-
-function toggleReadingModeQuick() {
-  const next = isPageMode() ? "scroll" : "page";
-  applyReadingMode(next);
-  showStatus(next === "page" ? "เปลี่ยนเป็นโหมดพลิกหน้าแล้ว" : "เปลี่ยนเป็นโหมดเลื่อนต่อเนื่องแล้ว", 2200);
-}
-
+/* ---------- ทางลัดในหน้าอ่าน: กลับไปตอนที่เพิ่งอ่าน ---------- */
 function openRecentChapter() {
   const other = state.recentChapters.find(id => id !== state.activeId && state.chapters.some(item => item.id === id));
   if (!other) { showStatus("ยังไม่มีตอนอื่นที่เปิดล่าสุด", 3000); return; }
@@ -1352,8 +1365,7 @@ async function openChapter(id, { scrollToTop = false, toEnd = false } = {}) {
   renderChapterList();
   history.replaceState(null, "", `#chapter=${encodeURIComponent(id)}`);
   updateScrollProgress();
-  renderBookmarks();
-  paintReaderProgress();
+  paintBookmarkSheet();
 }
 
 function closeReader() {
@@ -2339,7 +2351,6 @@ function updateScrollProgress() {
   const ratio = readingRatio();
   byId("scroll-progress-fill").style.width = `${(ratio * 100).toFixed(2)}%`;
   byId("scroll-percent").textContent = `${Math.round(ratio * 100)}%`;
-  paintReaderProgress();
   bar.classList.add("show");
   clearTimeout(state.scrollProgressTimer);
   state.scrollProgressTimer = setTimeout(() => bar.classList.remove("show"), 1100);
@@ -2449,7 +2460,6 @@ function setPage(index, { animate = true } = {}) {
   content.style.transform = `translate3d(${-target * step}px,0,0)`;
   if (!animate) void content.offsetWidth;
   updatePageFooter();
-  paintReaderProgress();
   scheduleSavePage();
 }
 
