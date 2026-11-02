@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.6";
+const APP_VERSION = "1.13.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.13.7", note: "หน้าตั้งค่าธีมมีตัวอย่างสีจริง จัดธีมเป็น 4 กลุ่ม และมีเครื่องหมายถูกที่ธีมที่ใช้อยู่ ชัดขึ้นทั้งธีมปกติและรี:ซีโร่" },
   { version: "1.13.6", note: "เปิดให้ลากเลือกข้อความในหน้าอ่านได้จริง เพื่อไฮไลต์และจดโน้ต โดยไม่ชนกับการแตะอ่านเสียงหรือการพลิกหน้า" },
   { version: "1.13.5", note: "ทางลัดจากไอคอนแอป สถิติการอ่านรายวัน คลังคำอ่าน/ชื่อตัวละคร และเครื่องมือดู–ลบพื้นที่เก็บข้อมูล" },
   { version: "1.13.4", note: "ลากเลือกข้อความเพื่อไฮไลต์และจดโน้ตส่วนตัว ดูรายการทั้งหมดและกระโดดกลับไปยังข้อความได้" },
@@ -1366,6 +1367,7 @@ function applyTheme(selection = "auto") {
   state.theme = effectiveTheme();
   document.documentElement.dataset.theme = state.theme;
   for (const mode of THEME_MODES) byId(`theme-${mode}`)?.setAttribute("aria-pressed", String(state.themeMode === mode));
+  paintThemePreview();
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[state.theme] || "#222631");
   applyCustomTheme();
   applyRezeroTheme();
@@ -1374,6 +1376,14 @@ function applyTheme(selection = "auto") {
   startAmbient(state.theme);
   applyLowPower();
   void syncRezeroCover();
+}
+
+/* การ์ดตัวอย่างธีมในหน้าตั้งค่า: ใช้ตัวแปรสีจริงของธีมที่กำลังใช้อยู่ */
+function paintThemePreview() {
+  const name = byId("theme-preview-name");
+  if (!name) return;
+  const label = byId(`theme-${state.theme}`)?.textContent?.trim() || "";
+  name.textContent = state.themeMode === "auto" ? `อัตโนมัติ${label ? ` · ${label}` : ""}` : label || "ตัวอย่างธีม";
 }
 
 /* ไอคอนแอปแยกตามธีม (สร้างจาก tools/build-theme-icons.py) ใช้ทั้งหน้าเปิดและหัวเว็บ */
