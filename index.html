@@ -65,6 +65,7 @@
         </div></div>
         <label class="search-label" for="search">ค้นหาชื่อเรื่องหรือตอน</label>
         <input id="search" class="search-input" type="search" placeholder="พิมพ์เพื่อค้นหา…" autocomplete="off">
+        <div id="content-results" class="content-results" aria-label="ผลค้นหาในเนื้อหา" aria-live="polite" hidden></div>
         <label class="sort-label" for="sort">เรียงตาม</label>
         <select id="sort" class="select-input"><option value="asc">Arc / ตอน · เก่าไปใหม่</option><option value="desc">Arc / ตอน · ใหม่ไปเก่า</option><option value="recent">บันทึกล่าสุด</option></select>
         <div id="grid-columns" class="grid-columns" hidden><span>คอลัมน์</span><button id="cols-2" class="cols-button" type="button" aria-pressed="true" aria-label="สองคอลัมน์">2</button><button id="cols-4" class="cols-button" type="button" aria-pressed="false" aria-label="สี่คอลัมน์">4</button><button id="cols-6" class="cols-button" type="button" aria-pressed="false" aria-label="หกคอลัมน์">6</button></div>
@@ -220,6 +221,7 @@
         <label class="switch-row"><span>ย่อหน้าถอยร่นแบบหนังสือ</span><input id="indent-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>ไฮไลต์ย่อหน้าที่กำลังอ่าน</span><input id="highlight-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>เลื่อนจอตามเสียงอ่าน</span><input id="follow-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
+        <label class="switch-row"><span>ฟังจบตอนแล้วไปตอนถัดไปอัตโนมัติ</span><input id="speech-continue" type="checkbox"><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>แตะข้อความเพื่ออ่านออกเสียง</span><input id="tap-speech-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>คำแนะนำการแตะจอ (ขึ้นครั้งแรก)</span><input id="tap-hint-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
       </details>

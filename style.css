@@ -662,3 +662,13 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .bookmark-count[hidden] { display:none; }
 .bookmark-item.auto { border-style:dashed; background:color-mix(in srgb,var(--accent) 6%,var(--surface)); }
 .bookmark-item.auto .bookmark-jump { color:var(--accent-strong); }
+
+/* ---------- ค้นหาข้อความในทุกบท ---------- */
+.content-results { display:grid; gap:6px; max-height:44dvh; margin:8px 0 4px; padding:8px; overflow-y:auto; border:1px solid color-mix(in srgb,var(--accent) 26%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--accent) 5%,var(--surface)); }
+.content-results[hidden] { display:none; }
+.content-results-head { margin:0 0 2px; color:var(--accent-strong); font-size:11.5px; font-weight:800; }
+.content-hit { display:grid; gap:2px; width:100%; min-height:44px; padding:8px 10px; border:1px solid transparent; border-radius:10px; background:var(--surface); color:var(--text); text-align:left; }
+.content-hit strong { font-size:12.5px; }
+.content-hit small { color:var(--accent-strong); font-size:11px; font-weight:700; }
+.content-hit-snippet { overflow:hidden; color:var(--muted); font-size:11.5px; line-height:1.5; text-overflow:ellipsis; }
+.reader-content .search-hit { border-radius:8px; background:color-mix(in srgb,#ffe27a 22%,transparent); box-shadow:0 0 0 3px color-mix(in srgb,#ffe27a 16%,transparent); }
