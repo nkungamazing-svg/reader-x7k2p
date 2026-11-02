@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.1";
+const APP_VERSION = "1.14.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.2", note: "การ์ดตัวละครเล็กลง: เรื่องย่อเอาแค่ย่อหน้าแรก ข้อมูลเหลือสังกัด–เผ่าพันธุ์–อายุ–สถานะ และความสามารถแสดงเป็นรายการสั้น ๆ" },
   { version: "1.14.1", note: "การ์ดตัวละครโฉมใหม่: สีตามค่าย รูปใหญ่กดซูมได้ ไอคอนลัด และแท็บข้อมูล–ความสามารถ–เรื่องย่อ" },
   { version: "1.14.0", note: "แก้การดึงข้อมูลวิกิ (Fandom ไม่มี prop=extracts) ให้อ่านย่อหน้าจากหน้าเพจจริง แล้วแปลไทยได้ครบ" },
   { version: "1.13.9", note: "วิกิในแอป: ดึงข้อมูลย่อและกล่องข้อมูลตัวละครจาก Re:Zero Wiki มาแปลเป็นไทย พร้อมเก็บคำแปลไว้ใช้ซ้ำ" },
@@ -2262,8 +2263,57 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
 }
 
 /* ---------- แผงข้อมูล/ความสามารถ/เรื่องย่อ ในการ์ดตัวละคร ---------- */
-const CHARACTER_INFO_FIELDS = ["ชื่อญี่ปุ่น", "โรมาจิ", "เผ่าพันธุ์", "เพศ", "อายุ", "วันเกิด", "ส่วนสูง", "สถานะ", "สังกัด", "อาชีพ"];
-const CHARACTER_POWER_FIELDS = ["เวทมนตร์", "พรจากเทพ", "Authority", "อาวุธ", "อุปกรณ์", "นามแฝง", "ชื่อเล่น"];
+/* การ์ดตัวละครแสดงแค่ข้อมูลหลัก 4 ช่อง ไม่ยกกล่องข้อมูลทั้งอันมาให้รก */
+const CHARACTER_INFO_FIELDS = ["สังกัด", "เผ่าพันธุ์", "อายุ", "สถานะ"];
+const CHARACTER_POWER_FIELDS = ["Authority", "เวทมนตร์", "พรจากเทพ"];
+
+/* คำง่าย ๆ ที่วิกิเขียนเป็นอังกฤษ แปลให้อ่านไทยได้ทันที */
+const WIKI_VALUE_THAI = {
+  human: "มนุษย์ (Human)", elf: "เอลฟ์ (Elf)", "half elf": "ครึ่งเอลฟ์ (Half-Elf)", "half-elf": "ครึ่งเอลฟ์ (Half-Elf)",
+  oni: "โอนิ (Oni)", "half oni": "ครึ่งโอนิ (Half-Oni)", beastman: "มนุษย์สัตว์ (Beastman)",
+  spirit: "วิญญาณ (Spirit)", dragon: "มังกร (Dragon)", demon: "ปีศาจ (Demon)",
+  alive: "มีชีวิต (Alive)", deceased: "เสียชีวิต (Deceased)", dead: "เสียชีวิต (Dead)", unknown: "ไม่ทราบ (Unknown)"
+};
+
+function wikiShortItem(value) {
+  return String(value || "")
+    .replace(/\s*\([^()]*\)/gu, "")
+    .replace(/\s+/gu, " ")
+    .trim()
+    .slice(0, 48)
+    .trim();
+}
+
+/* ความสามารถ = ชื่อเวท/พร/Authority ทีละรายการ ไม่เอาคำอธิบายยาว ๆ มาทั้งบรรทัด */
+function characterAbilities(fields = []) {
+  const list = [];
+  for (const label of CHARACTER_POWER_FIELDS) {
+    const row = fields.find(item => item.label === label);
+    if (!row) continue;
+    for (const raw of (row.items && row.items.length ? row.items : [row.value])) {
+      const text = wikiShortItem(raw);
+      if (!text || text.length < 3 || list.includes(text)) continue;
+      list.push(text);
+    }
+  }
+  return list.slice(0, 6);
+}
+
+function characterInfoValue(label, row, fields) {
+  const items = row.items && row.items.length ? row.items : [row.value];
+  if (label === "สังกัด") {
+    const camp = characterCamp(fields);
+    if (camp) return camp.label;
+    return items.slice(0, 2).join(" · ");
+  }
+  if (label === "อายุ") {
+    const numbers = (String(row.value || "").match(/\d+/g) || []).map(Number);
+    if (numbers.length) return `${Math.max(...numbers)} ปี`;
+  }
+  const simple = WIKI_VALUE_THAI[String(row.value || "").trim().toLocaleLowerCase()];
+  if (simple) return simple;
+  return items.slice(0, 2).join(" · ");
+}
 
 function characterRow(label, value) {
   const row = document.createElement("div");
@@ -2284,18 +2334,35 @@ function characterPanelMessage(text) {
 
 function renderCharacterPanels() {
   const fields = state.characterCardFields || [];
-  const fill = (panelId, labels, emptyText) => {
-    const panel = byId(panelId);
-    if (!panel) return;
-    panel.replaceChildren();
-    const rows = labels.map(label => fields.find(row => row.label === label)).filter(Boolean);
-    if (!rows.length) { panel.append(characterPanelMessage(emptyText)); return; }
-    for (const row of rows) panel.append(characterRow(row.label, row.value));
-  };
-  fill("cc-panel-info", CHARACTER_INFO_FIELDS, state.characterCardTitle
-    ? "วิกิไม่มีช่องข้อมูลพื้นฐานของตัวละครนี้"
-    : "ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน");
-  fill("cc-panel-power", CHARACTER_POWER_FIELDS, "วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้");
+  const infoPanel = byId("cc-panel-info");
+  if (infoPanel) {
+    infoPanel.replaceChildren();
+    const rows = CHARACTER_INFO_FIELDS.map(label => fields.find(row => row.label === label)).filter(Boolean);
+    if (!rows.length) {
+      infoPanel.append(characterPanelMessage(state.characterCardTitle
+        ? "วิกิไม่มีช่องข้อมูลพื้นฐานของตัวละครนี้"
+        : "ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน"));
+    } else {
+      for (const row of rows) infoPanel.append(characterRow(row.label, characterInfoValue(row.label, row, fields)));
+    }
+  }
+  const powerPanel = byId("cc-panel-power");
+  if (powerPanel) {
+    powerPanel.replaceChildren();
+    const abilities = characterAbilities(fields);
+    if (!abilities.length) {
+      powerPanel.append(characterPanelMessage("วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้"));
+    } else {
+      const list = document.createElement("ul");
+      list.className = "cc-list";
+      for (const ability of abilities) {
+        const item = document.createElement("li");
+        item.textContent = ability;
+        list.append(item);
+      }
+      powerPanel.append(list);
+    }
+  }
 }
 
 function renderCharacterBrief() {
@@ -2472,23 +2539,44 @@ const WIKI_FIELD_LABELS = { name: "ชื่อ", kanji: "ชื่อญี่�
 
 function cleanWikiMarkup(value) {
   return String(value || "")
+    .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "")
     .replace(/<ref[^>]*\/>/gi, "")
+    .replace(/<gallery[\s\S]*?<\/gallery>/gi, "")
+    .replace(/<br\s*\/?>|<\/?(?:p|hr|div|li)\s*\/?>/gi, " · ")
+    .replace(/<[^>]+>/g, "")
     .replace(/\{\{ruby\|([^|}]+)\|[^}]*\}\}/gi, "$1")
-    .replace(/\{\{[^}]*\}\}/g, "")
+    .replace(/\{\{[^{}]*\}\}/g, "")
+    .replace(/\{\{[^{}]*\}\}/g, "")
+    .replace(/\{\{[^{}]*$/g, "")
     .replace(/\[\[(?:File|Image):[^\]]*\]\]/gi, "")
     .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2")
     .replace(/\[\[([^\]]+)\]\]/g, "$1")
     .replace(/'{2,}/g, "")
     .replace(/\[https?:\/\/[^\s\]]+\s+([^\]]+)\]/g, "$1")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/(?:\s*·\s*)+/gu, " · ")
+    .replace(/^[\s·{}]+|[\s·{}]+$/gu, "")
     .replace(/\s+/gu, " ")
     .trim();
+}
+
+/* แยกค่าในกล่องข้อมูลออกเป็นรายการ ๆ ตาม <br> เพื่อใช้แสดงแบบสั้น ๆ */
+function wikiValueItems(raw) {
+  return String(raw || "")
+    .split(/<br\s*\/?>|\n/gi)
+    .map(part => cleanWikiMarkup(part))
+    .filter(Boolean);
 }
 
 function parseWikiInfobox(wikitext) {
   const rows = [];
   const seen = new Set();
-  const pattern = /^\s*\|\s*([^=|\n]+?)\s*=\s*([^\n]*)$/gmu;
+  // ห้ามใช้ \s*  вокруг “=” เพราะมันจะกินขึ้นบรรทัดใหม่ แล้วดึงค่าของช่องถัดไปมาใส่ช่องที่ว่าง
+  const pattern = /^[ \t]*\|[ \t]*([^=|\n]+?)[ \t]*=[ \t]*([^\n]*)$/gmu;
   let match;
   while ((match = pattern.exec(String(wikitext || "")))) {
     const key = match[1].trim().toLocaleLowerCase().replace(/\s+/gu, "_");
@@ -2497,8 +2585,8 @@ function parseWikiInfobox(wikitext) {
     const value = cleanWikiMarkup(match[2]).slice(0, 160);
     if (!value) continue;
     seen.add(key);
-    rows.push({ label, value });
-    if (rows.length >= 10) break;
+    rows.push({ label, value, items: wikiValueItems(match[2]).slice(0, 12) });
+    if (rows.length >= 30) break;
   }
   return rows;
 }
@@ -2521,7 +2609,8 @@ async function fetchWikiPage(title) {
       .map(element => String(element.textContent || "").replace(/\s+/gu, " ").trim())
       // เนื้อเรื่องจริงเป็นย่อหน้ายาว ส่วนที่สั้นกว่านี้มักเป็นเศษจากกล่องข้อมูล
       .filter(text => text.length >= 150 && !/^(This page is about|For the )/i.test(text));
-    intro = paragraphs.slice(0, 3).join("\n\n");
+    // เอาแค่ย่อหน้าแรกพอ — ย่อหน้าเยอะกว่านี้อ่านไม่ไหวในการ์ด
+    intro = paragraphs.slice(0, 1).join("\n\n");
   }
   return { intro, fields, title: parse.title || title };
 }

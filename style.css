@@ -795,6 +795,9 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .cc-key { flex:none; color:var(--muted); font-size:11.5px; font-weight:700; }
 .cc-value { flex:1 1 auto; text-align:right; color:var(--text); line-height:1.5; overflow-wrap:anywhere; }
 .cc-empty { margin:0; padding:4px 2px; color:var(--muted); font-size:12px; line-height:1.65; }
+.cc-list { margin:0; padding:0; list-style:none; display:grid; gap:6px; }
+.cc-list li { position:relative; padding:8px 10px 8px 24px; border-radius:12px; background:color-mix(in srgb,var(--character-color,var(--accent)) 12%,transparent); color:var(--text); font-size:12.5px; line-height:1.5; overflow-wrap:anywhere; }
+.cc-list li::before { content:"•"; position:absolute; left:9px; color:color-mix(in srgb,var(--character-color,var(--accent)) 80%,var(--text)); font-weight:700; }
 .cc-link { justify-self:start; min-height:44px; margin-top:8px; padding:8px 14px; border:1px solid color-mix(in srgb,var(--character-color,var(--accent)) 45%,var(--line)); border-radius:999px; background:transparent; color:var(--text); font-size:12px; font-weight:700; }
 @media(max-width:360px) {
   .character-card { padding:12px; border-radius:20px; }
