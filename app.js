@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.13.9";
+const APP_VERSION = "1.14.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.0", note: "แก้การดึงข้อมูลวิกิ (Fandom ไม่มี prop=extracts) ให้อ่านย่อหน้าจากหน้าเพจจริง แล้วแปลไทยได้ครบ" },
   { version: "1.13.9", note: "วิกิในแอป: ดึงข้อมูลย่อและกล่องข้อมูลตัวละครจาก Re:Zero Wiki มาแปลเป็นไทย พร้อมเก็บคำแปลไว้ใช้ซ้ำ" },
   { version: "1.13.8", note: "การ์ดตัวละครมีปุ่มเปิดหน้าวิกิ และแตะรูปเพื่อดูเต็มจอได้" },
   { version: "1.13.7", note: "หน้าตั้งค่าธีมมีตัวอย่างสีจริง จัดธีมเป็น 4 กลุ่ม และมีเครื่องหมายถูกที่ธีมที่ใช้อยู่ ชัดขึ้นทั้งธีมปกติและรี:ซีโร่" },
@@ -2325,8 +2326,7 @@ function setCharacterFigure(image, thai) {
 }
 
 /* ---------- วิกิในแอป: ดึงข้อมูลย่อ + กล่องข้อมูลจาก Re:Zero Wiki แล้วแปลไทย ---------- */
-const WIKI_FIELD_LABELS = { kanji: "ชื่อญี่ปุ่น", romaji: "โรมาจิ", race: "เผ่าพันธุ์", gender: "เพศ", age: "อายุ", birthday: "วันเกิด", height: "ส่วนสูง", weight: "น้ำหนัก", affiliation: "สังกัด", occupation: "อาชีพ", status: "สถานะ", relatives: "ญาติ", va: "นักพากย์", eye_color: "สีตา", hair_color: "สีผม", weapon: "อาวุธ", authority: "Authority" };
-const WIKI_API = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*";
+const WIKI_FIELD_LABELS = { name: "ชื่อ", kanji: "ชื่อญี่ปุ่น", romaji: "โรมาจิ", alias: "นามแฝง", nickname: "ชื่อเล่น", race: "เผ่าพันธุ์", gender: "เพศ", age: "อายุ", birthday: "วันเกิด", height: "ส่วนสูง", weight: "น้ำหนัก", hair_color: "สีผม", eye_color: "สีตา", affiliation: "สังกัด", previous_affiliation: "สังกัดเดิม", occupation: "อาชีพ", previous_occupation: "อาชีพเดิม", status: "สถานะ", relatives: "ญาติ", magic: "เวทมนตร์", divine_protection: "พรจากเทพ", authority: "Authority", weapon: "อาวุธ", equipment: "อุปกรณ์", japanese_voice: "นักพากย์ (ญี่ปุ่น)", english_voice: "นักพากย์ (อังกฤษ)" };
 
 function cleanWikiMarkup(value) {
   return String(value || "")
@@ -2334,6 +2334,7 @@ function cleanWikiMarkup(value) {
     .replace(/<ref[^>]*\/>/gi, "")
     .replace(/\{\{ruby\|([^|}]+)\|[^}]*\}\}/gi, "$1")
     .replace(/\{\{[^}]*\}\}/g, "")
+    .replace(/\[\[(?:File|Image):[^\]]*\]\]/gi, "")
     .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2")
     .replace(/\[\[([^\]]+)\]\]/g, "$1")
     .replace(/'{2,}/g, "")
@@ -2343,40 +2344,44 @@ function cleanWikiMarkup(value) {
 }
 
 function parseWikiInfobox(wikitext) {
-  const start = String(wikitext || "").indexOf("{{");
-  if (start < 0) return [];
-  const body = String(wikitext).slice(start, start + 6000);
   const rows = [];
   const seen = new Set();
-  const pattern = /\|\s*([a-z_]+)\s*=\s*([^\n|]*)/gi;
+  const pattern = /^\s*\|\s*([^=|\n]+?)\s*=\s*([^\n]*)$/gmu;
   let match;
-  while ((match = pattern.exec(body))) {
-    const key = match[1].toLocaleLowerCase();
-    if (!WIKI_FIELD_LABELS[key] || seen.has(key)) continue;
-    const value = cleanWikiMarkup(match[2]);
+  while ((match = pattern.exec(String(wikitext || "")))) {
+    const key = match[1].trim().toLocaleLowerCase().replace(/\s+/gu, "_");
+    const label = WIKI_FIELD_LABELS[key];
+    if (!label || seen.has(key)) continue;
+    const value = cleanWikiMarkup(match[2]).slice(0, 160);
     if (!value) continue;
     seen.add(key);
-    rows.push({ label: WIKI_FIELD_LABELS[key], value });
-    if (rows.length >= 8) break;
+    rows.push({ label, value });
+    if (rows.length >= 10) break;
   }
   return rows;
 }
 
-async function fetchWikiExtract(title) {
-  const url = `${WIKI_API}&prop=extracts&exintro=1&explaintext=1&redirects=1&titles=${encodeURIComponent(title)}`;
+/* หน้าวิกิใช้ action=parse (Fandom ไม่มี prop=extracts) แล้วดึงย่อหน้าจาก HTML */
+async function fetchWikiPage(title) {
+  const url = "https://rezero.fandom.com/api.php?action=parse&format=json&origin=*&redirects=1&prop=text|wikitext&section=0&page=" + encodeURIComponent(title);
   const response = await fetch(url, { referrerPolicy: "no-referrer" });
   if (!response.ok) throw new Error(`วิกิตอบ ${response.status}`);
   const payload = await response.json();
-  const page = Object.values(payload?.query?.pages || {})[0] || {};
-  return String(page.extract || "").trim();
-}
-
-async function fetchWikiFields(title) {
-  const url = `https://rezero.fandom.com/api.php?action=parse&format=json&origin=*&prop=wikitext&section=0&page=${encodeURIComponent(title)}`;
-  const response = await fetch(url, { referrerPolicy: "no-referrer" });
-  if (!response.ok) return [];
-  const payload = await response.json();
-  return parseWikiInfobox(payload?.parse?.wikitext?.["*"] || "");
+  if (payload?.error) throw new Error(payload.error.info || payload.error.code || "วิกิไม่พบหน้านี้");
+  const parse = payload?.parse || {};
+  const fields = parseWikiInfobox(parse.wikitext?.["*"] || "");
+  let intro = "";
+  const html = parse.text?.["*"] || "";
+  if (html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    for (const junk of doc.querySelectorAll("style, script, table, figure, .navbox, .mw-editsection, sup.reference, .reference")) junk.remove();
+    const paragraphs = [...doc.querySelectorAll("p")]
+      .map(element => String(element.textContent || "").replace(/\s+/gu, " ").trim())
+      // เนื้อเรื่องจริงเป็นย่อหน้ายาว ส่วนที่สั้นกว่านี้มักเป็นเศษจากกล่องข้อมูล
+      .filter(text => text.length >= 150 && !/^(This page is about|For the )/i.test(text));
+    intro = paragraphs.slice(0, 3).join("\n\n");
+  }
+  return { intro, fields, title: parse.title || title };
 }
 
 async function translateWikiText(text) {
@@ -2499,12 +2504,19 @@ async function openWikiPanel() {
     if (status) status.textContent = cached.thai ? "คำแปลที่บันทึกไว้" : "ข้อมูลย่อจากวิกิ";
   }
   try {
-    const [extract, fields] = await Promise.all([fetchWikiExtract(title), fetchWikiFields(title)]);
-    const same = Boolean(cached && cached.extract === extract);
+    const page = await fetchWikiPage(title);
+    if (page.title) state.characterCardWiki = page.title;
+    const same = Boolean(cached && cached.extract === page.intro);
     const thai = same ? cached.thai || "" : "";
-    applyWikiContent(extract || cached?.extract || "", thai, fields.length ? fields : cached?.fields || []);
-    if (status) status.textContent = extract ? "ข้อมูลย่อจากวิกิ" : "ไม่พบข้อมูลย่อในวิกิ";
-    if (!thai && extract) void runWikiTranslate();
+    applyWikiContent(page.intro || cached?.extract || "", thai, page.fields.length ? page.fields : cached?.fields || []);
+    if (status) {
+      status.textContent = page.intro
+        ? "ข้อมูลย่อจากวิกิ"
+        : page.fields.length
+          ? "หน้านี้ไม่มีข้อมูลย่อ มีแต่กล่องข้อมูล"
+          : "หน้านี้ไม่มีข้อมูลให้แสดง — ลองแก้ชื่อภาษาอังกฤษในการ์ด";
+    }
+    if (!thai && page.intro) void runWikiTranslate();
   } catch (error) {
     if (status) status.textContent = `ดึงข้อมูลไม่สำเร็จ (${error.message})`;
   }
