@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.0";
+const APP_VERSION = "1.14.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.1", note: "การ์ดตัวละครโฉมใหม่: สีตามค่าย รูปใหญ่กดซูมได้ ไอคอนลัด และแท็บข้อมูล–ความสามารถ–เรื่องย่อ" },
   { version: "1.14.0", note: "แก้การดึงข้อมูลวิกิ (Fandom ไม่มี prop=extracts) ให้อ่านย่อหน้าจากหน้าเพจจริง แล้วแปลไทยได้ครบ" },
   { version: "1.13.9", note: "วิกิในแอป: ดึงข้อมูลย่อและกล่องข้อมูลตัวละครจาก Re:Zero Wiki มาแปลเป็นไทย พร้อมเก็บคำแปลไว้ใช้ซ้ำ" },
   { version: "1.13.8", note: "การ์ดตัวละครมีปุ่มเปิดหน้าวิกิ และแตะรูปเพื่อดูเต็มจอได้" },
@@ -157,7 +158,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterCardTimer: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", wikiTitle: "", wikiExtract: "", wikiThai: "", wikiFields: [], wikiShowThai: true, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", wikiTitle: "", wikiExtract: "", wikiThai: "", wikiFields: [], wikiShowThai: true, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -2221,16 +2222,162 @@ async function lookupCharacterPortrait(query) {
   return { image: await lookupCharacterImage(query), entry: null };
 }
 
-function applyCharacterFaction(entry) {
+/* ค่าย/สังกัดของตัวละคร ใช้อิงสีของการ์ด (ดูจากช่อง “สังกัด” ในกล่องข้อมูลวิกิ) */
+const CHARACTER_CAMPS = [
+  { label: "Emilia Camp", color: "#7c5cff", match: /emilia/i },
+  { label: "Crusch Camp", color: "#10b981", match: /crusch/i },
+  { label: "Anastasia Camp", color: "#f59e0b", match: /anastasia/i },
+  { label: "Priscilla Camp", color: "#f43f5e", match: /priscilla/i },
+  { label: "Felt Camp", color: "#3b82f6", match: /felt/i },
+  { label: "Witch Cult", color: "#a855f7", match: /witch cult|sin archbishop/i },
+  { label: "Vollachia Empire", color: "#dc2626", match: /vollachia/i },
+  { label: "Kararagi", color: "#0ea5e9", match: /kararagi/i },
+  { label: "Kingdom of Lugunica", color: "#64748b", match: /lugu?nica|royal guard|knights? of/i }
+];
+
+function characterCamp(fields = []) {
+  const pick = label => (fields.find(row => row.label === label) || {}).value || "";
+  const haystack = pick("สังกัด") + " " + pick("สังกัดเดิม") + " " + pick("อาชีพ");
+  return CHARACTER_CAMPS.find(camp => camp.match.test(haystack)) || null;
+}
+
+function applyCharacterFaction(entry, fields = state.characterCardFields || []) {
   const card = byId("character-card");
   const badge = byId("character-card-faction");
-  if (entry?.color) card.style.setProperty("--character-color", entry.color);
+  const campTag = byId("character-card-camp");
+  const campName = byId("character-card-camp-name");
+  const camp = characterCamp(fields);
+  const color = camp?.color || entry?.color || "";
+  if (color) card.style.setProperty("--character-color", color);
   else card.style.removeProperty("--character-color");
+  card.classList.toggle("has-faction", Boolean(color));
+  if (campTag) {
+    campTag.hidden = !camp;
+    if (camp && campName) campName.textContent = camp.label;
+  }
   // บอกด้วยว่ารูปนี้อยู่กลุ่ม/แคมป์ไหน แล้วใช้สีกลุ่มนั้นกับการ์ดทั้งหลัง
-  const group = entry?.section || entry?.region || "";
+  const group = camp?.label || entry?.section || entry?.region || "";
   badge.hidden = !group;
   badge.textContent = group;
-  card.classList.toggle("has-faction", Boolean(group));
+}
+
+/* ---------- แผงข้อมูล/ความสามารถ/เรื่องย่อ ในการ์ดตัวละคร ---------- */
+const CHARACTER_INFO_FIELDS = ["ชื่อญี่ปุ่น", "โรมาจิ", "เผ่าพันธุ์", "เพศ", "อายุ", "วันเกิด", "ส่วนสูง", "สถานะ", "สังกัด", "อาชีพ"];
+const CHARACTER_POWER_FIELDS = ["เวทมนตร์", "พรจากเทพ", "Authority", "อาวุธ", "อุปกรณ์", "นามแฝง", "ชื่อเล่น"];
+
+function characterRow(label, value) {
+  const row = document.createElement("div");
+  row.className = "cc-row";
+  const key = document.createElement("span");
+  key.className = "cc-key"; key.textContent = label;
+  const val = document.createElement("span");
+  val.className = "cc-value"; val.textContent = value;
+  row.append(key, val);
+  return row;
+}
+
+function characterPanelMessage(text) {
+  const note = document.createElement("p");
+  note.className = "cc-empty"; note.textContent = text;
+  return note;
+}
+
+function renderCharacterPanels() {
+  const fields = state.characterCardFields || [];
+  const fill = (panelId, labels, emptyText) => {
+    const panel = byId(panelId);
+    if (!panel) return;
+    panel.replaceChildren();
+    const rows = labels.map(label => fields.find(row => row.label === label)).filter(Boolean);
+    if (!rows.length) { panel.append(characterPanelMessage(emptyText)); return; }
+    for (const row of rows) panel.append(characterRow(row.label, row.value));
+  };
+  fill("cc-panel-info", CHARACTER_INFO_FIELDS, state.characterCardTitle
+    ? "วิกิไม่มีช่องข้อมูลพื้นฐานของตัวละครนี้"
+    : "ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน");
+  fill("cc-panel-power", CHARACTER_POWER_FIELDS, "วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้");
+}
+
+function renderCharacterBrief() {
+  const panel = byId("cc-panel-wiki");
+  if (!panel) return;
+  panel.replaceChildren();
+  const thai = state.characterCardIntroThai || "";
+  const intro = state.characterCardIntro || "";
+  if (thai) panel.append(characterPanelMessage(thai));
+  else if (intro) panel.append(characterPanelMessage(intro));
+  else { panel.append(characterPanelMessage("ยังไม่มีเรื่องย่อ — กดไอคอน ◎ ด้านบนเพื่อเปิดวิกิในแอป")); return; }
+  const hint = document.createElement("button");
+  hint.type = "button"; hint.className = "cc-link"; hint.textContent = "เปิดวิกิในแอป (แปลไทย + กล่องข้อมูลเต็ม)";
+  hint.addEventListener("click", () => { void openWikiPanel(); });
+  panel.append(hint);
+  if (!thai && intro) {
+    const note = document.createElement("p");
+    note.className = "cc-empty";
+    note.textContent = "ต้นฉบับภาษาอังกฤษ · เปิดวิกิในแอปเพื่อแปลไทย";
+    panel.append(note);
+  }
+}
+
+async function loadCharacterBrief() {
+  const panel = byId("cc-panel-wiki");
+  const title = state.characterCardWiki || state.characterCardQuery;
+  if (!panel) return;
+  if (!title) { panel.replaceChildren(characterPanelMessage("ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน")); return; }
+  if (state.characterCardIntro || state.characterCardIntroThai) { renderCharacterBrief(); return; }
+  const token = state.characterCardToken;
+  panel.replaceChildren(characterPanelMessage("กำลังดึงเรื่องย่อจากวิกิ…"));
+  try {
+    const cache = (await readSetting("wikiCache", {})) || {};
+    const cached = cache[title];
+    const page = await fetchWikiPage(title);
+    if (token !== state.characterCardToken) return;
+    state.characterCardIntro = page.intro || cached?.extract || "";
+    state.characterCardIntroThai = cached && cached.extract === state.characterCardIntro ? cached.thai || "" : "";
+    if (!(state.characterCardFields || []).length && page.fields.length) {
+      state.characterCardFields = page.fields;
+      applyCharacterFaction(null, page.fields);
+      renderCharacterPanels();
+    }
+    renderCharacterBrief();
+  } catch (error) {
+    panel.replaceChildren(characterPanelMessage(`ดึงเรื่องย่อไม่สำเร็จ (${error.message}) — ลองแก้ชื่อภาษาอังกฤษในการ์ด`));
+  }
+}
+
+function selectCharacterTab(name) {
+  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
+    const active = tab.dataset.ccTab === name;
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+    tab.classList.toggle("is-active", active);
+    const panel = byId(`cc-panel-${tab.dataset.ccTab}`);
+    if (panel) panel.hidden = !active;
+  }
+  if (name === "wiki") void loadCharacterBrief();
+}
+
+async function copyCharacterName() {
+  const thai = byId("character-card-name").textContent || "";
+  const en = byId("character-card-title").textContent || "";
+  const text = [thai, en && `(${en})`].filter(Boolean).join(" ");
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    showStatus("คัดลอกชื่อแล้ว", 2000);
+  } catch (_) {
+    showStatus("คัดลอกอัตโนมัติไม่ได้ — เบราว์เซอร์ไม่อนุญาต", 3000);
+  }
+}
+
+/* รูปตัวละครพัง/บล็อก → วาดอวาตาร์ SVG ให้เห็นแทนไอคอนรูปแตก */
+function characterAvatarFallback(name) {
+  const letter = String(name || "?").trim().charAt(0).replace(/[<>&"]/g, "") || "?";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">`
+    + `<rect width="160" height="160" fill="#e2e8f0"/>`
+    + `<circle cx="80" cy="62" r="28" fill="#cbd5e1"/>`
+    + `<path d="M24 148c0-32 112-32 112 0Z" fill="#cbd5e1"/>`
+    + `<text x="80" y="146" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#64748b">${letter}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 
 function characterFactionLabel(entry) {
@@ -2292,21 +2439,10 @@ function showCharacterForm(visible) {
   byId("character-card-form").hidden = !visible;
   const box = byId("character-card-suggestions");
   if (!visible) { box.hidden = true; box.replaceChildren(); }
-  // While the rename form is open there is no portrait to look at, so the
-  // auto-close countdown must not run in the background.
-  else clearTimeout(state.characterCardTimer);
   byId("character-card-edit").hidden = visible || !state.characterCardTitle;
 }
 
-function armCharacterCardTimer() {
-  // Always restart the countdown for the image that just appeared; keeping the
-  // previous timeout would close the new card early.
-  clearTimeout(state.characterCardTimer);
-  state.characterCardTimer = setTimeout(closeCharacterCard, 10000);
-}
-
 function closeCharacterCard() {
-  clearTimeout(state.characterCardTimer);
   state.characterCardToken++;
   byId("character-card").hidden = true;
 }
@@ -2317,10 +2453,16 @@ function setCharacterFigure(image, thai) {
   state.characterCardImage = image || "";
   state.characterCardThai = thai || state.characterCardThai;
   if (zoom) zoom.hidden = !image;
-  if (!image) { figure.replaceChildren(); return; }
+  if (!image) { figure.replaceChildren(characterAvatarFallback(thai)); return; }
   const img = document.createElement("img");
   img.alt = thai; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = image;
   img.classList.add("zoomable");
+  img.addEventListener("error", () => {
+    if (img.dataset.fallback) return;
+    img.dataset.fallback = "1";
+    img.src = characterAvatarFallback(thai);
+    if (zoom) zoom.hidden = true;
+  }, { once: true });
   img.addEventListener("click", () => openImageViewer(image, thai));
   figure.replaceChildren(img);
 }
@@ -2382,6 +2524,24 @@ async function fetchWikiPage(title) {
     intro = paragraphs.slice(0, 3).join("\n\n");
   }
   return { intro, fields, title: parse.title || title };
+}
+
+/* ดึงเฉพาะกล่องข้อมูลของหน้า (เล็กกว่าการดึงทั้งหน้า) ใช้กับการ์ดตัวละคร */
+async function fetchCharacterFields(title) {
+  if (!title) return [];
+  if (!state.characterFieldCache) state.characterFieldCache = {};
+  if (state.characterFieldCache[title]) return state.characterFieldCache[title];
+  const url = "https://rezero.fandom.com/api.php?action=parse&format=json&origin=*&redirects=1&prop=wikitext&section=0&page=" + encodeURIComponent(title);
+  try {
+    const response = await fetch(url, { referrerPolicy: "no-referrer" });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    const fields = parseWikiInfobox(payload?.parse?.wikitext?.["*"] || "");
+    if (fields.length) state.characterFieldCache[title] = fields;
+    return fields;
+  } catch (_) {
+    return [];
+  }
 }
 
 async function translateWikiText(text) {
@@ -2540,14 +2700,20 @@ async function applyCharacterName(title) {
   setCharacterTitle(title);
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
+  state.characterCardFields = [];
+  state.characterCardIntro = "";
+  state.characterCardIntroThai = "";
+  const fields = await fetchCharacterFields(title);
+  state.characterCardFields = fields;
+  renderCharacterPanels();
+  renderCharacterBrief();
+  applyCharacterFaction(null, fields);
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
-  if (image) armCharacterCardTimer();
 }
 
 async function openCharacterCard(label) {
   const card = byId("character-card");
   const token = ++state.characterCardToken;
-  clearTimeout(state.characterCardTimer);
   setCharacterTitle("");
   const thai = characterThaiName(label) || "ตัวละคร";
   byId("character-card-name").textContent = thai;
@@ -2556,6 +2722,11 @@ async function openCharacterCard(label) {
   byId("character-card-figure").replaceChildren(spinner);
   showCharacterForm(false);
   byId("character-card-note").textContent = "กำลังค้นรูป…";
+  state.characterCardFields = [];
+  state.characterCardIntro = "";
+  state.characterCardIntroThai = "";
+  renderCharacterPanels();
+  selectCharacterTab("info");
   card.hidden = false;
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
@@ -2582,8 +2753,13 @@ async function openCharacterCard(label) {
   const portrait = await lookupCharacterPortrait(query);
   const image = portrait.image;
   if (card.hidden || token !== state.characterCardToken) return;
-  applyCharacterFaction(portrait.entry);
+  const fields = await fetchCharacterFields(state.characterCardWiki || query);
+  if (card.hidden || token !== state.characterCardToken) return;
+  state.characterCardFields = fields;
+  renderCharacterPanels();
+  applyCharacterFaction(portrait.entry, fields);
   if (!image) {
+    setCharacterFigure("", thai);
     showCharacterForm(true);
     byId("character-card-note").textContent = state.loadRemoteImages
       ? "ไม่พบรูปของ “" + query + "” ในวิกิ — แก้ชื่อภาษาอังกฤษ หรือแตะชื่ออีกครั้งเพื่อค้นใหม่"
@@ -2593,8 +2769,7 @@ async function openCharacterCard(label) {
   }
   setCharacterFigure(image, thai);
   if (portrait.entry?.title) state.characterCardWiki = portrait.entry.title;
-  byId("character-card-note").textContent = characterFactionLabel(portrait.entry);
-  armCharacterCardTimer();
+  byId("character-card-note").textContent = characterFactionLabel(portrait.entry) || "จาก Re:Zero Wiki · แตะรูปเพื่อดูเต็มจอ";
 }
 
 function installCharacterCards() {
@@ -2613,6 +2788,15 @@ function installCharacterCards() {
     void openCharacterCard(label);
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
+  byId("character-card-copy")?.addEventListener("click", () => { void copyCharacterName(); });
+  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
+    tab.addEventListener("click", () => selectCharacterTab(tab.dataset.ccTab));
+  }
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    const card = byId("character-card");
+    if (card && !card.hidden) closeCharacterCard();
+  });
   byId("character-card-external")?.addEventListener("click", () => { void openWikiPanel(); });
   byId("wiki-translate")?.addEventListener("click", () => { state.wikiShowThai = true; void runWikiTranslate(); });
   byId("wiki-original")?.addEventListener("click", () => { state.wikiShowThai = !state.wikiShowThai; renderWikiBody(); });
