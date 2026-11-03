@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.4";
+const APP_VERSION = "1.15.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.5", note: "คลังคำศัพท์ที่มากับไฟล์สำรองถูกใช้เองแล้ว: ชื่อไทย ↔ ชื่ออังกฤษเติมเข้าตารางตัวละครให้ทันที ทั้งตอนนำเข้าไฟล์และตอนซิงก์อัตโนมัติ ไม่ทับชื่อที่เคยแก้ไว้" },
   { version: "1.15.4", note: "การ์ดตัวละครที่ยังไม่รู้จัก: รูปเป็น ? ขอบเส้นประ ชื่อ ??? พร้อมป้ายกลุ่มจาง ๆ และช่องใส่ชื่อภาษาอังกฤษ" },
   { version: "1.15.3", note: "แผงวิกิ: ปุ่มล่างเป็นแถบติดขอบไม่ทับเนื้อหา แตะพื้นหลังเบลอเพื่อปิดได้ และชิปตำแหน่งยาว ๆ บนการ์ดถูกย่อให้อ่านพอดี" },
   { version: "1.15.2", note: "เก็บคำแปลบทบาทให้ครบขึ้น: หัวหน้าตระกูล มังกร ราชอาณาจักร ผู้ดูแล และจัดรูปวงเล็บ/ช่องว่างให้อ่านง่าย" },
@@ -2201,6 +2202,45 @@ async function clearCharacterTable() {
   await updateCharacterTableCount();
 }
 
+// The extension ships a per-novel glossary (data.novelGlossaries) inside its backup.
+// Every entry already pairs the Thai name with the English wiki name, which is exactly
+// what the character card needs, so the glossary no longer has to be imported by hand.
+function characterNamesFromGlossaries(glossaries) {
+  const rows = [];
+  if (!glossaries || typeof glossaries !== "object" || Array.isArray(glossaries)) return rows;
+  for (const list of Object.values(glossaries)) {
+    if (!Array.isArray(list)) continue;
+    for (const entry of list) {
+      if (!entry || typeof entry !== "object") continue;
+      const english = String(entry.src || "").trim();
+      const thai = normalizeCharacterKey(entry.dest || "");
+      if (!english || !thai || english === thai) continue;
+      rows.push([thai, english]);
+    }
+  }
+  return rows;
+}
+
+async function applyCharacterNames(rows, options = {}) {
+  if (!Array.isArray(rows) || !rows.length) return 0;
+  const table = options.replace ? {} : { ...(await characterNameTable()) };
+  let added = 0;
+  for (const row of rows) {
+    const thai = normalizeCharacterKey(row[0]);
+    const english = String(row[1] || "").trim();
+    if (!thai || !english || table[thai]) continue;
+    table[thai] = english;
+    added += 1;
+    const bare = normalizeCharacterKey(thai.replace(/\([^)]*\)/gu, ""));
+    if (bare && bare !== thai && !table[bare]) { table[bare] = english; added += 1; }
+  }
+  if (!added) return 0;
+  state.characterNames = table;
+  await writeSetting("characterNames", table);
+  await updateCharacterTableCount();
+  return added;
+}
+
 async function searchCharacterPages(query) {
   if (!query || query.length < 2) return [];
   try {
@@ -3231,7 +3271,8 @@ function validateBackup(parsed) {
   const pronunciations = parsed.data.ttsPronunciationDictionary ?? [];
   if (!Array.isArray(pronunciations) || pronunciations.some(entry => !entry || typeof entry !== "object" || typeof entry.word !== "string" || typeof entry.reading !== "string")) throw new Error("ตารางคำอ่านในไฟล์มีรูปแบบไม่ถูกต้อง ข้อมูลเดิมยังไม่ถูกเปลี่ยน");
   const settings = parsed.data.settings && typeof parsed.data.settings === "object" && !Array.isArray(parsed.data.settings) ? parsed.data.settings : {};
-  return { chapters, pronunciations, createdAt: parsed.createdAt || "", settings };
+  const characterNames = characterNamesFromGlossaries(parsed.data.novelGlossaries);
+  return { chapters, pronunciations, characterNames, createdAt: parsed.createdAt || "", settings };
 }
 
 async function importBackup(mode) {
@@ -3259,13 +3300,16 @@ async function importBackup(mode) {
     settingsCount += 1;
   }
   await transactionDone(tx);
+  // Fill the Thai→English character table from the glossary that came with the backup.
+  const namesAdded = await applyCharacterNames(backup.characterNames, { replace: mode === "replace" });
   state.imported = null; byId("import-dialog").close();
   state.speechQueue = []; state.speechIndex = 0;
   await refreshChapters();
   if (state.chapters.length) {
     const first = sortChapters(state.chapters)[0]; await openChapter(first.id);
   }
-  showStatus(`นำเข้าสำเร็จ ${backup.chapters.length.toLocaleString("th-TH")} บท · ${pronunciation.length.toLocaleString("th-TH")} คำอ่าน · ${mode === "merge" ? "รวมกับข้อมูลเดิมแล้ว" : "แทนที่ข้อมูลเดิมแล้ว"}`, 8000);
+  const namesPart = namesAdded ? ` · ชื่อตัวละคร ${namesAdded.toLocaleString("th-TH")}` : "";
+  showStatus(`นำเข้าสำเร็จ ${backup.chapters.length.toLocaleString("th-TH")} บท · ${pronunciation.length.toLocaleString("th-TH")} คำอ่าน${namesPart} · ${mode === "merge" ? "รวมกับข้อมูลเดิมแล้ว" : "แทนที่ข้อมูลเดิมแล้ว"}`, 8000);
   if (settingsCount) { showStatus(`นำเข้า ${backup.chapters.length.toLocaleString("th-TH")} บท พร้อมค่าตั้ง ${settingsCount} รายการ · กำลังโหลดใหม่`, 4000); setTimeout(() => location.reload(), 1300); }
 }
 
@@ -3353,6 +3397,7 @@ async function syncChapters({ manual = false } = {}) {
       const previous = table.get(item.word.toLocaleLowerCase());
       if (!previous || previous.reading !== item.reading) { table.set(item.word.toLocaleLowerCase(), item); tableChanged = true; }
     }
+    const namesAdded = await applyCharacterNames(backup.characterNames);
     if (touched.size || tableChanged) {
       const tx = db.transaction([CHAPTERS, SETTINGS], "readwrite");
       for (const chapter of backup.chapters) if (touched.has(chapter.id)) tx.objectStore(CHAPTERS).put(chapter);
@@ -3370,6 +3415,7 @@ async function syncChapters({ manual = false } = {}) {
     const summary = [];
     if (added) summary.push(`ใหม่ ${added.toLocaleString("th-TH")} บท`);
     if (updated) summary.push(`แก้ไข ${updated.toLocaleString("th-TH")} บท`);
+    if (namesAdded) summary.push(`ชื่อตัวละครใหม่ ${namesAdded.toLocaleString("th-TH")}`);
     if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
     else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
   } catch (error) {
