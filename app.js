@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.8";
+const APP_VERSION = "1.15.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.9", note: "ซิงก์แล้วบอกจำนวนคำอ่านที่เข้ามา และรีเฟรชคลังคำอ่านที่เปิดอยู่" },
   { version: "1.15.8", note: "ปุ่ม “ดูรายการ” ใต้ตารางชื่อตัวละคร: เปิดดูได้ทุกชื่อที่มี พร้อมป้ายที่มาและช่องค้นหา" },
   { version: "1.15.7", note: "หน้าตั้งค่าบอกที่มาของตารางชื่อตัวละคร: จากคลังคำศัพท์กี่ชื่อ (กี่เรื่อง) นำเข้าเอง แก้ชื่อเอง และชื่อที่ยังไม่ทราบที่มา" },
   { version: "1.15.6", note: "บทที่แปลใหม่บนคอมพิวเตอร์ขึ้นเครื่องเองเร็วขึ้น: ซิงก์อีกครั้งเมื่อกลับเข้าหน้าแอป และทุก 5 นาทีระหว่างเปิดอ่านอยู่" },
@@ -3550,9 +3551,11 @@ async function syncChapters({ manual = false } = {}) {
       updated += 1; touched.add(chapter.id);
     }
     const table = new Map((await readSetting("pronunciation", [])).map(item => [item.word.toLocaleLowerCase(), item]));
-    let tableChanged = false;
+    let tableChanged = false, tableAdded = 0, tableUpdated = 0;
     for (const item of backup.pronunciations) {
       const previous = table.get(item.word.toLocaleLowerCase());
+      if (!previous) tableAdded += 1;
+      else if (previous.reading !== item.reading) tableUpdated += 1;
       if (!previous || previous.reading !== item.reading) { table.set(item.word.toLocaleLowerCase(), item); tableChanged = true; }
     }
     const namesAdded = await applyCharacterNames(backup.characterNames);
@@ -3566,6 +3569,8 @@ async function syncChapters({ manual = false } = {}) {
       await transactionDone(tx);
       await refreshChapters();
       if (state.activeId && touched.has(state.activeId)) await openChapter(state.activeId);
+      // An open "khlang kham-an" sheet would otherwise keep showing the pre-sync table.
+      if (document.getElementById("glossary-sheet")?.open) void paintGlossary();
     }
     state.syncedAt = Date.now();
     await writeSetting("syncedAt", state.syncedAt);
@@ -3574,6 +3579,8 @@ async function syncChapters({ manual = false } = {}) {
     if (added) summary.push(`ใหม่ ${added.toLocaleString("th-TH")} บท`);
     if (updated) summary.push(`แก้ไข ${updated.toLocaleString("th-TH")} บท`);
     if (namesAdded) summary.push(`ชื่อตัวละครใหม่ ${namesAdded.toLocaleString("th-TH")}`);
+    if (tableAdded) summary.push(`คำอ่านใหม่ ${tableAdded.toLocaleString("th-TH")}`);
+    if (tableUpdated) summary.push(`คำอ่านแก้ไข ${tableUpdated.toLocaleString("th-TH")}`);
     if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
     else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
   } catch (error) {
