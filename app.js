@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.5";
+const APP_VERSION = "1.15.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.6", note: "บทที่แปลใหม่บนคอมพิวเตอร์ขึ้นเครื่องเองเร็วขึ้น: ซิงก์อีกครั้งเมื่อกลับเข้าหน้าแอป และทุก 5 นาทีระหว่างเปิดอ่านอยู่" },
   { version: "1.15.5", note: "คลังคำศัพท์ที่มากับไฟล์สำรองถูกใช้เองแล้ว: ชื่อไทย ↔ ชื่ออังกฤษเติมเข้าตารางตัวละครให้ทันที ทั้งตอนนำเข้าไฟล์และตอนซิงก์อัตโนมัติ ไม่ทับชื่อที่เคยแก้ไว้" },
   { version: "1.15.4", note: "การ์ดตัวละครที่ยังไม่รู้จัก: รูปเป็น ? ขอบเส้นประ ชื่อ ??? พร้อมป้ายกลุ่มจาง ๆ และช่องใส่ชื่อภาษาอังกฤษ" },
   { version: "1.15.3", note: "แผงวิกิ: ปุ่มล่างเป็นแถบติดขอบไม่ทับเนื้อหา แตะพื้นหลังเบลอเพื่อปิดได้ และชิปตำแหน่งยาว ๆ บนการ์ดถูกย่อให้อ่านพอดี" },
@@ -3366,6 +3367,27 @@ async function fetchBackupFromUrl(url) {
   } finally { clearTimeout(timer); }
 }
 
+// A chapter translated on the desktop lands in the same backup link, so the phone
+// re-reads it when the app returns to the foreground and every 5 minutes while it
+// stays open, instead of only once per launch.
+const AUTO_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+let autoSyncWatchTimer = 0;
+let autoSyncWatchBound = false;
+
+function startAutoSyncWatch() {
+  const runSync = () => {
+    if (document.visibilityState !== "visible") return;
+    if (!state.autoSync || !state.syncUrl || state.syncing) return;
+    void syncChapters();
+  };
+  clearInterval(autoSyncWatchTimer);
+  autoSyncWatchTimer = setInterval(runSync, AUTO_SYNC_INTERVAL_MS);
+  if (autoSyncWatchBound) return;
+  autoSyncWatchBound = true;
+  document.addEventListener("visibilitychange", runSync);
+  window.addEventListener("focus", runSync);
+}
+
 async function syncChapters({ manual = false } = {}) {
   if (state.syncing) return;
   const url = state.syncUrl;
@@ -4062,6 +4084,7 @@ async function initialize() {
     if (state.theme === "rezero") await waitForCoverTiles();
     hideSplash();
     if (state.syncUrl && state.autoSync) void syncChapters();
+  startAutoSyncWatch();
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) startServiceWorker();
   } catch (error) { showStatus(`เปิดคลังไม่สำเร็จ: ${error.message}`, 0); hideSplash(); }
 }
