@@ -219,6 +219,15 @@
     <div id="glossary-list" class="glossary-list"></div>
     <p id="glossary-empty" class="settings-hint">คำอ่านมาจากตารางคำอ่านในไฟล์สำรอง และชื่อตัวละครจะถูกจดเมื่อคุณแก้ชื่อในการ์ดตัวละคร</p>
   </dialog>
+  <dialog id="character-names-sheet" class="bookmark-sheet glossary-sheet" aria-label="ตารางชื่อตัวละคร">
+    <div class="bookmark-sheet-head">
+      <div><h3>ตารางชื่อตัวละคร</h3><p id="character-names-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดตารางชื่อตัวละคร">×</button></form>
+    </div>
+    <input id="character-names-search" class="search-input" type="search" placeholder="ค้นชื่อไทยหรือชื่ออังกฤษ…" autocomplete="off" aria-label="ค้นในตารางชื่อตัวละคร">
+    <div id="character-names-list" class="glossary-list"></div>
+    <p id="character-names-empty" class="settings-hint">ชื่อจะถูกเพิ่มเมื่อซิงก์คลังคำศัพท์ หรือนำเข้าไฟล์ JSON</p>
+  </dialog>
   <dialog id="notes-sheet" class="bookmark-sheet notes-sheet" aria-label="ไฮไลต์และโน้ต">
     <div class="bookmark-sheet-head">
       <div><h3>ไฮไลต์และโน้ต</h3><p id="notes-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
@@ -350,7 +359,7 @@
         <div class="setting-row"><span>หน้าเปิดแอป</span><div class="theme-row"><button id="launch-book" class="theme-choice" type="button" aria-pressed="true">📖 เปิดปกนิยาย</button><button id="launch-zoom" class="theme-choice" type="button" aria-pressed="false">🚀 ซูมแบบ X</button></div><small class="setting-hint">แบบปกนิยาย: ปกพลิกเปิดเข้าหาบทแรก · แบบซูม: โลโก้ขยายเต็มจอเหมือนเปิดแอป X</small></div>
         <label class="switch-row"><span>โหลดรูปจากเว็บต้นทาง</span><input id="remote-images-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <label class="switch-row"><span>กันจอดับระหว่างอ่าน</span><input id="wake-lock-toggle" type="checkbox"><i aria-hidden="true"></i></label>
-        <div class="setting-row"><span>ตารางชื่อตัวละคร</span><div class="row-actions"><button id="character-table-open" class="tool-button" type="button">นำเข้า JSON</button><button id="character-table-clear" class="tool-button" type="button">ล้าง</button></div><small id="character-table-count" class="setting-hint">ใช้จับคู่ชื่อไทยกับชื่อในวิกิ</small></div>
+        <div class="setting-row"><span>ตารางชื่อตัวละคร</span><div class="row-actions"><button id="character-names-open" class="tool-button" type="button">ดูรายการ</button><button id="character-table-open" class="tool-button" type="button">นำเข้า JSON</button><button id="character-table-clear" class="tool-button" type="button">ล้าง</button></div><small id="character-table-count" class="setting-hint">ใช้จับคู่ชื่อไทยกับชื่อในวิกิ</small></div>
         <input id="character-table-file" type="file" accept="application/json,.json" hidden>
         <p class="settings-subtitle">ย้ายค่าตั้งข้ามเครื่อง</p>
         <small class="setting-hint">คัดลอกค่าธีม ขนาดตัวอักษร โหมดอ่าน และเอฟเฟกต์ไปใช้ในเครื่องอื่นได้ ไม่เกี่ยวกับบทแปล</small>

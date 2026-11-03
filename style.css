@@ -708,6 +708,7 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .glossary-text strong { font-size:13px; }
 .glossary-text small { color:var(--accent-strong); font-size:11px; font-weight:700; }
 .glossary-row .tool-button { flex:none; min-height:44px; }
+.character-source { flex:none; padding:2px 8px; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--muted); font-size:10px; font-weight:700; white-space:nowrap; }
 
 /* ---------- หน้าตั้งค่าธีม: การ์ดตัวอย่าง + จัดกลุ่มธีม ---------- */
 .theme-preview { margin:10px 0 2px; padding:10px; border:1px solid color-mix(in srgb,var(--accent) 34%,var(--line)); border-radius:16px; background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 10%,var(--page)),var(--page)); }

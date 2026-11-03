@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.7";
+const APP_VERSION = "1.15.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.8", note: "ปุ่ม “ดูรายการ” ใต้ตารางชื่อตัวละคร: เปิดดูได้ทุกชื่อที่มี พร้อมป้ายที่มาและช่องค้นหา" },
   { version: "1.15.7", note: "หน้าตั้งค่าบอกที่มาของตารางชื่อตัวละคร: จากคลังคำศัพท์กี่ชื่อ (กี่เรื่อง) นำเข้าเอง แก้ชื่อเอง และชื่อที่ยังไม่ทราบที่มา" },
   { version: "1.15.6", note: "บทที่แปลใหม่บนคอมพิวเตอร์ขึ้นเครื่องเองเร็วขึ้น: ซิงก์อีกครั้งเมื่อกลับเข้าหน้าแอป และทุก 5 นาทีระหว่างเปิดอ่านอยู่" },
   { version: "1.15.5", note: "คลังคำศัพท์ที่มากับไฟล์สำรองถูกใช้เองแล้ว: ชื่อไทย ↔ ชื่ออังกฤษเติมเข้าตารางตัวละครให้ทันที ทั้งตอนนำเข้าไฟล์และตอนซิงก์อัตโนมัติ ไม่ทับชื่อที่เคยแก้ไว้" },
@@ -834,6 +835,70 @@ function startReadingClock() {
 }
 
 /* ---------- คลังคำอ่านและชื่อตัวละคร ---------- */
+function describeCharacterSources(summary) {
+  if (!summary || !summary.total) return "ยังไม่มีรายการ";
+  const novelCount = summary.novels.length;
+  const parts = [];
+  if (summary.glossary) parts.push("คลังคำศัพท์ " + summary.glossary.toLocaleString("th-TH") + (novelCount ? " (" + novelCount.toLocaleString("th-TH") + " เรื่อง)" : ""));
+  if (summary.imported) parts.push("นำเข้าเอง " + summary.imported.toLocaleString("th-TH"));
+  if (summary.manual) parts.push("แก้ชื่อเอง " + summary.manual.toLocaleString("th-TH"));
+  if (summary.unknown) parts.push("ไม่ทราบที่มา " + summary.unknown.toLocaleString("th-TH"));
+  return "จับคู่ไว้ " + summary.total.toLocaleString("th-TH") + " ชื่อ · " + parts.join(" · ");
+}
+
+function characterSourceBadge(meta) {
+  const kind = meta && typeof meta === "object" ? meta.kind : "";
+  if (kind === "glossary") return "คลังคำศัพท์";
+  if (kind === "import") return "นำเข้าเอง";
+  if (kind === "manual") return "แก้ชื่อเอง";
+  return "ไม่ทราบที่มา";
+}
+
+async function openCharacterNames() {
+  const sheet = byId("character-names-sheet");
+  if (!sheet) return;
+  const search = byId("character-names-search");
+  if (search) search.value = "";
+  await paintCharacterNames();
+  if (typeof sheet.showModal === "function") sheet.showModal();
+  else sheet.setAttribute("open", "");
+}
+
+async function paintCharacterNames() {
+  const list = byId("character-names-list");
+  if (!list) return;
+  const query = (byId("character-names-search")?.value || "").trim().toLocaleLowerCase();
+  const table = await characterNameTable();
+  const sources = await readCharacterNameSources();
+  const summary = summarizeCharacterNames(table, sources);
+  const sub = byId("character-names-sub");
+  if (sub) sub.textContent = describeCharacterSources(summary);
+  const rows = Object.entries(table)
+    .map(([thai, english]) => ({ thai, english: String(english || ""), source: sources[thai] || null }))
+    .filter(row => !query || `${row.thai} ${row.english}`.toLocaleLowerCase().includes(query))
+    .sort((a, b) => a.thai.localeCompare(b.thai, "th"));
+  list.replaceChildren();
+  const empty = byId("character-names-empty");
+  if (empty) empty.hidden = rows.length > 0;
+  for (const row of rows) {
+    const item = document.createElement("div");
+    item.className = "glossary-row";
+    const text = document.createElement("div");
+    text.className = "glossary-text";
+    const thai = document.createElement("strong");
+    thai.textContent = row.thai;
+    const english = document.createElement("small");
+    english.textContent = row.english || "—";
+    text.append(thai, english);
+    const badge = document.createElement("span");
+    badge.className = "character-source";
+    badge.textContent = characterSourceBadge(row.source);
+    if (row.source?.novel) badge.title = String(row.source.novel);
+    item.append(text, badge);
+    list.append(item);
+  }
+}
+
 async function paintGlossary() {
   const list = byId("glossary-list");
   if (!list) return;
@@ -2180,19 +2245,8 @@ async function updateCharacterTableCount() {
   const summary = summarizeCharacterNames(table, sources);
   const label = byId("character-table-count");
   if (!label) return;
-  if (!summary.total) {
-    label.textContent = "จับคู่ชื่อไทยในบทกับชื่ออังกฤษในวิกิ เพื่อดึงรูปและกลุ่มของตัวละคร";
-    label.title = "";
-    return;
-  }
-  const novelCount = summary.novels.length;
-  const parts = [];
-  if (summary.glossary) parts.push("คลังคำศัพท์ " + summary.glossary.toLocaleString("th-TH") + (novelCount ? " (" + novelCount.toLocaleString("th-TH") + " เรื่อง)" : ""));
-  if (summary.imported) parts.push("นำเข้าเอง " + summary.imported.toLocaleString("th-TH"));
-  if (summary.manual) parts.push("แก้ชื่อเอง " + summary.manual.toLocaleString("th-TH"));
-  if (summary.unknown) parts.push("ไม่ทราบที่มา " + summary.unknown.toLocaleString("th-TH"));
-  label.textContent = "จับคู่ไว้ " + summary.total.toLocaleString("th-TH") + " ชื่อ · " + parts.join(" · ");
-  label.title = novelCount
+  label.textContent = describeCharacterSources(summary);
+  label.title = summary.novels.length
     ? "จากคลังคำศัพท์แยกตามเรื่อง: " + summary.novels.map(([novel, count]) => (novel || "ไม่ระบุเรื่อง") + " " + count.toLocaleString("th-TH")).join(" · ")
     : "";
 }
@@ -3267,6 +3321,8 @@ function installCharacterCards() {
     } catch (error) { showStatus("นำเข้าตารางชื่อไม่สำเร็จ: " + error.message, 0); }
   });
   byId("character-table-clear").addEventListener("click", () => { void clearCharacterTable(); });
+  byId("character-names-open")?.addEventListener("click", () => { void openCharacterNames(); });
+  byId("character-names-search")?.addEventListener("input", () => { void paintCharacterNames(); });
   void updateCharacterTableCount();
   // ไม่ให้เลือก/ก๊อปข้อความทั้งแอป เว้นแต่ช่องกรอกที่ต้องพิมพ์หรือวางลิงก์
   document.addEventListener("selectstart", event => {
