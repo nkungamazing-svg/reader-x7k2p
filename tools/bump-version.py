@@ -3,8 +3,8 @@
 
 Usage: python3 tools/bump-version.py [patch|minor|major]   (default: patch)
 
-Versioning rule: the patch number runs 0-9, then the next bump rolls over
-into the minor number (1.4.9 -> 1.5.0).
+Versioning rule: patch and minor both run 0-9, rolling over at ten
+(1.4.9 -> 1.5.0, 1.9.9 -> 2.0.0).
 """
 import io
 import re
@@ -32,6 +32,10 @@ elif PART == "minor":
     minor += 1
     patch = 0
 else:
+    major += 1
+    minor = patch = 0
+
+if minor > 9:
     major += 1
     minor = patch = 0
 

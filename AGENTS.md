@@ -6,7 +6,7 @@ No build step, no package manager, no dependencies, no secrets. Data lives in th
 ## Versioning (required on every change)
 
 * Every change — feature, fix, copy edit, style tweak — bumps the version before committing.
-* The patch number runs `0`–`9`; the tenth bump rolls into the minor number: `1.4.0 … 1.4.9 → 1.5.0`.
+* The patch number runs `0`–`9`; the tenth bump rolls into the minor number, and the minor number runs `0`–`9` too: `1.4.0 … 1.4.9 → 1.5.0`, and finally `1.9.9 → 2.0.0`.
 * Never bump by hand in one file only. Run `python3 tools/bump-version.py patch` (or `minor` / `major`); it updates `APP_VERSION` in `app.js` and `CACHE_NAME` in `service-worker.js` together.
 * The version is shown on the launch splash and at the bottom of the settings sheet, so readers can confirm what they are running.
 
