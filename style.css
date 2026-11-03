@@ -743,8 +743,33 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .wiki-fields[hidden] { display:none; }
 .wiki-fields dt { color:var(--muted); font-weight:700; }
 .wiki-fields dd { margin:0; color:var(--text); }
-.wiki-body { display:grid; gap:8px; max-height:42dvh; overflow-y:auto; font-size:13px; line-height:1.75; }
+.wiki-body { display:grid; gap:8px; font-size:13px; line-height:1.75; }
 .wiki-body p { margin:0; }
+
+/* สรุปในวิกิ: ข้อมูลทั่วไป / ความสามารถ / บทบาท (ย้ายมาจากการ์ด) */
+.wiki-section { display:grid; gap:8px; }
+.wiki-section[hidden] { display:none!important; }
+.wiki-section-title { margin:0; color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+.wiki-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.wiki-field { min-width:0; padding:9px 11px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 26%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--character-color,var(--accent)) 8%,var(--surface-2)); }
+.wiki-field span { display:block; margin-bottom:2px; color:var(--muted); font-size:10.5px; }
+.wiki-field b { display:block; color:var(--text); font-size:12.5px; font-weight:800; line-height:1.5; overflow-wrap:anywhere; }
+.wiki-field.is-camp b { text-transform:uppercase; letter-spacing:.03em; }
+.wiki-abilities { display:grid; gap:8px; }
+.wiki-ability { display:flex; align-items:flex-start; gap:10px; padding:9px 11px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 22%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--character-color,var(--accent)) 8%,var(--surface-2)); }
+.wiki-ability-icon { flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:var(--surface); color:color-mix(in srgb,var(--character-color,var(--accent)) 78%,var(--text)); }
+.wiki-ability-icon svg { width:17px; height:17px; }
+.wiki-ability-text { display:grid; gap:1px; min-width:0; }
+.wiki-ability-text b { color:var(--text); font-size:12.5px; font-weight:800; line-height:1.5; overflow-wrap:anywhere; }
+.wiki-ability-text small { color:var(--muted); font-size:10.5px; line-height:1.5; }
+.wiki-role { display:grid; gap:2px; padding:9px 12px; border:1px solid color-mix(in srgb,var(--character-color,var(--line)) 24%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--character-color,var(--accent)) 9%,var(--surface-2)); }
+.wiki-role b { color:color-mix(in srgb,var(--character-color,var(--accent)) 74%,var(--text)); font-size:10.5px; font-weight:800; }
+.wiki-role span { color:var(--text); font-size:12.5px; line-height:1.55; }
+.wiki-all { border-top:1px dashed color-mix(in srgb,var(--line) 80%,transparent); padding-top:6px; }
+.wiki-all[hidden] { display:none!important; }
+.wiki-all summary { display:flex; align-items:center; min-height:44px; color:var(--muted); font-size:12px; font-weight:700; cursor:pointer; }
+.wiki-all .wiki-fields { margin-top:6px; }
+@media(max-width:360px) { .wiki-grid { grid-template-columns:1fr; } }
 
 /* ---------- การ์ดตัวละครแบบสั้น: รูป + ชื่อ + ค่าย (สีอิงตามค่ายในวิกิ) ---------- */
 .character-card {

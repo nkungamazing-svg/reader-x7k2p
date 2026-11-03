@@ -180,8 +180,22 @@
       </div>
     </div>
     <p id="wiki-status" class="settings-hint">กำลังดึงข้อมูลจากวิกิ…</p>
-    <dl id="wiki-fields" class="wiki-fields"></dl>
-    <div id="wiki-body" class="wiki-body"></div>
+    <section id="wiki-info" class="wiki-section" hidden>
+      <h4 class="wiki-section-title">ข้อมูลทั่วไป</h4>
+      <div id="wiki-grid" class="wiki-grid"></div>
+    </section>
+    <section id="wiki-power" class="wiki-section" hidden>
+      <h4 class="wiki-section-title">ความสามารถ</h4>
+      <div id="wiki-abilities" class="wiki-abilities"></div>
+    </section>
+    <section id="wiki-bio" class="wiki-section">
+      <h4 class="wiki-section-title">ชีวประวัติ</h4>
+      <div id="wiki-body" class="wiki-body"></div>
+    </section>
+    <details id="wiki-all" class="wiki-all" hidden>
+      <summary>ข้อมูลจากวิกิทั้งหมด</summary>
+      <dl id="wiki-fields" class="wiki-fields"></dl>
+    </details>
     <p id="wiki-credit" class="settings-hint" hidden></p>
     <div class="bookmark-sheet-actions">
       <button id="wiki-translate" class="tool-button" type="button">แปลเป็นไทย</button>

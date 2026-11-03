@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.5";
+const APP_VERSION = "1.14.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.6", note: "แผงวิกิจัดข้อมูลเป็นการ์ดอ่านง่าย: ข้อมูลทั่วไป 4 ช่อง ความสามารถพร้อมไอคอน บทบาทในเรื่อง และย่อหน้าชีวประวัติ ส่วนกล่องข้อมูลดิบทั้งหมดพับเก็บไว้ท้ายแผง" },
   { version: "1.14.5", note: "การ์ดตัวละครเหลือแค่รูป ชื่อไทย ชื่ออังกฤษ และป้ายค่ายสีเด่นตามวิกิ ส่วนชีวประวัติ/ความสามารถ/ข้อมูลทั่วไปย้ายไปอยู่ในแผงวิกิ และปิดรูปเต็มจอได้ด้วยการแตะพื้นหลัง" },
   { version: "1.14.4", note: "แก้การ์ดตัวละครค้างข้อมูลคนก่อนหน้า: ล้างชื่อและรูปทุกครั้งที่เปิดการ์ดใหม่ และกันคำตอบวิกิรอบเก่ามาเขียนทับ พร้อมโหลดเรื่องย่อของชื่อใหม่อีกครั้ง" },
   { version: "1.14.3", note: "การ์ดตัวละครดีไซน์ใหม่: รูปโปรไฟล์ใหญ่มีวงแหวนสีค่าย ป้ายเผ่าพันธุ์–อาชีพใต้ชื่อ ปุ่มกลม 3 ปุ่ม และแท็บชีวประวัติ–ความสามารถ–ข้อมูลทั่วไปแบบการ์ด" },
@@ -2533,6 +2534,22 @@ function renderWikiBody() {
       if (paragraph.textContent) body.append(paragraph);
     }
   }
+  const job = state.wikiFields.find(row => row.label === "อาชีพ");
+  if (text && job) {
+    const items = (job.items && job.items.length ? job.items : [job.value]).filter(Boolean).slice(0, 2);
+    if (items.length) {
+      const role = document.createElement("div");
+      role.className = "wiki-role";
+      const label = document.createElement("b");
+      label.textContent = "บทบาท";
+      const value = document.createElement("span");
+      value.textContent = items.join(" · ");
+      role.append(label, value);
+      body.append(role);
+    }
+  }
+  const bio = byId("wiki-bio");
+  if (bio) bio.hidden = !body.childElementCount;
   const toggle = byId("wiki-original");
   if (toggle) {
     toggle.hidden = !state.wikiThai;
@@ -2541,10 +2558,126 @@ function renderWikiBody() {
   }
 }
 
+/* ---------- แผงวิกิ: สรุปสั้นแบบการ์ด อ่านง่ายกว่ากล่องข้อมูลดิบทั้งก้อน ---------- */
+const WIKI_MAIN_FIELDS = ["สังกัด", "เผ่าพันธุ์", "อายุ", "สถานะ"];
+const WIKI_POWER_FIELDS = ["Authority", "เวทมนตร์", "พรจากเทพ"];
+const WIKI_MAIN_TITLES = { "สังกัด": "สังกัดค่าย" };
+
+/* คำง่าย ๆ ที่วิกิเขียนเป็นอังกฤษ แปลให้อ่านไทยได้ทันที */
+const WIKI_VALUE_THAI = {
+  human: "มนุษย์ (Human)", elf: "เอลฟ์ (Elf)", "half elf": "ครึ่งเอลฟ์ (Half-Elf)", "half-elf": "ครึ่งเอลฟ์ (Half-Elf)",
+  oni: "ยักษ์ (Oni)", "half oni": "ครึ่งยักษ์ (Half-Oni)", beastman: "มนุษย์สัตว์ (Beastman)",
+  spirit: "วิญญาณ (Spirit)", dragon: "มังกร (Dragon)", demon: "ปีศาจ (Demon)",
+  alive: "มีชีวิต (Alive)", deceased: "เสียชีวิต (Deceased)", dead: "เสียชีวิต (Dead)", unknown: "ไม่ทราบ (Unknown)"
+};
+
+const WIKI_ABILITY_KINDS = {
+  Authority: {
+    th: "พลังจากบาป",
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.2 2.8 6 13.4h4.4L10.8 21 18 10.4h-4.4z" fill="currentColor"/></svg>'
+  },
+  "เวทมนตร์": {
+    th: "เวทมนตร์ที่ใช้ได้",
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3s5.4 6.1 5.4 9.9a5.4 5.4 0 0 1-10.8 0C6.6 9.1 12 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
+  },
+  "พรจากเทพ": {
+    th: "พรติดตัวตั้งแต่เกิด",
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2l1.9 4.9 4.9 1.9-4.9 1.9L12 16.8l-1.9-4.9L5.2 10l4.9-1.9z" fill="currentColor"/><circle cx="17.6" cy="17.6" r="2" fill="currentColor"/></svg>'
+  }
+};
+
+function wikiShortItem(value) {
+  return String(value || "")
+    .replace(/\s*\([^()]*\)/gu, "")
+    .replace(/\s+/gu, " ")
+    .trim()
+    .slice(0, 48)
+    .trim();
+}
+
+function wikiFieldValue(label, row, fields) {
+  const items = row.items && row.items.length ? row.items : [row.value];
+  if (label === "สังกัด") {
+    const camp = characterCamp(fields);
+    if (camp) return camp.label;
+    return items.slice(0, 2).join(" · ");
+  }
+  if (label === "อายุ") {
+    const numbers = (String(row.value || "").match(/\d+/g) || []).map(Number);
+    if (numbers.length) return `${Math.max(...numbers)} ปี`;
+  }
+  const simple = WIKI_VALUE_THAI[String(row.value || "").trim().toLocaleLowerCase()];
+  if (simple) return simple;
+  return items.slice(0, 2).join(" · ");
+}
+
+function wikiAbilityCards(fields = []) {
+  const list = [];
+  const seen = new Set();
+  for (const label of WIKI_POWER_FIELDS) {
+    const row = fields.find(item => item.label === label);
+    if (!row) continue;
+    const kind = WIKI_ABILITY_KINDS[label];
+    for (const raw of (row.items && row.items.length ? row.items : [row.value])) {
+      const text = wikiShortItem(raw);
+      const key = text.toLocaleLowerCase();
+      if (!text || text.length < 3 || seen.has(key)) continue;
+      seen.add(key);
+      list.push({ name: text, desc: kind.th, icon: kind.icon });
+    }
+  }
+  return list.slice(0, 8);
+}
+
 function applyWikiContent(extract, thai, fields) {
   state.wikiExtract = extract || "";
   state.wikiThai = thai || "";
   state.wikiFields = Array.isArray(fields) ? fields : [];
+
+  const grid = byId("wiki-grid");
+  if (grid) {
+    grid.replaceChildren();
+    const rows = WIKI_MAIN_FIELDS.map(label => state.wikiFields.find(row => row.label === label)).filter(Boolean);
+    for (const row of rows) {
+      const field = document.createElement("div");
+      field.className = "wiki-field";
+      if (row.label === "สังกัด") field.classList.add("is-camp");
+      const key = document.createElement("span");
+      key.textContent = WIKI_MAIN_TITLES[row.label] || row.label;
+      const value = document.createElement("b");
+      value.textContent = wikiFieldValue(row.label, row, state.wikiFields);
+      field.append(key, value);
+      grid.append(field);
+    }
+    const info = byId("wiki-info");
+    if (info) info.hidden = rows.length === 0;
+  }
+
+  const powers = byId("wiki-abilities");
+  if (powers) {
+    powers.replaceChildren();
+    const abilities = wikiAbilityCards(state.wikiFields);
+    for (const ability of abilities) {
+      const item = document.createElement("div");
+      item.className = "wiki-ability";
+      const icon = document.createElement("span");
+      icon.className = "wiki-ability-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = ability.icon;
+      const text = document.createElement("div");
+      text.className = "wiki-ability-text";
+      const name = document.createElement("b");
+      name.textContent = ability.name;
+      const desc = document.createElement("small");
+      desc.textContent = ability.desc;
+      text.append(name, desc);
+      item.append(icon, text);
+      powers.append(item);
+    }
+    const section = byId("wiki-power");
+    if (section) section.hidden = abilities.length === 0;
+  }
+
   const list = byId("wiki-fields");
   if (list) {
     list.replaceChildren();
@@ -2553,7 +2686,8 @@ function applyWikiContent(extract, thai, fields) {
       const detail = document.createElement("dd"); detail.textContent = row.value;
       list.append(term, detail);
     }
-    list.hidden = state.wikiFields.length === 0;
+    const all = byId("wiki-all");
+    if (all) all.hidden = state.wikiFields.length === 0;
   }
   renderWikiBody();
 }
@@ -2588,6 +2722,10 @@ async function openWikiPanel() {
   if (!title) { showStatus("ยังไม่รู้ชื่อภาษาอังกฤษของตัวละครนี้ — แก้ชื่อในการ์ดก่อน", 4000); return; }
   state.wikiTitle = title;
   state.wikiShowThai = true;
+  // ยกสีค่ายจากการ์ดมาใช้กับวิกิ ทั้งป้ายค่ายและพื้นการ์ดข้อมูล
+  const cardColor = byId("character-card").style.getPropertyValue("--character-color").trim();
+  if (cardColor) sheet.style.setProperty("--character-color", cardColor);
+  else sheet.style.removeProperty("--character-color");
   byId("character-card").hidden = true;
   byId("wiki-title").textContent = state.characterCardThai || title;
   byId("wiki-name").textContent = state.characterCardThai || title;
