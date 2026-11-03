@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.6";
+const APP_VERSION = "1.15.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.7", note: "หน้าตั้งค่าบอกที่มาของตารางชื่อตัวละคร: จากคลังคำศัพท์กี่ชื่อ (กี่เรื่อง) นำเข้าเอง แก้ชื่อเอง และชื่อที่ยังไม่ทราบที่มา" },
   { version: "1.15.6", note: "บทที่แปลใหม่บนคอมพิวเตอร์ขึ้นเครื่องเองเร็วขึ้น: ซิงก์อีกครั้งเมื่อกลับเข้าหน้าแอป และทุก 5 นาทีระหว่างเปิดอ่านอยู่" },
   { version: "1.15.5", note: "คลังคำศัพท์ที่มากับไฟล์สำรองถูกใช้เองแล้ว: ชื่อไทย ↔ ชื่ออังกฤษเติมเข้าตารางตัวละครให้ทันที ทั้งตอนนำเข้าไฟล์และตอนซิงก์อัตโนมัติ ไม่ทับชื่อที่เคยแก้ไว้" },
   { version: "1.15.4", note: "การ์ดตัวละครที่ยังไม่รู้จัก: รูปเป็น ? ขอบเส้นประ ชื่อ ??? พร้อมป้ายกลุ่มจาง ๆ และช่องใส่ชื่อภาษาอังกฤษ" },
@@ -2160,8 +2161,13 @@ async function characterTitleFor(label) {
 
 async function rememberCharacterName(thai, title) {
   const table = await characterNameTable();
-  table[normalizeCharacterKey(thai)] = title;
+  const key = normalizeCharacterKey(thai);
+  table[key] = title;
   await writeSetting("characterNames", table);
+  const sources = { ...(await readCharacterNameSources()) };
+  sources[key] = { kind: "manual" };
+  await writeCharacterNameSources(sources);
+  await updateCharacterTableCount();
 }
 
 function normalizeCharacterKey(name) {
@@ -2170,11 +2176,25 @@ function normalizeCharacterKey(name) {
 
 async function updateCharacterTableCount() {
   const table = await characterNameTable();
-  const count = Object.keys(table).length;
+  const sources = await readCharacterNameSources();
+  const summary = summarizeCharacterNames(table, sources);
   const label = byId("character-table-count");
-  if (label) label.textContent = count
-    ? "จับคู่ไว้ " + count.toLocaleString("th-TH") + " ชื่อ · ใช้ดึงรูปและกลุ่มของตัวละคร"
-    : "จับคู่ชื่อไทยในบทกับชื่ออังกฤษในวิกิ เพื่อดึงรูปและกลุ่มของตัวละคร";
+  if (!label) return;
+  if (!summary.total) {
+    label.textContent = "จับคู่ชื่อไทยในบทกับชื่ออังกฤษในวิกิ เพื่อดึงรูปและกลุ่มของตัวละคร";
+    label.title = "";
+    return;
+  }
+  const novelCount = summary.novels.length;
+  const parts = [];
+  if (summary.glossary) parts.push("คลังคำศัพท์ " + summary.glossary.toLocaleString("th-TH") + (novelCount ? " (" + novelCount.toLocaleString("th-TH") + " เรื่อง)" : ""));
+  if (summary.imported) parts.push("นำเข้าเอง " + summary.imported.toLocaleString("th-TH"));
+  if (summary.manual) parts.push("แก้ชื่อเอง " + summary.manual.toLocaleString("th-TH"));
+  if (summary.unknown) parts.push("ไม่ทราบที่มา " + summary.unknown.toLocaleString("th-TH"));
+  label.textContent = "จับคู่ไว้ " + summary.total.toLocaleString("th-TH") + " ชื่อ · " + parts.join(" · ");
+  label.title = novelCount
+    ? "จากคลังคำศัพท์แยกตามเรื่อง: " + summary.novels.map(([novel, count]) => (novel || "ไม่ระบุเรื่อง") + " " + count.toLocaleString("th-TH")).join(" · ")
+    : "";
 }
 
 async function importCharacterTable(file) {
@@ -2192,7 +2212,10 @@ async function importCharacterTable(file) {
     const bare = normalizeCharacterKey(target.replace(/\([^)]*\)/gu, ""));
     if (bare && bare !== target && !table[bare]) { table[bare] = source; added += 1; }
   }
+  const sources = { ...(await readCharacterNameSources()) };
+  for (const key of Object.keys(table)) if (!sources[key]) sources[key] = { kind: "import" };
   await writeSetting("characterNames", table);
+  await writeCharacterNameSources(sources);
   await updateCharacterTableCount();
   return added;
 }
@@ -2200,23 +2223,64 @@ async function importCharacterTable(file) {
 async function clearCharacterTable() {
   state.characterNames = {};
   await writeSetting("characterNames", {});
+  await writeCharacterNameSources({});
   await updateCharacterTableCount();
 }
 
 // The extension ships a per-novel glossary (data.novelGlossaries) inside its backup.
 // Every entry already pairs the Thai name with the English wiki name, which is exactly
 // what the character card needs, so the glossary no longer has to be imported by hand.
+// Provenance of every name in the character table. The settings row can then say
+// where the numbers came from instead of showing one unexplained total.
+let characterNameSourceCache = null;
+
+async function readCharacterNameSources() {
+  if (characterNameSourceCache) return characterNameSourceCache;
+  const stored = await readSetting("characterNameSources", {});
+  characterNameSourceCache = stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {};
+  return characterNameSourceCache;
+}
+
+async function writeCharacterNameSources(sources) {
+  characterNameSourceCache = sources || {};
+  await writeSetting("characterNameSources", characterNameSourceCache);
+}
+
+function summarizeCharacterNames(table, sources) {
+  const keys = Object.keys(table || {});
+  const byNovel = new Map();
+  let glossary = 0, imported = 0, manual = 0, unknown = 0;
+  for (const key of keys) {
+    const meta = sources && typeof sources === "object" ? sources[key] : null;
+    if (meta?.kind === "glossary") {
+      glossary += 1;
+      const novel = String(meta.novel || "");
+      byNovel.set(novel, (byNovel.get(novel) || 0) + 1);
+    } else if (meta?.kind === "import") imported += 1;
+    else if (meta?.kind === "manual") manual += 1;
+    else unknown += 1;
+  }
+  return {
+    total: keys.length,
+    glossary,
+    imported,
+    manual,
+    unknown,
+    novels: [...byNovel.entries()].sort((a, b) => b[1] - a[1])
+  };
+}
+
 function characterNamesFromGlossaries(glossaries) {
   const rows = [];
   if (!glossaries || typeof glossaries !== "object" || Array.isArray(glossaries)) return rows;
-  for (const list of Object.values(glossaries)) {
+  for (const [novelId, list] of Object.entries(glossaries)) {
     if (!Array.isArray(list)) continue;
     for (const entry of list) {
       if (!entry || typeof entry !== "object") continue;
       const english = String(entry.src || "").trim();
       const thai = normalizeCharacterKey(entry.dest || "");
       if (!english || !thai || english === thai) continue;
-      rows.push([thai, english]);
+      rows.push([thai, english, String(novelId || "")]);
     }
   }
   return rows;
@@ -2225,20 +2289,36 @@ function characterNamesFromGlossaries(glossaries) {
 async function applyCharacterNames(rows, options = {}) {
   if (!Array.isArray(rows) || !rows.length) return 0;
   const table = options.replace ? {} : { ...(await characterNameTable()) };
+  const sources = options.replace ? {} : { ...(await readCharacterNameSources()) };
   let added = 0;
+  let tagged = false;
+  const tag = (key, novel) => {
+    const meta = sources[key];
+    if (meta && meta.kind === "glossary" && String(meta.novel || "") === novel) return;
+    sources[key] = { kind: "glossary", novel };
+    tagged = true;
+  };
   for (const row of rows) {
     const thai = normalizeCharacterKey(row[0]);
     const english = String(row[1] || "").trim();
-    if (!thai || !english || table[thai]) continue;
-    table[thai] = english;
-    added += 1;
+    const novel = String(row[2] || "").trim();
+    if (!thai || !english) continue;
+    const existing = table[thai];
+    if (!existing) { table[thai] = english; added += 1; tag(thai, novel); }
+    else if (existing === english) tag(thai, novel);
     const bare = normalizeCharacterKey(thai.replace(/\([^)]*\)/gu, ""));
-    if (bare && bare !== thai && !table[bare]) { table[bare] = english; added += 1; }
+    if (bare && bare !== thai) {
+      const bareExisting = table[bare];
+      if (!bareExisting) { table[bare] = english; added += 1; tag(bare, novel); }
+      else if (bareExisting === english) tag(bare, novel);
+    }
   }
-  if (!added) return 0;
-  state.characterNames = table;
-  await writeSetting("characterNames", table);
-  await updateCharacterTableCount();
+  if (added || tagged) {
+    state.characterNames = table;
+    await writeSetting("characterNames", table);
+    await writeCharacterNameSources(sources);
+    await updateCharacterTableCount();
+  }
   return added;
 }
 
