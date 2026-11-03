@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.8";
+const APP_VERSION = "1.14.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.9", note: "การ์ดตัวละครย่อเหลือรูปชื่อและป้าย ส่วนแท็บ ชีวประวัติ/ความสามารถ/ข้อมูลทั่วไป ย้ายไปอยู่ในแผงวิกิ พร้อมปุ่มปิดชื่อย้ายขึ้นแถวบนสุด" },
   { version: "1.14.8", note: "การ์ดตัวละครกลับมามีแท็บ ชีวประวัติ/ความสามารถ/ข้อมูลทั่วไป พร้อมป้ายอาชีพและเผ่าใต้ชื่อ ความสามารถมีไอคอนสีตามหมวด และสถานะในแท็บข้อมูลถูกเบลอไว้กันสปอย" },
   { version: "1.14.7", note: "วิกิ: หัวข้อมีแท็บสีค่าย ความสามารถเรียงแถวละ 2 พร้อมไอคอนคนละสีตามหมวด สถานะเบลอไว้กันสปอย (แตะเพื่อดู) และตัดข้อความสถานะ/เครดิตที่รกออก" },
   { version: "1.14.6", note: "แผงวิกิจัดข้อมูลเป็นการ์ดอ่านง่าย: ข้อมูลทั่วไป 4 ช่อง ความสามารถพร้อมไอคอน บทบาทในเรื่อง และย่อหน้าชีวประวัติ ส่วนกล่องข้อมูลดิบทั้งหมดพับเก็บไว้ท้ายแผง" },
@@ -2524,6 +2525,16 @@ async function translateWikiText(text) {
   return parts.join(" ");
 }
 
+function selectWikiTab(name) {
+  for (const tab of document.querySelectorAll("#wiki-sheet .wiki-tab")) {
+    const active = tab.dataset.wikiTab === name;
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+    tab.classList.toggle("is-active", active);
+    const panel = byId(`wiki-panel-${tab.dataset.wikiTab}`);
+    if (panel) panel.hidden = !active;
+  }
+}
+
 function renderWikiBody() {
   const body = byId("wiki-body");
   if (!body) return;
@@ -2550,8 +2561,12 @@ function renderWikiBody() {
       body.append(role);
     }
   }
-  const bio = byId("wiki-bio");
-  if (bio) bio.hidden = !body.childElementCount;
+  if (!body.childElementCount) {
+    const empty = document.createElement("p");
+    empty.className = "cc-empty";
+    empty.textContent = "หน้านี้ไม่มีข้อมูลย่อ — ลองแก้ชื่อภาษาอังกฤษในการ์ด";
+    body.append(empty);
+  }
   const toggle = byId("wiki-original");
   if (toggle) {
     toggle.hidden = !state.wikiThai;
@@ -2673,14 +2688,18 @@ function applyWikiContent(extract, thai, fields) {
       }
       grid.append(field);
     }
-    const info = byId("wiki-info");
-    if (info) info.hidden = rows.length === 0;
   }
 
   const powers = byId("wiki-abilities");
   if (powers) {
     powers.replaceChildren();
     const abilities = wikiAbilityCards(state.wikiFields);
+    if (!abilities.length) {
+      const empty = document.createElement("p");
+      empty.className = "cc-empty";
+      empty.textContent = "วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้";
+      powers.append(empty);
+    }
     for (const ability of abilities) {
       const item = document.createElement("div");
       item.className = "wiki-ability";
@@ -2699,8 +2718,6 @@ function applyWikiContent(extract, thai, fields) {
       item.append(icon, text);
       powers.append(item);
     }
-    const section = byId("wiki-power");
-    if (section) section.hidden = abilities.length === 0;
   }
 
   const list = byId("wiki-fields");
@@ -2768,6 +2785,7 @@ async function openWikiPanel() {
   const credit = byId("wiki-credit"); if (credit) credit.hidden = true;
   const status = byId("wiki-status"); if (status) status.textContent = "กำลังดึงข้อมูลจากวิกิ…";
   const toggle = byId("wiki-original"); if (toggle) toggle.hidden = true;
+  selectWikiTab("bio");
   if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
 
   const cache = (await readSetting("wikiCache", {})) || {};
@@ -2803,21 +2821,13 @@ function openCharacterWiki() {
   window.open(`https://rezero.fandom.com/wiki/${slug}`, "_blank", "noopener,noreferrer");
 }
 
-/* ---------- เนื้อหาในแท็บของการ์ดตัวละคร ---------- */
-const CARD_INFO_FIELDS = ["สังกัด", "เผ่าพันธุ์", "อายุ", "สถานะ"];
+/* ---------- ป้ายอาชีพ/เผ่าใต้ชื่อในการ์ด ---------- */
 const CARD_JOB_THAI = [
   [/maid/i, "เมดสาว"], [/knight/i, "อัศวิน"], [/butler/i, "พ่อบ้าน"],
   [/high school student|student/i, "นักเรียน"], [/gladiator/i, "นักสู้"],
   [/royal guard|royal army/i, "องครักษ์"], [/princess/i, "เจ้าหญิง"],
   [/prince/i, "เจ้าชาย"], [/shopkeeper|merchant/i, "พ่อค้า"], [/emperor|empress/i, "จักรพรรดิ"]
 ];
-
-function cardMessage(text) {
-  const note = document.createElement("p");
-  note.className = "cc-empty";
-  note.textContent = text;
-  return note;
-}
 
 function cardJobThai(value) {
   const text = String(value || "").trim();
@@ -2830,9 +2840,9 @@ function renderCardTags(fields = state.characterCardFields || []) {
   const box = byId("character-card-tags");
   if (!box) return;
   box.replaceChildren();
-  const add = text => {
+  const add = (text, plain) => {
     const chip = document.createElement("span");
-    chip.className = "cc-tag";
+    chip.className = plain ? "cc-tag is-plain" : "cc-tag";
     chip.textContent = text;
     box.append(chip);
   };
@@ -2840,176 +2850,13 @@ function renderCardTags(fields = state.characterCardFields || []) {
   if (job) {
     const first = (job.items && job.items.length ? job.items[0] : job.value) || "";
     const thai = cardJobThai(first);
-    if (thai) add(thai);
+    if (thai) add(thai, false);
   }
   const race = fields.find(row => row.label === "เผ่าพันธุ์");
   if (race) {
     const thai = WIKI_VALUE_THAI[String(race.value || "").trim().toLocaleLowerCase()] || race.value;
     const short = String(thai).replace(/\s*\([^()]*\)/u, "").trim();
-    if (short) add(short.startsWith("เผ่า") ? short : `เผ่า${short}`);
-  }
-}
-
-function renderCardInfo(fields = []) {
-  const panel = byId("cc-panel-info");
-  if (!panel) return;
-  panel.replaceChildren();
-  const rows = CARD_INFO_FIELDS.map(label => fields.find(row => row.label === label)).filter(Boolean);
-  if (!rows.length) {
-    panel.append(cardMessage(fields.length
-      ? "วิกิไม่มีช่องข้อมูลพื้นฐานของตัวละครนี้"
-      : "ยังไม่รู้ชื่อภาษาอังกฤษ — แตะไอคอนดินสอเพื่อแก้ชื่อก่อน"));
-    return;
-  }
-  const grid = document.createElement("div");
-  grid.className = "wiki-grid";
-  for (const row of rows) {
-    // สถานะเป็นสปอย เบลอไว้ก่อน แตะเพื่อดู
-    const isStatus = row.label === "สถานะ";
-    const field = document.createElement(isStatus ? "button" : "div");
-    field.className = "wiki-field";
-    if (row.label === "สังกัด") field.classList.add("is-camp");
-    if (isStatus) {
-      field.type = "button";
-      field.classList.add("is-spoiler");
-      field.setAttribute("aria-pressed", "false");
-      field.setAttribute("aria-label", "สถานะถูกซ่อนไว้ แตะเพื่อดู");
-      field.addEventListener("click", () => {
-        const shown = field.classList.toggle("is-revealed");
-        field.setAttribute("aria-pressed", String(shown));
-        field.setAttribute("aria-label", shown ? "ซ่อนสถานะอีกครั้ง" : "สถานะถูกซ่อนไว้ แตะเพื่อดู");
-      });
-    }
-    const key = document.createElement("span");
-    key.textContent = WIKI_MAIN_TITLES[row.label] || row.label;
-    const value = document.createElement("b");
-    value.textContent = wikiFieldValue(row.label, row, fields);
-    field.append(key, value);
-    if (isStatus) {
-      const hint = document.createElement("i");
-      hint.className = "wiki-spoiler-hint";
-      hint.textContent = "แตะเพื่อดู";
-      field.append(hint);
-    }
-    grid.append(field);
-  }
-  panel.append(grid);
-}
-
-function renderCardAbilities(fields = []) {
-  const panel = byId("cc-panel-power");
-  if (!panel) return;
-  panel.replaceChildren();
-  const abilities = wikiAbilityCards(fields);
-  if (!abilities.length) {
-    panel.append(cardMessage("วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้"));
-    return;
-  }
-  for (const ability of abilities) {
-    const item = document.createElement("div");
-    item.className = "cc-ability";
-    if (ability.color) item.style.setProperty("--ability-color", ability.color);
-    const icon = document.createElement("span");
-    icon.className = "cc-ability-icon";
-    icon.setAttribute("aria-hidden", "true");
-    icon.innerHTML = ability.icon;
-    const text = document.createElement("div");
-    text.className = "cc-ability-text";
-    const name = document.createElement("b");
-    name.textContent = ability.name;
-    const desc = document.createElement("small");
-    desc.textContent = ability.desc;
-    text.append(name, desc);
-    item.append(icon, text);
-    panel.append(item);
-  }
-}
-
-function renderCardPanels() {
-  const fields = state.characterCardFields || [];
-  renderCardInfo(fields);
-  renderCardAbilities(fields);
-}
-
-function renderCardBio() {
-  const panel = byId("cc-panel-wiki");
-  if (!panel) return;
-  const text = state.characterCardIntroThai || state.characterCardIntro || "";
-  if (!text) {
-    panel.replaceChildren(cardMessage("ยังไม่มีเรื่องย่อ — แตะไอคอนลูกโลกเพื่อเปิดวิกิในแอป"));
-    return;
-  }
-  panel.replaceChildren();
-  const body = document.createElement("p");
-  body.className = "cc-bio";
-  body.textContent = text;
-  panel.append(body);
-  const job = (state.characterCardFields || []).find(row => row.label === "อาชีพ");
-  if (job) {
-    const items = (job.items && job.items.length ? job.items : [job.value]).filter(Boolean).slice(0, 2);
-    if (items.length) {
-      const box = document.createElement("div");
-      box.className = "cc-highlight";
-      const label = document.createElement("b");
-      label.textContent = "บทบาท";
-      const value = document.createElement("span");
-      value.textContent = items.map(cardJobThai).join(" · ");
-      box.append(label, value);
-      panel.append(box);
-    }
-  }
-  if (!state.characterCardIntroThai) {
-    const note = document.createElement("p");
-    note.className = "cc-empty";
-    note.textContent = "ต้นฉบับภาษาอังกฤษ · เปิดวิกิในแอปเพื่อแปลไทย";
-    panel.append(note);
-  }
-}
-
-function selectCharacterTab(name) {
-  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
-    const active = tab.dataset.ccTab === name;
-    tab.setAttribute("aria-selected", active ? "true" : "false");
-    tab.classList.toggle("is-active", active);
-    const panel = byId(`cc-panel-${tab.dataset.ccTab}`);
-    if (panel) panel.hidden = !active;
-  }
-  if (name === "wiki") void loadCardBrief();
-}
-
-async function loadCardBrief() {
-  const panel = byId("cc-panel-wiki");
-  if (!panel) return;
-  const title = state.characterCardWiki || state.characterCardQuery;
-  if (!title) {
-    panel.replaceChildren(cardMessage("ยังไม่รู้ชื่อภาษาอังกฤษ — แตะไอคอนดินสอเพื่อแก้ชื่อก่อน"));
-    return;
-  }
-  if (state.characterCardIntro || state.characterCardIntroThai) {
-    renderCardBio();
-    return;
-  }
-  const token = state.characterCardToken;
-  const briefToken = (state.characterCardBriefToken || 0) + 1;
-  state.characterCardBriefToken = briefToken;
-  panel.replaceChildren(cardMessage("กำลังดึงเรื่องย่อจากวิกิ…"));
-  try {
-    const cache = (await readSetting("wikiCache", {})) || {};
-    const cached = cache[title];
-    const page = await fetchWikiPage(title);
-    if (token !== state.characterCardToken || briefToken !== state.characterCardBriefToken) return;
-    state.characterCardIntro = page.intro || cached?.extract || "";
-    state.characterCardIntroThai = cached && cached.extract === state.characterCardIntro ? cached.thai || "" : "";
-    if (!(state.characterCardFields || []).length && page.fields.length) {
-      state.characterCardFields = page.fields;
-      applyCharacterFaction(null, page.fields);
-      renderCardPanels();
-      renderCardTags(page.fields);
-    }
-    renderCardBio();
-  } catch (error) {
-    if (token !== state.characterCardToken) return;
-    panel.replaceChildren(cardMessage(`ดึงเรื่องย่อไม่สำเร็จ (${error.message}) — ลองแก้ชื่อภาษาอังกฤษในการ์ด`));
+    if (short) add(short.startsWith("เผ่า") ? short : `เผ่า${short}`, true);
   }
 }
 
@@ -3027,17 +2874,12 @@ async function applyCharacterName(title) {
   state.characterCardWiki = title;
   state.characterCardImage = image || "";
   state.characterCardFields = [];
-  state.characterCardIntro = "";
-  state.characterCardIntroThai = "";
-  renderCardPanels();
   renderCardTags([]);
   const fields = await fetchCharacterFields(title);
   if (byId("character-card").hidden || token !== state.characterCardToken) return;
   state.characterCardFields = fields;
   applyCharacterFaction(null, fields);
-  renderCardPanels();
   renderCardTags(fields);
-  void loadCardBrief();
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
 }
 
@@ -3054,15 +2896,11 @@ async function openCharacterCard(label) {
   byId("character-card-note").textContent = "กำลังค้นรูป…";
   // ล้างชื่อ/รูป/ค่ายของคนก่อนหน้า ไม่งั้นการ์ดใหม่จะยังติดข้อมูลคนเก่าอยู่
   state.characterCardFields = [];
-  state.characterCardIntro = "";
-  state.characterCardIntroThai = "";
   state.characterCardQuery = "";
   state.characterCardWiki = "";
   state.characterCardImage = "";
   applyCharacterFaction(null, []);
-  renderCardPanels();
   renderCardTags([]);
-  selectCharacterTab("wiki");
   card.hidden = false;
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
@@ -3070,7 +2908,6 @@ async function openCharacterCard(label) {
   state.characterCardQuery = query;
   state.characterCardThai = thai;
   state.characterCardWiki = query;
-  void loadCardBrief();
   const external = byId("character-card-external");
   if (external) {
     external.hidden = !query;
@@ -3094,9 +2931,7 @@ async function openCharacterCard(label) {
   if (card.hidden || token !== state.characterCardToken) return;
   state.characterCardFields = fields;
   applyCharacterFaction(portrait.entry, fields);
-  renderCardPanels();
   renderCardTags(fields);
-  if (state.characterCardIntro || state.characterCardIntroThai) renderCardBio();
   if (!image) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
@@ -3128,8 +2963,8 @@ function installCharacterCards() {
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
   byId("character-card-copy")?.addEventListener("click", () => { void copyCharacterName(); });
-  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
-    tab.addEventListener("click", () => selectCharacterTab(tab.dataset.ccTab));
+  for (const tab of document.querySelectorAll("#wiki-sheet .wiki-tab")) {
+    tab.addEventListener("click", () => selectWikiTab(tab.dataset.wikiTab));
   }
   document.addEventListener("keydown", event => {
     if (event.key !== "Escape") return;
