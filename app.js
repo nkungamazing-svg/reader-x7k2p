@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.3";
+const APP_VERSION = "1.15.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.4", note: "การ์ดตัวละครที่ยังไม่รู้จัก: รูปเป็น ? ขอบเส้นประ ชื่อ ??? พร้อมป้ายกลุ่มจาง ๆ และช่องใส่ชื่อภาษาอังกฤษ" },
   { version: "1.15.3", note: "แผงวิกิ: ปุ่มล่างเป็นแถบติดขอบไม่ทับเนื้อหา แตะพื้นหลังเบลอเพื่อปิดได้ และชิปตำแหน่งยาว ๆ บนการ์ดถูกย่อให้อ่านพอดี" },
   { version: "1.15.2", note: "เก็บคำแปลบทบาทให้ครบขึ้น: หัวหน้าตระกูล มังกร ราชอาณาจักร ผู้ดูแล และจัดรูปวงเล็บ/ช่องว่างให้อ่านง่าย" },
   { version: "1.15.1", note: "สีค่าย/กลุ่มใช้ค่าเดียวกับวิกิ (character-header) และแปลตำแหน่งยาว ๆ อย่าง President of the Hoshin Company หรือ Royal Selection Candidate เป็นไทยทั้งบนการ์ดและในวิกิ" },
@@ -2311,6 +2312,17 @@ async function copyCharacterName() {
 }
 
 /* รูปตัวละครพัง/บล็อก → วาดอวาตาร์ SVG ให้เห็นแทนไอคอนรูปแตก */
+function setCharacterUnknownFigure() {
+  const figure = byId("character-card-figure");
+  if (!figure) return;
+  const mark = document.createElement("span");
+  mark.className = "cc-unknown-mark";
+  mark.setAttribute("aria-hidden", "true");
+  mark.textContent = "?";
+  figure.replaceChildren(mark);
+  state.characterCardImage = "";
+}
+
 function characterAvatarFallback(name) {
   const letter = String(name || "?").trim().charAt(0).replace(/[<>&"]/g, "") || "?";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">`
@@ -2966,6 +2978,13 @@ async function applyCharacterName(title) {
   const image = await lookupCharacterImage(title);
   if (byId("character-card").hidden || token !== state.characterCardToken) return;
   setCharacterTitle(title);
+  byId("character-card").classList.remove("is-unknown");
+  {
+    const campTag = byId("character-card-camp");
+    const copy = byId("character-card-copy");
+    if (campTag) campTag.classList.remove("is-unknown");
+    if (copy) copy.hidden = false;
+  }
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
   state.characterCardQuery = title;
@@ -3012,14 +3031,32 @@ async function openCharacterCard(label) {
     if (query) external.setAttribute("aria-label", `เปิดหน้าวิกิของ ${query}`);
   }
   if (!query) {
-    setCharacterFigure("", thai);
+    // ตัวละครที่ยังไม่รู้จัก: การ์ดโทนจาง ๆ มี ? แทนรูป แล้วให้ใส่ชื่อเอง
+    card.classList.add("is-unknown");
+    byId("character-card-name").textContent = "???";
+    byId("character-card-title").textContent = thai && thai !== "ตัวละคร" ? thai : "ยังไม่รู้จักตัวละครนี้";
+    setCharacterUnknownFigure();
     showCharacterForm(true);
-    const tableSize = state.characterNames ? Object.keys(state.characterNames).length : 0;
-    byId("character-card-note").textContent = tableSize
-      ? "“" + thai + "” ไม่อยู่ในตารางชื่อที่นำเข้า — พิมพ์ชื่อภาษาอังกฤษแล้วกดบันทึก"
-      : "ยังไม่มีชื่อภาษาอังกฤษ — พิมพ์หรือเลือกชื่อจากวิกิแล้วกดบันทึก (จำไว้ครั้งเดียว)";
+    const campTag = byId("character-card-camp");
+    const campName = byId("character-card-camp-name");
+    if (campTag && campName) {
+      campTag.hidden = false;
+      campTag.classList.add("is-unknown");
+      campName.textContent = "ยังไม่ระบุกลุ่ม";
+    }
+    renderCardTags([]);
+    const copy = byId("character-card-copy");
+    if (copy) copy.hidden = true;
+    byId("character-card-note").textContent = "แตะไอคอนดินสอเพื่อใส่ชื่อภาษาอังกฤษของตัวละครนี้";
     byId("character-card-input").value = "";
     return;
+  }
+  card.classList.remove("is-unknown");
+  {
+    const campTag = byId("character-card-camp");
+    const copy = byId("character-card-copy");
+    if (campTag) campTag.classList.remove("is-unknown");
+    if (copy) copy.hidden = false;
   }
   const portrait = await lookupCharacterPortrait(query);
   const image = portrait.image;
