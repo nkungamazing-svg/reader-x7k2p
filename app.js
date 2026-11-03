@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.1", note: "หน้าต่างลอยแสดงรูปประกอบของย่อหน้าที่กำลังอ่าน" },
   { version: "2.0.0", note: "เพิ่มคำอ่านเองได้ในชีตคลังคำอ่านของมือถือ" },
   { version: "1.15.9", note: "ซิงก์แล้วบอกจำนวนคำอ่านที่เข้ามา และรีเฟรชคลังคำอ่านที่เปิดอยู่" },
   { version: "1.15.8", note: "ปุ่ม “ดูรายการ” ใต้ตารางชื่อตัวละคร: เปิดดูได้ทุกชื่อที่มี พร้อมป้ายที่มาและช่องค้นหา" },
