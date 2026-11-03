@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.6";
+const APP_VERSION = "1.14.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.7", note: "วิกิ: หัวข้อมีแท็บสีค่าย ความสามารถเรียงแถวละ 2 พร้อมไอคอนคนละสีตามหมวด สถานะเบลอไว้กันสปอย (แตะเพื่อดู) และตัดข้อความสถานะ/เครดิตที่รกออก" },
   { version: "1.14.6", note: "แผงวิกิจัดข้อมูลเป็นการ์ดอ่านง่าย: ข้อมูลทั่วไป 4 ช่อง ความสามารถพร้อมไอคอน บทบาทในเรื่อง และย่อหน้าชีวประวัติ ส่วนกล่องข้อมูลดิบทั้งหมดพับเก็บไว้ท้ายแผง" },
   { version: "1.14.5", note: "การ์ดตัวละครเหลือแค่รูป ชื่อไทย ชื่ออังกฤษ และป้ายค่ายสีเด่นตามวิกิ ส่วนชีวประวัติ/ความสามารถ/ข้อมูลทั่วไปย้ายไปอยู่ในแผงวิกิ และปิดรูปเต็มจอได้ด้วยการแตะพื้นหลัง" },
   { version: "1.14.4", note: "แก้การ์ดตัวละครค้างข้อมูลคนก่อนหน้า: ล้างชื่อและรูปทุกครั้งที่เปิดการ์ดใหม่ และกันคำตอบวิกิรอบเก่ามาเขียนทับ พร้อมโหลดเรื่องย่อของชื่อใหม่อีกครั้ง" },
@@ -2574,14 +2575,17 @@ const WIKI_VALUE_THAI = {
 const WIKI_ABILITY_KINDS = {
   Authority: {
     th: "พลังจากบาป",
+    color: "#a855f7",
     icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.2 2.8 6 13.4h4.4L10.8 21 18 10.4h-4.4z" fill="currentColor"/></svg>'
   },
   "เวทมนตร์": {
     th: "เวทมนตร์ที่ใช้ได้",
+    color: "#3b82f6",
     icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3s5.4 6.1 5.4 9.9a5.4 5.4 0 0 1-10.8 0C6.6 9.1 12 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
   },
   "พรจากเทพ": {
     th: "พรติดตัวตั้งแต่เกิด",
+    color: "#f59e0b",
     icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2l1.9 4.9 4.9 1.9-4.9 1.9L12 16.8l-1.9-4.9L5.2 10l4.9-1.9z" fill="currentColor"/><circle cx="17.6" cy="17.6" r="2" fill="currentColor"/></svg>'
   }
 };
@@ -2623,7 +2627,7 @@ function wikiAbilityCards(fields = []) {
       const key = text.toLocaleLowerCase();
       if (!text || text.length < 3 || seen.has(key)) continue;
       seen.add(key);
-      list.push({ name: text, desc: kind.th, icon: kind.icon });
+      list.push({ name: text, desc: kind.th, icon: kind.icon, color: kind.color });
     }
   }
   return list.slice(0, 8);
@@ -2639,14 +2643,33 @@ function applyWikiContent(extract, thai, fields) {
     grid.replaceChildren();
     const rows = WIKI_MAIN_FIELDS.map(label => state.wikiFields.find(row => row.label === label)).filter(Boolean);
     for (const row of rows) {
-      const field = document.createElement("div");
+      // สถานะเป็นสปอย เลยเบลอไว้ก่อน แตะที่การ์ดเพื่อดู/ซ่อน
+      const isStatus = row.label === "สถานะ";
+      const field = document.createElement(isStatus ? "button" : "div");
       field.className = "wiki-field";
       if (row.label === "สังกัด") field.classList.add("is-camp");
+      if (isStatus) {
+        field.type = "button";
+        field.classList.add("is-spoiler");
+        field.setAttribute("aria-pressed", "false");
+        field.setAttribute("aria-label", "สถานะถูกซ่อนไว้ แตะเพื่อดู");
+        field.addEventListener("click", () => {
+          const shown = field.classList.toggle("is-revealed");
+          field.setAttribute("aria-pressed", String(shown));
+          field.setAttribute("aria-label", shown ? "ซ่อนสถานะอีกครั้ง" : "สถานะถูกซ่อนไว้ แตะเพื่อดู");
+        });
+      }
       const key = document.createElement("span");
       key.textContent = WIKI_MAIN_TITLES[row.label] || row.label;
       const value = document.createElement("b");
       value.textContent = wikiFieldValue(row.label, row, state.wikiFields);
       field.append(key, value);
+      if (isStatus) {
+        const hint = document.createElement("i");
+        hint.className = "wiki-spoiler-hint";
+        hint.textContent = "แตะเพื่อดู";
+        field.append(hint);
+      }
       grid.append(field);
     }
     const info = byId("wiki-info");
@@ -2660,6 +2683,7 @@ function applyWikiContent(extract, thai, fields) {
     for (const ability of abilities) {
       const item = document.createElement("div");
       item.className = "wiki-ability";
+      if (ability.color) item.style.setProperty("--ability-color", ability.color);
       const icon = document.createElement("span");
       icon.className = "wiki-ability-icon";
       icon.setAttribute("aria-hidden", "true");
@@ -2702,9 +2726,9 @@ async function runWikiTranslate() {
     const thai = await translateWikiText(state.wikiExtract);
     state.wikiShowThai = true;
     applyWikiContent(state.wikiExtract, thai, state.wikiFields);
-    if (status) status.textContent = "ข้อมูลย่อจากวิกิ (แปลอัตโนมัติ)";
+    if (status) status.textContent = "";
     const credit = byId("wiki-credit");
-    if (credit) { credit.hidden = false; credit.textContent = "คำแปลจาก MyMemory ซึ่งเป็นบริการแปลฟรี อาจคลาดเคลื่อน · ข้อมูลต้นฉบับจาก Re:Zero Wiki"; }
+    if (credit) { credit.hidden = false; credit.classList.add("wiki-credit-tiny"); credit.textContent = "แปลด้วย MyMemory · ข้อมูลจาก Re:Zero Wiki"; }
     const cache = (await readSetting("wikiCache", {})) || {};
     cache[state.wikiTitle] = { extract: state.wikiExtract, thai, fields: state.wikiFields, at: Date.now() };
     await writeSetting("wikiCache", cache);
@@ -2749,7 +2773,7 @@ async function openWikiPanel() {
   const cached = cache[title];
   if (cached?.extract) {
     applyWikiContent(cached.extract, cached.thai || "", cached.fields || []);
-    if (status) status.textContent = cached.thai ? "คำแปลที่บันทึกไว้" : "ข้อมูลย่อจากวิกิ";
+    if (status) status.textContent = "";
   }
   try {
     const page = await fetchWikiPage(title);
@@ -2759,7 +2783,7 @@ async function openWikiPanel() {
     applyWikiContent(page.intro || cached?.extract || "", thai, page.fields.length ? page.fields : cached?.fields || []);
     if (status) {
       status.textContent = page.intro
-        ? "ข้อมูลย่อจากวิกิ"
+        ? ""
         : page.fields.length
           ? "หน้านี้ไม่มีข้อมูลย่อ มีแต่กล่องข้อมูล"
           : "หน้านี้ไม่มีข้อมูลให้แสดง — ลองแก้ชื่อภาษาอังกฤษในการ์ด";
