@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.2";
+const APP_VERSION = "1.15.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.3", note: "แผงวิกิ: ปุ่มล่างเป็นแถบติดขอบไม่ทับเนื้อหา แตะพื้นหลังเบลอเพื่อปิดได้ และชิปตำแหน่งยาว ๆ บนการ์ดถูกย่อให้อ่านพอดี" },
   { version: "1.15.2", note: "เก็บคำแปลบทบาทให้ครบขึ้น: หัวหน้าตระกูล มังกร ราชอาณาจักร ผู้ดูแล และจัดรูปวงเล็บ/ช่องว่างให้อ่านง่าย" },
   { version: "1.15.1", note: "สีค่าย/กลุ่มใช้ค่าเดียวกับวิกิ (character-header) และแปลตำแหน่งยาว ๆ อย่าง President of the Hoshin Company หรือ Royal Selection Candidate เป็นไทยทั้งบนการ์ดและในวิกิ" },
   { version: "1.15.0", note: "หน้าดูรูปเต็มจอ: พื้นหลังเบลอจาง ๆ เหมือนตอนเปิดแผงตั้งค่า และยังแตะพื้นหลังเพื่อปิดได้" },
@@ -2847,6 +2848,12 @@ const ROLE_THAI = [
   [/\bimperial guard\b/gi, "องครักษ์จักรพรรดิ"],
   [/\bknights? of the royal guard\b/gi, "องครักษ์หลวง"],
   [/\broyal guard\b/gi, "องครักษ์หลวง"],
+  [/\bseventy-seventh emperor of the sacred vollachia empire\b/gi, "จักรพรรดิ Vollachia"],
+  [/\bsacred vollachia empire\b/gi, "จักรวรรดิ Vollachia"],
+  [/\bvollachia empire\b/gi, "จักรวรรดิ Vollachia"],
+  [/\bseventy-seventh\b/gi, "ที่ 77"],
+  [/\bempire\b/gi, "จักรวรรดิ"],
+  [/\bsacred\b/gi, "ศักดิ์สิทธิ์"],
   [/\bkingdom\b/gi, "ราชอาณาจักร"],
   [/\bmaid\b/gi, "เมด"],
   [/\bbutler\b/gi, "พ่อบ้าน"],
@@ -2905,10 +2912,26 @@ function roleThai(value) {
   return text || wikiShortItem(value);
 }
 
+/* ชิปบนการ์ดมีที่จำกัด ตำแหน่งยาว ๆ ให้ย่อเหลือแก่นความหมาย */
+function shortRole(value) {
+  const thai = roleThai(value);
+  if (thai.length <= 26) return thai;
+  const trimmed = thai.replace(/\s*\([^()]*\)/gu, "").trim();
+  if (trimmed.length <= 26) return trimmed;
+  const words = trimmed.split(" ");
+  let out = "";
+  for (const word of words) {
+    const next = (out + " " + word).trim();
+    if (next.length > 26) break;
+    out = next;
+  }
+  return out ? `${out}…` : `${trimmed.slice(0, 24)}…`;
+}
+
 function cardJobThai(value) {
   const text = String(value || "").trim();
   if (!text) return "";
-  return roleThai(text);
+  return shortRole(text);
 }
 
 function renderCardTags(fields = state.characterCardFields || []) {
@@ -3038,6 +3061,21 @@ function installCharacterCards() {
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
   byId("character-card-copy")?.addEventListener("click", () => { void copyCharacterName(); });
+  // แตะพื้นที่ว่างรอบแผงวิกิ (หลังเบลอ) เพื่อปิดได้เลย ไม่ต้องกดกากบาท
+  const wikiSheet = byId("wiki-sheet");
+  wikiSheet?.addEventListener("click", event => {
+    if (event.target !== wikiSheet) return;
+    // แตะในเนื้อแผงต้องไม่ปิด แตะรอบนอก (หลังเบลอ) ปิดได้
+    const rect = wikiSheet.getBoundingClientRect();
+    const style = getComputedStyle(wikiSheet);
+    const left = rect.left + (parseFloat(style.paddingLeft) || 0);
+    const right = rect.right - (parseFloat(style.paddingRight) || 0);
+    const top = rect.top + (parseFloat(style.paddingTop) || 0);
+    const bottom = rect.bottom - (parseFloat(style.paddingBottom) || 0);
+    if (event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom) return;
+    if (typeof wikiSheet.close === "function") wikiSheet.close();
+    else wikiSheet.removeAttribute("open");
+  });
   for (const tab of document.querySelectorAll("#wiki-sheet .wiki-tab")) {
     tab.addEventListener("click", () => selectWikiTab(tab.dataset.wikiTab));
   }
