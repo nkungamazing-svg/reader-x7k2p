@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.14.4";
+const APP_VERSION = "1.14.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.14.5", note: "การ์ดตัวละครเหลือแค่รูป ชื่อไทย ชื่ออังกฤษ และป้ายค่ายสีเด่นตามวิกิ ส่วนชีวประวัติ/ความสามารถ/ข้อมูลทั่วไปย้ายไปอยู่ในแผงวิกิ และปิดรูปเต็มจอได้ด้วยการแตะพื้นหลัง" },
   { version: "1.14.4", note: "แก้การ์ดตัวละครค้างข้อมูลคนก่อนหน้า: ล้างชื่อและรูปทุกครั้งที่เปิดการ์ดใหม่ และกันคำตอบวิกิรอบเก่ามาเขียนทับ พร้อมโหลดเรื่องย่อของชื่อใหม่อีกครั้ง" },
   { version: "1.14.3", note: "การ์ดตัวละครดีไซน์ใหม่: รูปโปรไฟล์ใหญ่มีวงแหวนสีค่าย ป้ายเผ่าพันธุ์–อาชีพใต้ชื่อ ปุ่มกลม 3 ปุ่ม และแท็บชีวประวัติ–ความสามารถ–ข้อมูลทั่วไปแบบการ์ด" },
   { version: "1.14.2", note: "การ์ดตัวละครเล็กลง: เรื่องย่อเอาแค่ย่อหน้าแรก ข้อมูลเหลือสังกัด–เผ่าพันธุ์–อายุ–สถานะ และความสามารถแสดงเป็นรายการสั้น ๆ" },
@@ -1274,12 +1275,39 @@ function toggleBookmark() {
 }
 
 /* ---------- ดูรูปประกอบในบทแบบเต็มจอ ---------- */
+function closeImageViewer() {
+  const viewer = byId("image-viewer");
+  if (!viewer) return;
+  if (typeof viewer.close === "function" && viewer.open) viewer.close();
+  else viewer.removeAttribute("open");
+}
+
+/* แตะพื้นที่ว่างรอบรูป (ขอบที่รูปไม่ถึง) ก็ปิดได้ ไม่ต้องเล็งกากบาท */
+function viewerBackgroundTap(viewer, image, event) {
+  if (event.target === viewer) { closeImageViewer(); return; }
+  if (event.target !== image || !image.naturalWidth) return;
+  const rect = image.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const scale = Math.min(rect.width / image.naturalWidth, rect.height / image.naturalHeight);
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+  const left = rect.left + (rect.width - width) / 2;
+  const top = rect.top + (rect.height - height) / 2;
+  const outside = event.clientX < left || event.clientX > left + width
+    || event.clientY < top || event.clientY > top + height;
+  if (outside) closeImageViewer();
+}
+
 function openImageViewer(src, alt = "") {
   const viewer = byId("image-viewer"), image = byId("image-viewer-img");
   if (!viewer || !image || !src) return;
   image.referrerPolicy = "no-referrer";
   image.src = src;
   image.alt = alt || "รูปประกอบ";
+  if (!viewer.dataset.tapClose) {
+    viewer.dataset.tapClose = "1";
+    viewer.addEventListener("click", event => viewerBackgroundTap(viewer, image, event));
+  }
   if (typeof viewer.showModal === "function") viewer.showModal();
   else viewer.setAttribute("open", "");
 }
@@ -2257,265 +2285,6 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
     campTag.hidden = !camp;
     if (camp && campName) campName.textContent = camp.label;
   }
-  renderCharacterTags(fields);
-}
-
-/* ---------- แผงข้อมูล/ความสามารถ/เรื่องย่อ ในการ์ดตัวละคร ---------- */
-/* การ์ดตัวละครแสดงแค่ข้อมูลหลัก 4 ช่อง ไม่ยกกล่องข้อมูลทั้งอันมาให้รก */
-const CHARACTER_INFO_FIELDS = ["สังกัด", "เผ่าพันธุ์", "อายุ", "สถานะ"];
-const CHARACTER_POWER_FIELDS = ["Authority", "เวทมนตร์", "พรจากเทพ"];
-/* ป้ายที่แสดงบนการ์ด (ชื่อช่องในวิกิ ← หัวข้อที่อ่านง่ายกว่า) */
-const CC_INFO_TITLES = { "สังกัด": "สังกัดค่าย" };
-
-/* คำง่าย ๆ ที่วิกิเขียนเป็นอังกฤษ แปลให้อ่านไทยได้ทันที */
-const WIKI_VALUE_THAI = {
-  human: "มนุษย์ (Human)", elf: "เอลฟ์ (Elf)", "half elf": "ครึ่งเอลฟ์ (Half-Elf)", "half-elf": "ครึ่งเอลฟ์ (Half-Elf)",
-  oni: "ยักษ์ (Oni)", "half oni": "ครึ่งยักษ์ (Half-Oni)", beastman: "มนุษย์สัตว์ (Beastman)",
-  spirit: "วิญญาณ (Spirit)", dragon: "มังกร (Dragon)", demon: "ปีศาจ (Demon)",
-  alive: "มีชีวิต (Alive)", deceased: "เสียชีวิต (Deceased)", dead: "เสียชีวิต (Dead)", unknown: "ไม่ทราบ (Unknown)"
-};
-
-/* ป้ายสั้น ๆ ใต้ชื่อ: เผ่าพันธุ์ + อาชีพ แบบที่วิกิเขียน */
-const WIKI_JOB_THAI = [
-  [/maid/i, "เมดสาว"], [/knight/i, "อัศวิน"], [/butler/i, "พ่อบ้าน"],
-  [/high school student|student/i, "นักเรียน"], [/gladiator/i, "นักสู้"],
-  [/royal guard|royal army/i, "องครักษ์"], [/emperor|empress/i, "จักรพรรดิ"],
-  [/princess/i, "เจ้าหญิง"], [/prince/i, "เจ้าชาย"], [/shopkeeper|merchant/i, "พ่อค้า"]
-];
-
-function wikiJobThai(value) {
-  const text = String(value || "").trim();
-  if (!text) return "";
-  const hit = WIKI_JOB_THAI.find(([pattern]) => pattern.test(text));
-  return hit ? hit[1] : wikiShortItem(text);
-}
-
-function renderCharacterTags(fields = []) {
-  const box = byId("character-card-tags");
-  if (!box) return;
-  box.replaceChildren();
-  const add = text => {
-    const chip = document.createElement("span");
-    chip.className = "cc-tag";
-    chip.textContent = text;
-    box.append(chip);
-  };
-  const race = fields.find(row => row.label === "เผ่าพันธุ์");
-  if (race) {
-    const thai = WIKI_VALUE_THAI[String(race.value || "").trim().toLocaleLowerCase()] || race.value;
-    const short = String(thai).replace(/\s*\([^()]*\)/u, "").trim();
-    if (short) add(short);
-  }
-  const job = fields.find(row => row.label === "อาชีพ");
-  if (job) {
-    const first = (job.items && job.items.length ? job.items[0] : job.value) || "";
-    const thai = wikiJobThai(first);
-    if (thai) add(thai);
-  }
-}
-
-function wikiShortItem(value) {
-  return String(value || "")
-    .replace(/\s*\([^()]*\)/gu, "")
-    .replace(/\s+/gu, " ")
-    .trim()
-    .slice(0, 48)
-    .trim();
-}
-
-/* ความสามารถ = ชื่อเวท/พร/Authority ทีละรายการ พร้อมไอคอนและคำอธิบายสั้น ๆ */
-const CC_ABILITY_KINDS = {
-  Authority: {
-    th: "พลังจากบาป",
-    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.2 2.8 6 13.4h4.4L10.8 21 18 10.4h-4.4z" fill="currentColor"/></svg>'
-  },
-  "เวทมนตร์": {
-    th: "เวทมนตร์ที่ใช้ได้",
-    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3s5.4 6.1 5.4 9.9a5.4 5.4 0 0 1-10.8 0C6.6 9.1 12 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
-  },
-  "พรจากเทพ": {
-    th: "พรติดตัวตั้งแต่เกิด",
-    icon: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2l1.9 4.9 4.9 1.9-4.9 1.9L12 16.8l-1.9-4.9L5.2 10l4.9-1.9z" fill="currentColor"/><circle cx="17.6" cy="17.6" r="2" fill="currentColor"/></svg>'
-  }
-};
-
-function characterAbilities(fields = []) {
-  const list = [];
-  const seen = new Set();
-  for (const label of CHARACTER_POWER_FIELDS) {
-    const row = fields.find(item => item.label === label);
-    if (!row) continue;
-    const kind = CC_ABILITY_KINDS[label];
-    for (const raw of (row.items && row.items.length ? row.items : [row.value])) {
-      const text = wikiShortItem(raw);
-      const key = text.toLocaleLowerCase();
-      if (!text || text.length < 3 || seen.has(key)) continue;
-      seen.add(key);
-      list.push({ name: text, desc: kind.th, icon: kind.icon });
-    }
-  }
-  return list.slice(0, 6);
-}
-
-function characterInfoValue(label, row, fields) {
-  const items = row.items && row.items.length ? row.items : [row.value];
-  if (label === "สังกัด") {
-    const camp = characterCamp(fields);
-    if (camp) return camp.label;
-    return items.slice(0, 2).join(" · ");
-  }
-  if (label === "อายุ") {
-    const numbers = (String(row.value || "").match(/\d+/g) || []).map(Number);
-    if (numbers.length) return `${Math.max(...numbers)} ปี`;
-  }
-  const simple = WIKI_VALUE_THAI[String(row.value || "").trim().toLocaleLowerCase()];
-  if (simple) return simple;
-  return items.slice(0, 2).join(" · ");
-}
-
-function characterPanelMessage(text) {
-  const note = document.createElement("p");
-  note.className = "cc-empty"; note.textContent = text;
-  return note;
-}
-
-function renderCharacterPanels() {
-  const fields = state.characterCardFields || [];
-  const infoPanel = byId("cc-panel-info");
-  if (infoPanel) {
-    infoPanel.replaceChildren();
-    const rows = CHARACTER_INFO_FIELDS.map(label => fields.find(row => row.label === label)).filter(Boolean);
-    if (!rows.length) {
-      infoPanel.append(characterPanelMessage(state.characterCardTitle
-        ? "วิกิไม่มีช่องข้อมูลพื้นฐานของตัวละครนี้"
-        : "ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน"));
-    } else {
-      const grid = document.createElement("div");
-      grid.className = "cc-grid";
-      for (const row of rows) {
-        const field = document.createElement("div");
-        field.className = "cc-field";
-        if (row.label === "สังกัด") field.classList.add("is-camp");
-        const key = document.createElement("span");
-        key.textContent = CC_INFO_TITLES[row.label] || row.label;
-        const value = document.createElement("b");
-        value.textContent = characterInfoValue(row.label, row, fields);
-        field.append(key, value);
-        grid.append(field);
-      }
-      infoPanel.append(grid);
-    }
-  }
-  const powerPanel = byId("cc-panel-power");
-  if (powerPanel) {
-    powerPanel.replaceChildren();
-    const abilities = characterAbilities(fields);
-    if (!abilities.length) {
-      powerPanel.append(characterPanelMessage("วิกิไม่ได้ระบุเวทมนตร์หรือพรของตัวละครนี้"));
-    } else {
-      for (const ability of abilities) {
-        const item = document.createElement("div");
-        item.className = "cc-ability";
-        const icon = document.createElement("span");
-        icon.className = "cc-ability-icon";
-        icon.setAttribute("aria-hidden", "true");
-        icon.innerHTML = ability.icon;
-        const text = document.createElement("div");
-        text.className = "cc-ability-text";
-        const name = document.createElement("b");
-        name.textContent = ability.name;
-        const desc = document.createElement("small");
-        desc.textContent = ability.desc;
-        text.append(name, desc);
-        item.append(icon, text);
-        powerPanel.append(item);
-      }
-    }
-  }
-}
-
-function renderCharacterBrief() {
-  const panel = byId("cc-panel-wiki");
-  if (!panel) return;
-  panel.replaceChildren();
-  const thai = state.characterCardIntroThai || "";
-  const intro = state.characterCardIntro || "";
-  const text = thai || intro;
-  if (!text) {
-    panel.append(characterPanelMessage("ยังไม่มีเรื่องย่อ — แตะไอคอนลูกโลกด้านบนเพื่อเปิดวิกิในแอป"));
-    return;
-  }
-  const body = document.createElement("p");
-  body.className = "cc-bio";
-  body.textContent = text;
-  panel.append(body);
-  // กล่องสั้น ๆ ใต้ย่อหน้า บอกบทบาทในเรื่อง (ถ้าวิกิระบุอาชีพไว้)
-  const job = (state.characterCardFields || []).find(row => row.label === "อาชีพ");
-  if (job) {
-    const items = (job.items && job.items.length ? job.items : [job.value]).filter(Boolean).slice(0, 2);
-    if (items.length) {
-      const box = document.createElement("div");
-      box.className = "cc-highlight";
-      const label = document.createElement("b");
-      label.textContent = "บทบาท";
-      const value = document.createElement("span");
-      value.textContent = items.map(wikiJobThai).join(" · ");
-      box.append(label, value);
-      panel.append(box);
-    }
-  }
-  if (!thai) {
-    const note = document.createElement("p");
-    note.className = "cc-empty";
-    note.textContent = "ต้นฉบับภาษาอังกฤษ · เปิดวิกิในแอปเพื่อแปลไทย";
-    panel.append(note);
-  }
-  const hint = document.createElement("button");
-  hint.type = "button";
-  hint.className = "cc-link";
-  hint.textContent = "เปิดวิกิในแอป (แปลไทย + กล่องข้อมูลเต็ม)";
-  hint.addEventListener("click", () => { void openWikiPanel(); });
-  panel.append(hint);
-}
-
-async function loadCharacterBrief() {
-  const panel = byId("cc-panel-wiki");
-  const title = state.characterCardWiki || state.characterCardQuery;
-  if (!panel) return;
-  if (!title) { panel.replaceChildren(characterPanelMessage("ยังไม่รู้ชื่อภาษาอังกฤษ — แตะ ✎ เพื่อแก้ชื่อก่อน")); return; }
-  if (state.characterCardIntro || state.characterCardIntroThai) { renderCharacterBrief(); return; }
-  const token = state.characterCardToken;
-  // กันผลลัพธ์รอบเก่ามาเขียนทับ เช่น กดคนใหม่หรือแก้ชื่อระหว่างรอวิกิ
-  const briefToken = (state.characterCardBriefToken || 0) + 1;
-  state.characterCardBriefToken = briefToken;
-  panel.replaceChildren(characterPanelMessage("กำลังดึงเรื่องย่อจากวิกิ…"));
-  try {
-    const cache = (await readSetting("wikiCache", {})) || {};
-    const cached = cache[title];
-    const page = await fetchWikiPage(title);
-    if (token !== state.characterCardToken || briefToken !== state.characterCardBriefToken) return;
-    state.characterCardIntro = page.intro || cached?.extract || "";
-    state.characterCardIntroThai = cached && cached.extract === state.characterCardIntro ? cached.thai || "" : "";
-    if (!(state.characterCardFields || []).length && page.fields.length) {
-      state.characterCardFields = page.fields;
-      applyCharacterFaction(null, page.fields);
-      renderCharacterPanels();
-    }
-    renderCharacterBrief();
-  } catch (error) {
-    panel.replaceChildren(characterPanelMessage(`ดึงเรื่องย่อไม่สำเร็จ (${error.message}) — ลองแก้ชื่อภาษาอังกฤษในการ์ด`));
-  }
-}
-
-function selectCharacterTab(name) {
-  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
-    const active = tab.dataset.ccTab === name;
-    tab.setAttribute("aria-selected", active ? "true" : "false");
-    tab.classList.toggle("is-active", active);
-    const panel = byId(`cc-panel-${tab.dataset.ccTab}`);
-    if (panel) panel.hidden = !active;
-  }
-  if (name === "wiki") void loadCharacterBrief();
 }
 
 async function copyCharacterName() {
@@ -2881,17 +2650,12 @@ async function applyCharacterName(title) {
   setCharacterTitle(title);
   setCharacterFigure(image, thai);
   showCharacterForm(!image);
-  state.characterCardFields = [];
-  state.characterCardIntro = "";
-  state.characterCardIntroThai = "";
   state.characterCardQuery = title;
   state.characterCardWiki = title;
+  state.characterCardImage = image || "";
   const fields = await fetchCharacterFields(title);
   if (byId("character-card").hidden || token !== state.characterCardToken) return;
-  state.characterCardFields = fields;
-  renderCharacterPanels();
   applyCharacterFaction(null, fields);
-  void loadCharacterBrief();
   byId("character-card-note").textContent = image ? "จาก Re:Zero Wiki · จำชื่อนี้ไว้แล้ว" : "ไม่พบรูปของ “" + title + "” — ลองเลือกชื่ออื่น";
 }
 
@@ -2906,16 +2670,12 @@ async function openCharacterCard(label) {
   byId("character-card-figure").replaceChildren(spinner);
   showCharacterForm(false);
   byId("character-card-note").textContent = "กำลังค้นรูป…";
+  // ล้างชื่อ/รูป/ค่ายของคนก่อนหน้า ไม่งั้นการ์ดใหม่จะยังติดข้อมูลคนเก่าอยู่
   state.characterCardFields = [];
-  state.characterCardIntro = "";
-  state.characterCardIntroThai = "";
-  // ล้างชื่อ/รูปของคนก่อนหน้า ไม่งั้นแท็บชีวประวัติจะดึงเรื่องย่อของคนเก่ามาแสดง
   state.characterCardQuery = "";
   state.characterCardWiki = "";
   state.characterCardImage = "";
-  renderCharacterPanels();
-  renderCharacterTags([]);
-  selectCharacterTab("wiki");
+  applyCharacterFaction(null, []);
   card.hidden = false;
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
@@ -2923,7 +2683,6 @@ async function openCharacterCard(label) {
   state.characterCardQuery = query;
   state.characterCardThai = thai;
   state.characterCardWiki = query;
-  void loadCharacterBrief();
   const external = byId("character-card-external");
   if (external) {
     external.hidden = !query;
@@ -2932,7 +2691,6 @@ async function openCharacterCard(label) {
   if (!query) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
-    applyCharacterFaction(null);
     const tableSize = state.characterNames ? Object.keys(state.characterNames).length : 0;
     byId("character-card-note").textContent = tableSize
       ? "“" + thai + "” ไม่อยู่ในตารางชื่อที่นำเข้า — พิมพ์ชื่อภาษาอังกฤษแล้วกดบันทึก"
@@ -2943,12 +2701,11 @@ async function openCharacterCard(label) {
   const portrait = await lookupCharacterPortrait(query);
   const image = portrait.image;
   if (card.hidden || token !== state.characterCardToken) return;
-  const fields = await fetchCharacterFields(state.characterCardWiki || query);
+  // กล่องข้อมูลใช้แค่รู้ว่าอยู่ค่ายไหน ส่วนเรื่องยาว ๆ อยู่ในวิกิ
+  const fields = await fetchCharacterFields(portrait.entry?.title || query);
   if (card.hidden || token !== state.characterCardToken) return;
   state.characterCardFields = fields;
-  renderCharacterPanels();
   applyCharacterFaction(portrait.entry, fields);
-  if (state.characterCardIntro || state.characterCardIntroThai) renderCharacterBrief();
   if (!image) {
     setCharacterFigure("", thai);
     showCharacterForm(true);
@@ -2980,9 +2737,6 @@ function installCharacterCards() {
   }, true);
   byId("character-card-close").addEventListener("click", closeCharacterCard);
   byId("character-card-copy")?.addEventListener("click", () => { void copyCharacterName(); });
-  for (const tab of document.querySelectorAll("#character-card .cc-tab")) {
-    tab.addEventListener("click", () => selectCharacterTab(tab.dataset.ccTab));
-  }
   document.addEventListener("keydown", event => {
     if (event.key !== "Escape") return;
     const card = byId("character-card");
