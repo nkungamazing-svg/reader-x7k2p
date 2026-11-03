@@ -5,10 +5,12 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.0";
+const APP_VERSION = "1.15.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.2", note: "เก็บคำแปลบทบาทให้ครบขึ้น: หัวหน้าตระกูล มังกร ราชอาณาจักร ผู้ดูแล และจัดรูปวงเล็บ/ช่องว่างให้อ่านง่าย" },
+  { version: "1.15.1", note: "สีค่าย/กลุ่มใช้ค่าเดียวกับวิกิ (character-header) และแปลตำแหน่งยาว ๆ อย่าง President of the Hoshin Company หรือ Royal Selection Candidate เป็นไทยทั้งบนการ์ดและในวิกิ" },
   { version: "1.15.0", note: "หน้าดูรูปเต็มจอ: พื้นหลังเบลอจาง ๆ เหมือนตอนเปิดแผงตั้งค่า และยังแตะพื้นหลังเพื่อปิดได้" },
   { version: "1.14.9", note: "การ์ดตัวละครย่อเหลือรูปชื่อและป้าย ส่วนแท็บ ชีวประวัติ/ความสามารถ/ข้อมูลทั่วไป ย้ายไปอยู่ในแผงวิกิ พร้อมปุ่มปิดชื่อย้ายขึ้นแถวบนสุด" },
   { version: "1.14.8", note: "การ์ดตัวละครกลับมามีแท็บ ชีวประวัติ/ความสามารถ/ข้อมูลทั่วไป พร้อมป้ายอาชีพและเผ่าใต้ชื่อ ความสามารถมีไอคอนสีตามหมวด และสถานะในแท็บข้อมูลถูกเบลอไว้กันสปอย" },
@@ -2259,16 +2261,18 @@ async function lookupCharacterPortrait(query) {
 }
 
 /* ค่าย/สังกัดของตัวละคร ใช้อิงสีของการ์ด (ดูจากช่อง “สังกัด” ในกล่องข้อมูลวิกิ) */
+/* สีค่ายอ้างจาก CSS ของวิกิ (character-header.* ใน MediaWiki:Common.css) */
 const CHARACTER_CAMPS = [
-  { label: "Emilia Camp", color: "#7c5cff", match: /emilia/i },
-  { label: "Crusch Camp", color: "#10b981", match: /crusch/i },
-  { label: "Anastasia Camp", color: "#f59e0b", match: /anastasia/i },
-  { label: "Priscilla Camp", color: "#f43f5e", match: /priscilla/i },
-  { label: "Felt Camp", color: "#3b82f6", match: /felt/i },
-  { label: "Witch Cult", color: "#a855f7", match: /witch cult|sin archbishop/i },
-  { label: "Vollachia Empire", color: "#dc2626", match: /vollachia/i },
-  { label: "Kararagi", color: "#0ea5e9", match: /kararagi/i },
-  { label: "Kingdom of Lugunica", color: "#64748b", match: /lugu?nica|royal guard|knights? of/i }
+  { label: "Emilia Camp", color: "#eaeae9", match: /emilia/i },
+  { label: "Crusch Camp", color: "#2f4f45", match: /crusch/i },
+  { label: "Anastasia Camp", color: "#cfb4dd", match: /anastasia/i },
+  { label: "Priscilla Camp", color: "#ffc588", match: /priscilla/i },
+  { label: "Felt Camp", color: "#eb4f50", match: /felt/i },
+  { label: "Filore Camp", color: "#415381", match: /filore/i },
+  { label: "Witch Cult", color: "#000000", match: /witch cult|sin archbishop/i },
+  { label: "Vollachia Empire", color: "#dc143c", match: /vollachia/i },
+  { label: "Kararagi", color: "#5cd411", match: /kararagi/i },
+  { label: "Kingdom of Lugunica", color: "#ffd700", match: /lugu?nica|royal guard|knights? of/i }
 ];
 
 function characterCamp(fields = []) {
@@ -2557,7 +2561,7 @@ function renderWikiBody() {
       const label = document.createElement("b");
       label.textContent = "บทบาท";
       const value = document.createElement("span");
-      value.textContent = items.join(" · ");
+      value.textContent = items.map(roleThai).join(" · ");
       role.append(label, value);
       body.append(role);
     }
@@ -2726,7 +2730,11 @@ function applyWikiContent(extract, thai, fields) {
     list.replaceChildren();
     for (const row of state.wikiFields) {
       const term = document.createElement("dt"); term.textContent = row.label;
-      const detail = document.createElement("dd"); detail.textContent = row.value;
+      const detail = document.createElement("dd");
+      // ตำแหน่ง/บทบาทยาว ๆ แปลเป็นไทยให้อ่านออก
+      const isRole = row.label === "อาชีพ" || row.label === "อาชีพเดิม";
+      const items = isRole ? (row.items && row.items.length ? row.items : [row.value]) : [];
+      detail.textContent = isRole ? items.map(roleThai).join(" · ") : row.value;
       list.append(term, detail);
     }
     const all = byId("wiki-all");
@@ -2823,18 +2831,84 @@ function openCharacterWiki() {
 }
 
 /* ---------- ป้ายอาชีพ/เผ่าใต้ชื่อในการ์ด ---------- */
-const CARD_JOB_THAI = [
-  [/maid/i, "เมดสาว"], [/knight/i, "อัศวิน"], [/butler/i, "พ่อบ้าน"],
-  [/high school student|student/i, "นักเรียน"], [/gladiator/i, "นักสู้"],
-  [/royal guard|royal army/i, "องครักษ์"], [/princess/i, "เจ้าหญิง"],
-  [/prince/i, "เจ้าชาย"], [/shopkeeper|merchant/i, "พ่อค้า"], [/emperor|empress/i, "จักรพรรดิ"]
+
+/* คำระบุตำแหน่ง/บทบาทจากวิกิ แปลเป็นไทยให้อ่านออก (วลียาวก่อน คำสั้นทีหลัง) */
+const ROLE_THAI = [
+  [/\bpresident of the hoshin (trading )?company\b/gi, "ประธานบริษัทโฮชิน"],
+  [/\bhead of the hoshin (trading )?company\b/gi, "หัวหน้าบริษัทโฮชิน"],
+  [/\bhoshin (trading )?company\b/gi, "บริษัทโฮชิน"],
+  [/\broyal selection candidate\b/gi, "ผู้สมัครชิงบัลลังก์"],
+  [/\broyal candidate\b/gi, "ผู้สมัครชิงบัลลังก์"],
+  [/\bsin archbishop\b/gi, "อาร์คบิชอปแห่งบาป"],
+  [/\bsword saint\b/gi, "นักดาบศักดิ์สิทธิ์"],
+  [/\bdivine general\b/gi, "แม่ทัพศักดิ์สิทธิ์"],
+  [/\bgreat spirit\b/gi, "วิญญาณผู้ยิ่งใหญ่"],
+  [/\bpleiades watchtower\b/gi, "หอคอยเพลยาดีส"],
+  [/\bimperial guard\b/gi, "องครักษ์จักรพรรดิ"],
+  [/\bknights? of the royal guard\b/gi, "องครักษ์หลวง"],
+  [/\broyal guard\b/gi, "องครักษ์หลวง"],
+  [/\bkingdom\b/gi, "ราชอาณาจักร"],
+  [/\bmaid\b/gi, "เมด"],
+  [/\bbutler\b/gi, "พ่อบ้าน"],
+  [/\bknight\b/gi, "อัศวิน"],
+  [/\bstudent\b/gi, "นักเรียน"],
+  [/\bgladiator\b/gi, "นักสู้"],
+  [/\bmercenary\b/gi, "ทหารรับจ้าง"],
+  [/\bshopkeeper\b/gi, "พ่อค้า"],
+  [/\bmerchant\b/gi, "พ่อค้า"],
+  [/\bnoble\b/gi, "ขุนนาง"],
+  [/\bduchess\b/gi, "ดัชเชส"],
+  [/\bmatriarch (of )?house\b/gi, "หัวหน้าตระกูล"],
+  [/\bmatriarch\b/gi, "หัวหน้าตระกูล"],
+  [/\bhouse\b/gi, "ตระกูล"],
+  [/\bprincess\b/gi, "เจ้าหญิง"],
+  [/\bprince\b/gi, "เจ้าชาย"],
+  [/\bempress\b/gi, "จักรพรรดินี"],
+  [/\bemperor\b/gi, "จักรพรรดิ"],
+  [/\bqueen\b/gi, "ราชินี"],
+  [/\bking\b/gi, "กษัตริย์"],
+  [/\bgeneral\b/gi, "แม่ทัพ"],
+  [/\bcaptain\b/gi, "หัวหน้า"],
+  [/\bleader\b/gi, "หัวหน้า"],
+  [/\badministrator\b/gi, "ผู้ดูแล"],
+  [/\bresearcher\b/gi, "นักวิจัย"],
+  [/\bteacher\b/gi, "ครู"],
+  [/\bdoctor\b/gi, "แพทย์"],
+  [/\bchef\b/gi, "พ่อครัว"],
+  [/\bcook\b/gi, "พ่อครัว"],
+  [/\badventurer\b/gi, "นักผจญภัย"],
+  [/\bassassin\b/gi, "นักฆ่า"],
+  [/\bthief\b/gi, "โจร"],
+  [/\bhunter\b/gi, "นักล่า"],
+  [/\bsoldier\b/gi, "ทหาร"],
+  [/\bguard\b/gi, "ยาม"],
+  [/\bwitch\b/gi, "แม่มด"],
+  [/\bspirit\b/gi, "วิญญาณ"],
+  [/\bpresident\b/gi, "ประธาน"],
+  [/\bcompany\b/gi, "บริษัท"],
+  [/\bdragon\b/gi, "มังกร"],
+  [/\bwatchtower\b/gi, "หอคอย"]
 ];
+
+function roleThai(value) {
+  let text = String(value || "").trim();
+  if (!text) return "";
+  for (const [pattern, thai] of ROLE_THAI) text = text.replace(pattern, thai);
+  // "Emilia's Knight" → "อัศวินของ Emilia"
+  text = text.replace(/([A-Za-z][\w.'-]*)'s\b/gi, "ของ $1");
+  text = text.replace(/(ของ\s+[A-Za-z][\w.'-]*)\s+(อัศวิน|เมด|พ่อบ้าน|นักเรียน|ผู้ดูแล)/gu, "$2$1");
+  // ตัดคำเชื่อมอังกฤษที่ค้างอยู่ และจัดช่องว่าง/จุลภาค
+  text = text.replace(/\b(of|the|and|a|an|in)\b/gi, " ");
+  text = text.replace(/\s*,\s*/gu, " · ").replace(/\s+/gu, " ").trim();
+  text = text.replace(/\(\s+/gu, "(").replace(/\s+\)/gu, ")");
+  text = text.replace(/^[·\s]+|[·\s]+$/gu, "");
+  return text || wikiShortItem(value);
+}
 
 function cardJobThai(value) {
   const text = String(value || "").trim();
   if (!text) return "";
-  const hit = CARD_JOB_THAI.find(([pattern]) => pattern.test(text));
-  return hit ? hit[1] : wikiShortItem(text);
+  return roleThai(text);
 }
 
 function renderCardTags(fields = state.characterCardFields || []) {
