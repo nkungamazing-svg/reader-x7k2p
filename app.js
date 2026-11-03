@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "1.15.9";
+const APP_VERSION = "1.15.10";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "1.15.10", note: "เพิ่มคำอ่านเองได้ในชีตคลังคำอ่านของมือถือ" },
   { version: "1.15.9", note: "ซิงก์แล้วบอกจำนวนคำอ่านที่เข้ามา และรีเฟรชคลังคำอ่านที่เปิดอยู่" },
   { version: "1.15.8", note: "ปุ่ม “ดูรายการ” ใต้ตารางชื่อตัวละคร: เปิดดูได้ทุกชื่อที่มี พร้อมป้ายที่มาและช่องค้นหา" },
   { version: "1.15.7", note: "หน้าตั้งค่าบอกที่มาของตารางชื่อตัวละคร: จากคลังคำศัพท์กี่ชื่อ (กี่เรื่อง) นำเข้าเอง แก้ชื่อเอง และชื่อที่ยังไม่ทราบที่มา" },
@@ -3626,6 +3627,21 @@ function bindEvents() {
   byId("search").addEventListener("input", scheduleContentSearch);
   byId("notes-open")?.addEventListener("click", openNotesSheet);
   byId("glossary-open")?.addEventListener("click", () => { void openGlossary(); });
+  // Typing a reading here keeps working offline; the extension still owns the synced table.
+  byId("pronunciation-form")?.addEventListener("submit", async event => {
+    event.preventDefault();
+    const wordInput = byId("pronunciation-word"), readingInput = byId("pronunciation-reading");
+    const word = (wordInput?.value || "").trim(), reading = (readingInput?.value || "").trim();
+    if (!word || !reading) { showStatus("ใส่ทั้งคำและคำอ่านก่อน", 3000); return; }
+    const key = word.toLocaleLowerCase();
+    state.pronunciation = [...state.pronunciation.filter(entry => String(entry?.word || "").toLocaleLowerCase() !== key), { word, reading }];
+    await writeSetting("pronunciation", state.pronunciation);
+    if (wordInput) wordInput.value = "";
+    if (readingInput) readingInput.value = "";
+    await paintGlossary();
+    showStatus(`บันทึกคำอ่าน “${word}” แล้ว`, 2500);
+    wordInput?.focus();
+  });
   byId("glossary-search")?.addEventListener("input", () => { void paintGlossary(); });
   byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });

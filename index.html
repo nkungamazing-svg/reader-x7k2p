@@ -216,6 +216,12 @@
       <form method="dialog"><button class="icon-button" aria-label="ปิดคลังคำอ่าน">×</button></form>
     </div>
     <input id="glossary-search" class="search-input" type="search" placeholder="ค้นคำหรือชื่อ…" autocomplete="off" aria-label="ค้นในคลังคำอ่าน">
+    <form id="pronunciation-form" class="pronunciation-form" autocomplete="off">
+      <input id="pronunciation-word" class="search-input" type="text" placeholder="คำในบท" aria-label="คำที่ต้องการกำหนดคำอ่าน" required>
+      <input id="pronunciation-reading" class="search-input" type="text" placeholder="อ่านว่า" aria-label="คำอ่าน" required>
+      <button class="primary-button" type="submit">เพิ่ม</button>
+    </form>
+    <p class="settings-hint">เพิ่มเองได้ที่นี่ (เก็บในเครื่องนี้) — ชุดหลักมาจากตารางคำอ่านในส่วนขยาย</p>
     <div id="glossary-list" class="glossary-list"></div>
     <p id="glossary-empty" class="settings-hint">คำอ่านมาจากตารางคำอ่านในไฟล์สำรอง และชื่อตัวละครจะถูกจดเมื่อคุณแก้ชื่อในการ์ดตัวละคร</p>
   </dialog>
