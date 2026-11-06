@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.8";
+const APP_VERSION = "2.0.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.9", note: "ลบย่อหน้าว่างรอบภาพที่ทำให้เกิดช่องโหว่บน-ล่างภาพแนวนอน" },
   { version: "2.0.8", note: "ภาพแนวนอนไม่เหลือช่องว่างบน/ล่าง และปุ่มแชร์ไม่ทับชื่อตอนแล้ว" },
   { version: "2.0.7", note: "ตัดหัวเรื่องซ้ำในเนื้อบท และลดช่องว่างระหว่างหัวบท รูป และแถบตัวละคร" },
   { version: "2.0.6", note: "รูปย่อตัวละครพอดีกรอบการ์ดแล้ว ไม่ล้นออกนอกขอบ" },
@@ -1977,6 +1978,31 @@ function trimDuplicateChapterTitle(content, item) {
   if (top !== heading && !top.textContent.trim() && !top.querySelector("img")) top.remove();
 }
 
+/* แปลต้นทางมักแทรกย่อหน้าว่าง/ย่อหน้าใส่ <br> ไว้รอบภาพ → เกิดช่องว่างบน-ล่างภาพแนวนอน */
+function isEmptyReaderBlock(node) {
+  if (!node || !/^(?:P|DIV|SECTION|FIGURE)$/.test(node.tagName || "")) return false;
+  if (node.querySelector("img, video, audio, iframe, table, .noat-speaker-label")) return false;
+  return !String(node.textContent || "").replace(/[s ]+/gu, "");
+}
+
+function trimImageGaps(content) {
+  for (const image of content.querySelectorAll("img:not(.emoji-img)")) {
+    const holder = image.closest("p, figure, div") || image;
+    let previous = holder.previousElementSibling;
+    while (isEmptyReaderBlock(previous)) {
+      const earlier = previous.previousElementSibling;
+      previous.remove();
+      previous = earlier;
+    }
+    let following = holder.nextElementSibling;
+    while (isEmptyReaderBlock(following)) {
+      const later = following.nextElementSibling;
+      following.remove();
+      following = later;
+    }
+  }
+}
+
 function renderChapterContent(item) {
   const content = byId("reader-content");
   content.replaceChildren();
@@ -1989,6 +2015,7 @@ function renderChapterContent(item) {
   decorateSpeakerLabels(content);
   applyNoteMarks(item.id);
   trimDuplicateChapterTitle(content, item);
+  trimImageGaps(content);
   renderChapterHeroStats(item);
   void renderChapterCast();
   for (const image of content.querySelectorAll("img")) {
