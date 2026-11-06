@@ -940,3 +940,11 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 .chapter-cast { margin:4px 0 10px; }
 .chapter-cast + * { margin-top:0; }
 body.page-mode .chapter-cast { margin:4px 0 8px; }
+
+/* กล่องรูปสูงตามสัดส่วนจริง: ภาพแนวนอนไม่เหลือช่องว่างบน/ล่างจาก object-fit */
+.reader-content img:not(.emoji-img) { height:auto !important; }
+body.page-mode .reader-content img:not(.emoji-img) { height:auto !important; }
+/* ปุ่มแชร์/เมนูอยู่ข้างชื่อตอน ไม่ทับข้อความ */
+.reader-topbar { display:flex; align-items:flex-start; gap:8px; }
+.reader-hero { flex:1 1 auto; min-width:0; padding:0; }
+.reader-topbar-actions { position:static; top:auto; right:auto; flex:none; }

@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.7";
+const APP_VERSION = "2.0.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.8", note: "ภาพแนวนอนไม่เหลือช่องว่างบน/ล่าง และปุ่มแชร์ไม่ทับชื่อตอนแล้ว" },
   { version: "2.0.7", note: "ตัดหัวเรื่องซ้ำในเนื้อบท และลดช่องว่างระหว่างหัวบท รูป และแถบตัวละคร" },
   { version: "2.0.6", note: "รูปย่อตัวละครพอดีกรอบการ์ดแล้ว ไม่ล้นออกนอกขอบ" },
   { version: "2.0.5", note: "รูปย่อตัวละครยิงขอแบบไม่ส่ง referrer ก่อน ถ้าถูกบล็อกจึงลอง API วิกิ และขึ้น ? แทนกล่องว่าง" },
