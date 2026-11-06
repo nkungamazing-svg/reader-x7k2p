@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.2";
+const APP_VERSION = "2.0.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.3", note: "รูปและสีกรอบของตัวละครในตอนดึงจาก characters.json ก่อน ทำให้ภาพขึ้นไวและจัดกลุ่มสีได้ทันที" },
   { version: "2.0.2", note: "ชิปตัวละครที่กรอบสีเดียวกันถูกรวมไว้ติดกันและเรียงกลุ่มตามสีกรอบ" },
   { version: "2.0.1", note: "หัวบทกลางจอพร้อมป้ายชื่อเรื่องและสถิติการอ่าน แถบตัวละครในตอนใต้ภาพ (แตะดูการ์ดได้) และจุดสีฝ่ายบนรูปย่อ" },
   { version: "2.0.0", note: "เพิ่มคำอ่านเองได้ในชีตคลังคำอ่านของมือถือ" },
@@ -2124,7 +2125,20 @@ async function renderChapterCast() {
     row.append(chip);
     const query = table[normalizeCharacterKey(name)] || "";
     if (query) {
-      void lookupCharacterImage(query).then(url => {
+      void characterIndexEntry(query).then(async entry => {
+        if (entry?.color) {
+          avatar.style.setProperty("--cast-color", entry.color);
+          if (!characterFactionColors.get(normalizeCharacterKey(name))) {
+            rememberCastColor(normalizeCharacterKey(name), entry.color);
+            layoutCastGroups();
+          }
+        }
+        if (entry?.image) {
+          avatar.textContent = "";
+          avatar.style.backgroundImage = 'url("' + entry.image + '")';
+          return;
+        }
+        const url = await lookupCharacterImage(query);
         if (!url) return;
         avatar.textContent = "";
         avatar.style.backgroundImage = 'url("' + url + '")';
