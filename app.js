@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.1", note: "หัวบทกลางจอพร้อมป้ายชื่อเรื่องและสถิติการอ่าน แถบตัวละครในตอนใต้ภาพ (แตะดูการ์ดได้) และจุดสีฝ่ายบนรูปย่อ" },
   { version: "2.0.0", note: "เพิ่มคำอ่านเองได้ในชีตคลังคำอ่านของมือถือ" },
   { version: "1.15.9", note: "ซิงก์แล้วบอกจำนวนคำอ่านที่เข้ามา และรีเฟรชคลังคำอ่านที่เปิดอยู่" },
   { version: "1.15.8", note: "ปุ่ม “ดูรายการ” ใต้ตารางชื่อตัวละคร: เปิดดูได้ทุกชื่อที่มี พร้อมป้ายที่มาและช่องค้นหา" },
@@ -1961,12 +1962,120 @@ function renderChapterContent(item) {
   markSmallImages(content);
   decorateSpeakerLabels(content);
   applyNoteMarks(item.id);
+  renderChapterHeroStats(item);
+  void renderChapterCast();
   for (const image of content.querySelectorAll("img")) {
     // Paged mode needs the real height before splitting pages; scroll mode keeps
     // images lazy so a long chapter does not download everything at once.
     if (!isPageMode()) image.loading = "lazy";
     if (!image.complete) image.addEventListener("load", () => { if (isPageMode()) schedulePaginate(); }, { once: true });
   }
+}
+
+/* ---------- Chapter hero stats + cast strip ---------- */
+const characterFactionColors = new Map();
+let chapterCastRow = null;
+
+function chapterWordCount(text) {
+  try {
+    if (Intl?.Segmenter) {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const part of segmenter.segment(text)) if (part.isWordLike) count += 1;
+      return count;
+    }
+  } catch (_) {}
+  return text.split(/\s+/u).filter(Boolean).length;
+}
+
+function renderChapterHeroStats(item) {
+  const text = String(byId("reader-content")?.textContent || "").replace(/\s+/gu, " ").trim();
+  const chars = text.length;
+  const minutes = Math.max(1, Math.round(chars / 420));
+  const time = byId("reader-time");
+  if (time) time.textContent = "อ่านประมาณ " + minutes.toLocaleString("th-TH") + " นาที";
+  const words = byId("reader-words");
+  if (words) words.textContent = chapterWordCount(text).toLocaleString("th-TH") + " คำ";
+  const novel = byId("reader-novel");
+  if (novel && item) { const label = novelLabel(item); novel.textContent = label; novel.title = label; }
+}
+
+function castFactionColor(name) {
+  return characterFactionColors.get(normalizeCharacterKey(name)) || "";
+}
+
+function paintCastFactionDots() {
+  const row = chapterCastRow;
+  if (!row) return;
+  for (const chip of row.querySelectorAll(".cast-chip")) {
+    const color = castFactionColor(chip.dataset.name || "");
+    const avatar = chip.querySelector(".cast-avatar");
+    if (color && avatar) avatar.style.setProperty("--cast-color", color);
+  }
+}
+
+async function renderChapterCast() {
+  const content = byId("reader-content");
+  if (!content) return;
+  const chapterId = state.activeId;
+  const section = document.createElement("section");
+  section.id = "chapter-cast";
+  section.className = "chapter-cast";
+  section.setAttribute("aria-label", "ตัวละครในตอนนี้");
+  const head = document.createElement("div");
+  head.className = "chapter-cast-head";
+  const title = document.createElement("span");
+  title.textContent = "ตัวละครในตอนนี้";
+  const count = document.createElement("span");
+  count.id = "cast-count";
+  head.append(title, count);
+  const row = document.createElement("div");
+  row.id = "cast-row";
+  row.className = "chapter-cast-row";
+  chapterCastRow = row;
+  section.append(head, row);
+
+  const speakers = new Map();
+  for (const label of content.querySelectorAll(".noat-speaker-label")) {
+    const name = characterThaiName(label);
+    if (!name || name.length > 40 || /^[\s?？.·…\-–—]+$/u.test(name)) continue;
+    if (!speakers.has(name)) speakers.set(name, label);
+  }
+  const entries = [...speakers.entries()].slice(0, 24);
+  if (!entries.length) return;
+  const table = await characterNameTable();
+  for (const [name, label] of entries) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "cast-chip";
+    chip.dataset.name = name;
+    chip.setAttribute("aria-label", "ดูข้อมูลตัวละคร " + name);
+    const avatar = document.createElement("span");
+    avatar.className = "cast-avatar";
+    avatar.textContent = "?";
+    const caption = document.createElement("span");
+    caption.className = "cast-name";
+    caption.textContent = name;
+    chip.append(avatar, caption);
+    chip.addEventListener("click", () => { void openCharacterCard(label); });
+    const color = castFactionColor(name);
+    if (color) avatar.style.setProperty("--cast-color", color);
+    row.append(chip);
+    const query = table[normalizeCharacterKey(name)] || "";
+    if (query) {
+      void lookupCharacterImage(query).then(url => {
+        if (!url) return;
+        avatar.textContent = "";
+        avatar.style.backgroundImage = 'url("' + url + '")';
+      });
+    }
+  }
+  if (count) count.textContent = entries.length.toLocaleString("th-TH") + " คน";
+  if (state.activeId !== chapterId) return;
+  const firstImage = [...content.querySelectorAll("img")].find(image => !image.classList.contains("emoji-img"));
+  const anchor = firstImage ? (firstImage.closest("figure,p") || firstImage) : null;
+  if (anchor && anchor.parentElement) anchor.after(section);
+  else content.prepend(section);
 }
 
 function revealActiveChapter() {
@@ -2469,6 +2578,12 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
   if (color) card.style.setProperty("--character-color", color);
   else card.style.removeProperty("--character-color");
   card.classList.toggle("has-faction", Boolean(color));
+  // Remember the camp colour so the cast strip can show it as a status dot.
+  const castName = byId("character-card-name")?.textContent || "";
+  if (castName && color) {
+    const key = normalizeCharacterKey(castName);
+    if (characterFactionColors.get(key) !== color) { characterFactionColors.set(key, color); paintCastFactionDots(); }
+  }
   if (campTag) {
     campTag.hidden = !camp;
     if (camp && campName) campName.textContent = camp.label;
