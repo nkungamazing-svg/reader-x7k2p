@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.4";
+const APP_VERSION = "2.0.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.5", note: "รูปย่อตัวละครยิงขอแบบไม่ส่ง referrer ก่อน ถ้าถูกบล็อกจึงลอง API วิกิ และขึ้น ? แทนกล่องว่าง" },
   { version: "2.0.4", note: "รูปตัวละครในแถบยังเคารพสวิตช์โหลดรูปจากเว็บต้นทาง เหมือนรูปอื่นในบท" },
   { version: "2.0.3", note: "รูปและสีกรอบของตัวละครในตอนดึงจาก characters.json ก่อน ทำให้ภาพขึ้นไวและจัดกลุ่มสีได้ทันที" },
   { version: "2.0.2", note: "ชิปตัวละครที่กรอบสีเดียวกันถูกรวมไว้ติดกันและเรียงกลุ่มตามสีกรอบ" },
@@ -2126,7 +2127,8 @@ async function renderChapterCast() {
     row.append(chip);
     const query = table[normalizeCharacterKey(name)] || "";
     if (query) {
-      void characterIndexEntry(query).then(async entry => {
+      void (async () => {
+        const entry = await characterIndexEntry(query);
         if (entry?.color) {
           avatar.style.setProperty("--cast-color", entry.color);
           if (!characterFactionColors.get(normalizeCharacterKey(name))) {
@@ -2134,16 +2136,34 @@ async function renderChapterCast() {
             layoutCastGroups();
           }
         }
-        if (entry?.image && state.loadRemoteImages) {
+        if (!state.loadRemoteImages) return;
+        const paint = url => {
+          const image = document.createElement("img");
+          image.className = "cast-avatar-image";
+          image.alt = "";
+          image.decoding = "async";
+          image.referrerPolicy = "no-referrer";
+          image.addEventListener("error", () => {
+            image.remove();
+            if (!avatar.querySelector("img")) avatar.textContent = "?";
+          }, { once: true });
+          image.src = url;
           avatar.textContent = "";
-          avatar.style.backgroundImage = 'url("' + entry.image + '")';
-          return;
-        }
-        const url = await lookupCharacterImage(query);
-        if (!url) return;
-        avatar.textContent = "";
-        avatar.style.backgroundImage = 'url("' + url + '")';
-      });
+          avatar.append(image);
+        };
+        // ยิงขอรูปด้วย referrerPolicy no-referrer ก่อน ถ้าถูกบล็อกค่อยลอง API วิกิ
+        const canLoad = url => new Promise(resolve => {
+          if (!url) return resolve(false);
+          const probe = new Image();
+          probe.referrerPolicy = "no-referrer";
+          probe.onload = () => resolve(true);
+          probe.onerror = () => resolve(false);
+          probe.src = url;
+        });
+        if (await canLoad(entry?.image || "")) { paint(entry.image); return; }
+        const fallback = await lookupCharacterImage(query);
+        if (await canLoad(fallback)) paint(fallback);
+      })();
     }
   }
   if (count) count.textContent = entries.length.toLocaleString("th-TH") + " คน";

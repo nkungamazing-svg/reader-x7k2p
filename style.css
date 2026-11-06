@@ -914,3 +914,5 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 /* จัดกลุ่มชิปตามสีกรอบ: สีเดียวกันอยู่ติดกัน เรียงกลุ่มตามสี */
 .cast-group { display:flex; flex:0 0 auto; gap:8px; }
 .cast-group + .cast-group { padding-left:14px; border-left:1px solid var(--line); }
+
+.cast-avatar img.cast-avatar-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
