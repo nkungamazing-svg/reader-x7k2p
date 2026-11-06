@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.6";
+const APP_VERSION = "2.0.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.7", note: "ตัดหัวเรื่องซ้ำในเนื้อบท และลดช่องว่างระหว่างหัวบท รูป และแถบตัวละคร" },
   { version: "2.0.6", note: "รูปย่อตัวละครพอดีกรอบการ์ดแล้ว ไม่ล้นออกนอกขอบ" },
   { version: "2.0.5", note: "รูปย่อตัวละครยิงขอแบบไม่ส่ง referrer ก่อน ถ้าถูกบล็อกจึงลอง API วิกิ และขึ้น ? แทนกล่องว่าง" },
   { version: "2.0.4", note: "รูปตัวละครในแถบยังเคารพสวิตช์โหลดรูปจากเว็บต้นทาง เหมือนรูปอื่นในบท" },
@@ -1956,6 +1957,25 @@ function markSmallImages(root) {
   }
 }
 
+/* หัวเรื่องในเนื้อบทซ้ำกับหัวบทด้านบน (เช่น “บทที่ 66 …”) → ตัดออกเหลือหัวเดียว */
+function trimDuplicateChapterTitle(content, item) {
+  const heading = content.querySelector("h1, h2");
+  if (!heading) return;
+  let top = heading;
+  while (top.parentElement && top.parentElement !== content) top = top.parentElement;
+  if ([...content.children].indexOf(top) > 1) return;
+  const text = String(heading.textContent || "").replace(/s+/gu, " ").trim();
+  if (!text) return;
+  const key = value => String(value || "").normalize("NFKC").replace(/[sp{P}p{S}]+/gu, "").toLocaleLowerCase();
+  const hero = key(normalizeTitle(item));
+  const line = key(text);
+  const lead = /^(?:บทที่|ตอนที่|chapter)s*[d๐-๙]/iu.test(text);
+  const tail = line.length >= 8 && hero.length >= 8 && (hero.endsWith(line.slice(-8)) || line.endsWith(hero.slice(-8)));
+  if (!lead && !tail) return;
+  heading.remove();
+  if (top !== heading && !top.textContent.trim() && !top.querySelector("img")) top.remove();
+}
+
 function renderChapterContent(item) {
   const content = byId("reader-content");
   content.replaceChildren();
@@ -1967,6 +1987,7 @@ function renderChapterContent(item) {
   markSmallImages(content);
   decorateSpeakerLabels(content);
   applyNoteMarks(item.id);
+  trimDuplicateChapterTitle(content, item);
   renderChapterHeroStats(item);
   void renderChapterCast();
   for (const image of content.querySelectorAll("img")) {

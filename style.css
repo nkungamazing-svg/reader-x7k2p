@@ -930,3 +930,13 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
   object-fit:cover;
   object-position:center top;
 }
+
+/* ระยะห่างกระชับขึ้น: หัวบท → รูป → ตัวละครในตอนนี้ */
+.reader-topbar { padding-top:max(8px, env(safe-area-inset-top, 0px)); margin:0 auto 4px; }
+.reader-topbar-actions { top:max(8px, env(safe-area-inset-top, 0px)); right:0; }
+.reader-hero { gap:4px; }
+.reader-content { padding-top:8px; }
+.reader-content > :has(+ .chapter-cast) { margin-bottom:0; }
+.chapter-cast { margin:4px 0 10px; }
+.chapter-cast + * { margin-top:0; }
+body.page-mode .chapter-cast { margin:4px 0 8px; }
