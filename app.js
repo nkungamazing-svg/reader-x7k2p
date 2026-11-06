@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.1";
+const APP_VERSION = "2.0.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.0.2", note: "ชิปตัวละครที่กรอบสีเดียวกันถูกรวมไว้ติดกันและเรียงกลุ่มตามสีกรอบ" },
   { version: "2.0.1", note: "หัวบทกลางจอพร้อมป้ายชื่อเรื่องและสถิติการอ่าน แถบตัวละครในตอนใต้ภาพ (แตะดูการ์ดได้) และจุดสีฝ่ายบนรูปย่อ" },
   { version: "2.0.0", note: "เพิ่มคำอ่านเองได้ในชีตคลังคำอ่านของมือถือ" },
   { version: "1.15.9", note: "ซิงก์แล้วบอกจำนวนคำอ่านที่เข้ามา และรีเฟรชคลังคำอ่านที่เปิดอยู่" },
@@ -1973,7 +1974,15 @@ function renderChapterContent(item) {
 }
 
 /* ---------- Chapter hero stats + cast strip ---------- */
-const characterFactionColors = new Map();
+const CAST_COLOR_STORE = "noat-cast-factions";
+function readCastColorStore() {
+  try { const parsed = JSON.parse(localStorage.getItem(CAST_COLOR_STORE) || "{}"); return parsed && typeof parsed === "object" ? parsed : {}; } catch (_) { return {}; }
+}
+const characterFactionColors = new Map(Object.entries(readCastColorStore()));
+function rememberCastColor(key, color) {
+  characterFactionColors.set(key, color);
+  try { localStorage.setItem(CAST_COLOR_STORE, JSON.stringify(Object.fromEntries(characterFactionColors))); } catch (_) {}
+}
 let chapterCastRow = null;
 
 function chapterWordCount(text) {
@@ -2004,6 +2013,56 @@ function castFactionColor(name) {
   return characterFactionColors.get(normalizeCharacterKey(name)) || "";
 }
 
+/* สีเดียวกัน = กลุ่มเดียวกัน เรียงกลุ่มตามสีกรอบ (hue) แล้วค่อยกลุ่มที่ยังไม่มีสี */
+function castColorRank(color) {
+  const hex = String(color || "").replace("#", "");
+  if (!/^[0-9a-f]{6}$/iu.test(hex)) return [3, 0];
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), delta = max - min;
+  if (delta < 0.08) return [2, 1 - max];
+  let hue;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  else if (max === g) hue = (b - r) / delta + 2;
+  else hue = (r - g) / delta + 4;
+  hue *= 60;
+  if (hue < 0) hue += 360;
+  return [0, hue];
+}
+
+function castColorSortValue(color) {
+  const [tier, value] = castColorRank(color);
+  return tier * 1000 + value;
+}
+
+function layoutCastGroups() {
+  const row = chapterCastRow;
+  if (!row) return;
+  const chips = [...row.querySelectorAll(".cast-chip")];
+  if (!chips.length) return;
+  const groups = new Map();
+  for (const chip of chips) {
+    const color = (castFactionColor(chip.dataset.name || "") || "").toLocaleLowerCase() || "none";
+    if (!groups.has(color)) groups.set(color, []);
+    groups.get(color).push(chip);
+  }
+  const order = [...groups.keys()].sort((a, b) => {
+    if (a === "none") return 1;
+    if (b === "none") return -1;
+    return castColorSortValue(a) - castColorSortValue(b);
+  });
+  const frag = document.createDocumentFragment();
+  for (const color of order) {
+    const group = document.createElement("div");
+    group.className = "cast-group";
+    if (color !== "none") group.style.setProperty("--cast-color", color);
+    for (const chip of groups.get(color)) group.append(chip);
+    frag.append(group);
+  }
+  row.replaceChildren(frag);
+}
+
 function paintCastFactionDots() {
   const row = chapterCastRow;
   if (!row) return;
@@ -2012,7 +2071,9 @@ function paintCastFactionDots() {
     const avatar = chip.querySelector(".cast-avatar");
     if (color && avatar) avatar.style.setProperty("--cast-color", color);
   }
+  layoutCastGroups();
 }
+
 
 async function renderChapterCast() {
   const content = byId("reader-content");
@@ -2071,6 +2132,7 @@ async function renderChapterCast() {
     }
   }
   if (count) count.textContent = entries.length.toLocaleString("th-TH") + " คน";
+  layoutCastGroups();
   if (state.activeId !== chapterId) return;
   const firstImage = [...content.querySelectorAll("img")].find(image => !image.classList.contains("emoji-img"));
   const anchor = firstImage ? (firstImage.closest("figure,p") || firstImage) : null;
@@ -2582,7 +2644,7 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
   const castName = byId("character-card-name")?.textContent || "";
   if (castName && color) {
     const key = normalizeCharacterKey(castName);
-    if (characterFactionColors.get(key) !== color) { characterFactionColors.set(key, color); paintCastFactionDots(); }
+    if (characterFactionColors.get(key) !== color) { rememberCastColor(key, color); paintCastFactionDots(); }
   }
   if (campTag) {
     campTag.hidden = !camp;
