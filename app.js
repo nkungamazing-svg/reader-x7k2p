@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.0.9";
+const APP_VERSION = "2.1.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.0", note: "ไฮไลต์ย่อหน้าตอนฟังเสียงตรงกับที่อ่านแล้ว: เลขย่อหน้าไม่เพี้ยนหลังตัดหัวข้อซ้ำ/ช่องว่างรอบภาพ และไฮไลต์ติดตอนเสียงเริ่มจริง" },
   { version: "2.0.9", note: "ลบย่อหน้าว่างรอบภาพที่ทำให้เกิดช่องโหว่บน-ล่างภาพแนวนอน" },
   { version: "2.0.8", note: "ภาพแนวนอนไม่เหลือช่องว่างบน/ล่าง และปุ่มแชร์ไม่ทับชื่อตอนแล้ว" },
   { version: "2.0.7", note: "ตัดหัวเรื่องซ้ำในเนื้อบท และลดช่องว่างระหว่างหัวบท รูป และแถบตัวละคร" },
@@ -2003,19 +2004,25 @@ function trimImageGaps(content) {
   }
 }
 
+function indexReaderBlocks(content) {
+  const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
+  const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
+  blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
+  return blocks;
+}
+
 function renderChapterContent(item) {
   const content = byId("reader-content");
   content.replaceChildren();
   content.append(safeChapterFragment(item.html, item.sourceUrl || ""));
-  const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
-  const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
-  blocks.forEach((block, blockIndex) => { block.dataset.blockIndex = String(blockIndex); });
+  indexReaderBlocks(content);
   state.currentBlockIndex = -1;
   markSmallImages(content);
   decorateSpeakerLabels(content);
   applyNoteMarks(item.id);
   trimDuplicateChapterTitle(content, item);
   trimImageGaps(content);
+  indexReaderBlocks(content);
   renderChapterHeroStats(item);
   void renderChapterCast();
   for (const image of content.querySelectorAll("img")) {
@@ -2272,10 +2279,9 @@ function saveReadingPosition() {
 
 function buildSpeechQueue() {
   const content = byId("reader-content");
-  const blockSelector = "p,li,blockquote,h1,h2,h3,h4,h5,h6";
-  const blocks = [...content.querySelectorAll(blockSelector)].filter(element => !element.parentElement?.closest(blockSelector));
-  return blocks.flatMap((block, blockIndex) => splitSpeechText(block.textContent.replace(/\s+/gu, " ").trim())
-    .map(text => ({ text, blockIndex })));
+  const blocks = indexReaderBlocks(content);
+  return blocks.flatMap(block => splitSpeechText(block.textContent.replace(/\s+/gu, " ").trim())
+    .map(text => ({ text, blockIndex: Number(block.dataset.blockIndex) })));
 }
 
 function splitSpeechText(text, maxLength = 180) {
@@ -2370,13 +2376,21 @@ function speakFrom(index = state.speechIndex) {
       showStatus("อ่านจบบทแล้ว"); return;
     }
     const source = state.speechQueue[state.speechIndex];
-    setActiveBlock(source.blockIndex);
     saveSpeechCursor();
     const utterance = new SpeechSynthesisUtterance(applyPronunciation(source.text));
     state.utterance = utterance; utterance.voice = voice; utterance.lang = voice.lang || "th-TH"; utterance.rate = Number(byId("rate").value) || 1;
-    utterance.onstart = () => { if (token === state.speechToken) { byId("speech-notice").hidden = true; setActiveBlock(source.blockIndex); updateSpeechControls(); } };
-    utterance.onend = () => { if (token !== state.speechToken) return; state.speechIndex++; saveSpeechCursor(); setTimeout(next, 40); };
+    let started = false;
+    const startFallback = setTimeout(() => {
+      if (token === state.speechToken && state.speaking && !started) setActiveBlock(source.blockIndex);
+    }, 900);
+    utterance.onstart = () => {
+      started = true;
+      clearTimeout(startFallback);
+      if (token === state.speechToken) { byId("speech-notice").hidden = true; setActiveBlock(source.blockIndex); updateSpeechControls(); }
+    };
+    utterance.onend = () => { clearTimeout(startFallback); if (token !== state.speechToken) return; state.speechIndex++; saveSpeechCursor(); setTimeout(next, 40); };
     utterance.onerror = event => {
+      clearTimeout(startFallback);
       if (token !== state.speechToken) return;
       if (event.error === "canceled" || event.error === "interrupted") return;
       state.speaking = false; state.utterance = null; updateSpeechControls();
