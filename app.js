@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.2";
+const APP_VERSION = "2.1.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.3", note: "ตัวละครที่ไม่มีรูปขึ้นกรอบ ? เส้นประทั้งในการ์ดและแถบตัวละคร และแถบตัวละครเรียงค่ายเอมิเลียก่อน ส่วนที่ยังไม่รู้จักไปอยู่ท้ายสุด" },
   { version: "2.1.2", note: "รูปตัวละครในตอนนี้เต็มกรอบทุกคน ชิปที่ยังไม่รู้จักขึ้นเป็นกรอบ ? เส้นประ และเสียงอ่านออกชื่อว่า “ไม่ทราบชื่อ” แทนคำว่า คำถาม" },
   { version: "2.1.1", note: "ย้ายปุ่มแชร์ไปแถบหัวเรื่องและตัดปุ่มเมนูที่ซ้ำกับปุ่ม ☰ ออก ชื่อตอนจึงอยู่กลางจอเต็มความกว้าง" },
   { version: "2.1.0", note: "ไฮไลต์ย่อหน้าตอนฟังเสียงตรงกับที่อ่านแล้ว: เลขย่อหน้าไม่เพี้ยนหลังตัดหัวข้อซ้ำ/ช่องว่างรอบภาพ และไฮไลต์ติดตอนเสียงเริ่มจริง" },
@@ -2041,6 +2042,25 @@ function readCastColorStore() {
   try { const parsed = JSON.parse(localStorage.getItem(CAST_COLOR_STORE) || "{}"); return parsed && typeof parsed === "object" ? parsed : {}; } catch (_) { return {}; }
 }
 const characterFactionColors = new Map(Object.entries(readCastColorStore()));
+const CAST_CAMP_STORE = "noat-cast-camps";
+function readCastCampStore() {
+  try { const parsed = JSON.parse(localStorage.getItem(CAST_CAMP_STORE) || "{}"); return parsed && typeof parsed === "object" ? parsed : {}; } catch (_) { return {}; }
+}
+const characterFactionCamps = new Map(Object.entries(readCastCampStore()));
+function rememberCastCamp(key, camp) {
+  const value = String(camp || "").trim();
+  if (!key || !value) return;
+  characterFactionCamps.set(key, value);
+  try { localStorage.setItem(CAST_CAMP_STORE, JSON.stringify(Object.fromEntries(characterFactionCamps))); } catch (_) {}
+}
+/* เอมิเลีย (ตัวเอก) ขึ้นก่อน แล้วไล่ตามค่ายในวิกิ · 50 = ค่ายอื่น · 99 = ยังไม่รู้จัก/ไม่มีกลุ่ม */
+const CAST_CAMP_ORDER = [/emilia/i, /crusch/i, /anastasia/i, /priscilla/i, /felt/i, /filore/i, /witch cult|sin archbishop/i, /vollachia/i, /kararagi/i, /lugu?nica|royal guard|knights? of/i];
+function castCampRank(camp) {
+  const text = String(camp || "").trim();
+  if (!text) return 99;
+  const index = CAST_CAMP_ORDER.findIndex(pattern => pattern.test(text));
+  return index < 0 ? 50 : index;
+}
 function rememberCastColor(key, color) {
   characterFactionColors.set(key, color);
   try { localStorage.setItem(CAST_COLOR_STORE, JSON.stringify(Object.fromEntries(characterFactionColors))); } catch (_) {}
@@ -2074,6 +2094,18 @@ function renderChapterHeroStats(item) {
 function castFactionColor(name) {
   return characterFactionColors.get(normalizeCharacterKey(name)) || "";
 }
+function castFactionCamp(name) {
+  return characterFactionCamps.get(normalizeCharacterKey(name)) || "";
+}
+/* ถ้ารู้แค่สี ก็ยังเดาค่ายจากสีมาตรฐานของวิกิได้ */
+function castCampForChip(name, color) {
+  const known = castFactionCamp(name);
+  if (known) return known;
+  const hex = String(color || "").toLocaleLowerCase();
+  if (!hex) return "";
+  const camp = CHARACTER_CAMPS.find(item => item.color.toLocaleLowerCase() === hex);
+  return camp ? camp.label : "";
+}
 
 /* สีเดียวกัน = กลุ่มเดียวกัน เรียงกลุ่มตามสีกรอบ (hue) แล้วค่อยกลุ่มที่ยังไม่มีสี */
 function castColorRank(color) {
@@ -2105,22 +2137,28 @@ function layoutCastGroups() {
   if (!chips.length) return;
   const groups = new Map();
   for (const chip of chips) {
-    const color = (castFactionColor(chip.dataset.name || "") || "").toLocaleLowerCase() || "none";
-    if (!groups.has(color)) groups.set(color, []);
-    groups.get(color).push(chip);
+    const name = chip.dataset.name || "";
+    const color = (castFactionColor(name) || "").toLocaleLowerCase() || "none";
+    const camp = castCampForChip(name, color === "none" ? "" : color);
+    const rank = castCampRank(camp);
+    chip.dataset.campRank = String(rank);
+    const key = rank + "|" + color;
+    if (!groups.has(key)) groups.set(key, { rank, color, chips: [] });
+    groups.get(key).chips.push(chip);
   }
-  const order = [...groups.keys()].sort((a, b) => {
-    if (a === "none") return 1;
-    if (b === "none") return -1;
-    return castColorSortValue(a) - castColorSortValue(b);
+  const order = [...groups.values()].sort((a, b) => {
+    if (a.rank !== b.rank) return a.rank - b.rank;
+    if (a.color === "none") return 1;
+    if (b.color === "none") return -1;
+    return castColorSortValue(a.color) - castColorSortValue(b.color);
   });
   const frag = document.createDocumentFragment();
-  for (const color of order) {
-    const group = document.createElement("div");
-    group.className = "cast-group";
-    if (color !== "none") group.style.setProperty("--cast-color", color);
-    for (const chip of groups.get(color)) group.append(chip);
-    frag.append(group);
+  for (const group of order) {
+    const box = document.createElement("div");
+    box.className = "cast-group";
+    if (group.color !== "none") box.style.setProperty("--cast-color", group.color);
+    for (const chip of group.chips) box.append(chip);
+    frag.append(box);
   }
   row.replaceChildren(frag);
 }
@@ -2129,9 +2167,12 @@ function paintCastFactionDots() {
   const row = chapterCastRow;
   if (!row) return;
   for (const chip of row.querySelectorAll(".cast-chip")) {
-    const color = castFactionColor(chip.dataset.name || "");
+    const name = chip.dataset.name || "";
+    const color = castFactionColor(name);
     const avatar = chip.querySelector(".cast-avatar");
     if (color && avatar) avatar.style.setProperty("--cast-color", color);
+    const camp = castFactionCamp(name);
+    if (camp) chip.dataset.camp = camp;
   }
   layoutCastGroups();
 }
@@ -2177,13 +2218,17 @@ async function renderChapterCast() {
     chip.dataset.name = name;
     chip.setAttribute("aria-label", unknownChip ? "ตัวละครที่ยังไม่รู้จัก" : "ดูข้อมูลตัวละคร " + name);
     const avatar = document.createElement("span");
-    avatar.className = unknownChip ? "cast-avatar is-unknown" : "cast-avatar";
+    // ยังไม่มีรูป = กรอบ ? เส้นประ จะเปลี่ยนเป็นรูปจริงเมื่อโหลดสำเร็จ
+    avatar.className = "cast-avatar is-unknown";
     avatar.textContent = "?";
     const caption = document.createElement("span");
     caption.className = "cast-name";
     caption.textContent = name;
     chip.append(avatar, caption);
     chip.addEventListener("click", () => { void openCharacterCard(label); });
+    const knownCamp = castFactionCamp(name);
+    if (knownCamp) chip.dataset.camp = knownCamp;
+    if (unknownChip) chip.dataset.campRank = "99";
     if (!unknownChip) {
       const color = castFactionColor(name);
       if (color) avatar.style.setProperty("--cast-color", color);
@@ -2194,13 +2239,15 @@ async function renderChapterCast() {
     if (query) {
       void (async () => {
         const entry = await characterIndexEntry(query);
+        if (entry?.section) {
+          chip.dataset.camp = entry.section;
+          if (!characterFactionCamps.get(normalizeCharacterKey(name))) rememberCastCamp(normalizeCharacterKey(name), entry.section);
+        }
         if (entry?.color) {
           avatar.style.setProperty("--cast-color", entry.color);
-          if (!characterFactionColors.get(normalizeCharacterKey(name))) {
-            rememberCastColor(normalizeCharacterKey(name), entry.color);
-            layoutCastGroups();
-          }
+          if (!characterFactionColors.get(normalizeCharacterKey(name))) rememberCastColor(normalizeCharacterKey(name), entry.color);
         }
+        if (entry?.color || entry?.section) layoutCastGroups();
         if (!state.loadRemoteImages) return;
         const paint = url => {
           const image = document.createElement("img");
@@ -2210,9 +2257,11 @@ async function renderChapterCast() {
           image.referrerPolicy = "no-referrer";
           image.addEventListener("error", () => {
             image.remove();
+            avatar.classList.add("is-unknown");
             if (!avatar.querySelector("img")) avatar.textContent = "?";
           }, { once: true });
           image.src = url;
+          avatar.classList.remove("is-unknown");
           avatar.textContent = "";
           avatar.append(image);
         };
@@ -2754,9 +2803,12 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
   card.classList.toggle("has-faction", Boolean(color));
   // Remember the camp colour so the cast strip can show it as a status dot.
   const castName = byId("character-card-name")?.textContent || "";
-  if (castName && color) {
+  if (castName) {
     const key = normalizeCharacterKey(castName);
-    if (characterFactionColors.get(key) !== color) { rememberCastColor(key, color); paintCastFactionDots(); }
+    let changed = false;
+    if (color && characterFactionColors.get(key) !== color) { rememberCastColor(key, color); changed = true; }
+    if (camp?.label && characterFactionCamps.get(key) !== camp.label) { rememberCastCamp(key, camp.label); changed = true; }
+    if (changed) paintCastFactionDots();
   }
   if (campTag) {
     campTag.hidden = !camp;
@@ -2781,6 +2833,7 @@ async function copyCharacterName() {
 function setCharacterUnknownFigure() {
   const figure = byId("character-card-figure");
   if (!figure) return;
+  figure.classList.add("is-placeholder");
   const mark = document.createElement("span");
   mark.className = "cc-unknown-mark";
   mark.setAttribute("aria-hidden", "true");
@@ -2870,15 +2923,12 @@ function setCharacterFigure(image, thai) {
   const figure = byId("character-card-figure");
   state.characterCardImage = image || "";
   state.characterCardThai = thai || state.characterCardThai;
-  if (!image) { figure.replaceChildren(characterAvatarFallback(thai)); return; }
+  figure.classList.toggle("is-placeholder", !image);
+  if (!image) { setCharacterUnknownFigure(); return; }
   const img = document.createElement("img");
   img.alt = thai; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = image;
   img.classList.add("zoomable");
-  img.addEventListener("error", () => {
-    if (img.dataset.fallback) return;
-    img.dataset.fallback = "1";
-    img.src = characterAvatarFallback(thai);
-  }, { once: true });
+  img.addEventListener("error", () => { setCharacterFigure("", thai); }, { once: true });
   img.addEventListener("click", () => openImageViewer(image, thai));
   figure.replaceChildren(img);
 }

@@ -854,6 +854,7 @@ button.wiki-field:focus-visible { outline:2px solid color-mix(in srgb,var(--char
 .character-card .character-card-suggestions { justify-content:flex-start; }
 
 /* ---------- การ์ดตัวละครที่ยังไม่รู้จัก ---------- */
+.character-card-figure.is-placeholder { border:2px dashed color-mix(in srgb,var(--accent) 42%,var(--line)); background:var(--surface-2); }
 .character-card.is-unknown {
   border-style:dashed;
   border-color:color-mix(in srgb,var(--muted) 42%,var(--line));
