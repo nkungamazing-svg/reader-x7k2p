@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.4";
+const APP_VERSION = "2.1.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.5", note: "ชิปที่ยังไม่รู้จัก (???) ไปอยู่ท้ายแถบตัวละครเสมอ ไม่ติดไปกับค่ายที่เคยจำไว้" },
   { version: "2.1.3", note: "ตัวละครที่ไม่มีรูปขึ้นกรอบ ? เส้นประทั้งในการ์ดและแถบตัวละคร และแถบตัวละครเรียงค่ายเอมิเลียก่อน ส่วนที่ยังไม่รู้จักไปอยู่ท้ายสุด" },
   { version: "2.1.2", note: "รูปตัวละครในตอนนี้เต็มกรอบทุกคน ชิปที่ยังไม่รู้จักขึ้นเป็นกรอบ ? เส้นประ และเสียงอ่านออกชื่อว่า “ไม่ทราบชื่อ” แทนคำว่า คำถาม" },
   { version: "2.1.1", note: "ย้ายปุ่มแชร์ไปแถบหัวเรื่องและตัดปุ่มเมนูที่ซ้ำกับปุ่ม ☰ ออก ชื่อตอนจึงอยู่กลางจอเต็มความกว้าง" },
@@ -2055,6 +2056,11 @@ function rememberCastCamp(key, camp) {
 }
 /* เอมิเลีย (ตัวเอก) ขึ้นก่อน แล้วไล่ตามค่ายในวิกิ · 50 = ค่ายอื่น · 99 = ยังไม่รู้จัก/ไม่มีกลุ่ม */
 const CAST_CAMP_ORDER = [/emilia/i, /crusch/i, /anastasia/i, /priscilla/i, /felt/i, /filore/i, /witch cult|sin archbishop/i, /vollachia/i, /kararagi/i, /lugu?nica|royal guard|knights? of/i];
+const CAST_UNKNOWN_NAME = /^[\s?？.·…\-–—]+$/u;
+function isUnknownCastName(name) {
+  return CAST_UNKNOWN_NAME.test(String(name || ""));
+}
+
 function castCampRank(camp) {
   const text = String(camp || "").trim();
   if (!text) return 99;
@@ -2099,6 +2105,7 @@ function castFactionCamp(name) {
 }
 /* ถ้ารู้แค่สี ก็ยังเดาค่ายจากสีมาตรฐานของวิกิได้ */
 function castCampForChip(name, color) {
+  if (isUnknownCastName(name)) return "";
   const known = castFactionCamp(name);
   if (known) return known;
   const hex = String(color || "").toLocaleLowerCase();
@@ -2140,7 +2147,7 @@ function layoutCastGroups() {
     const name = chip.dataset.name || "";
     const color = (castFactionColor(name) || "").toLocaleLowerCase() || "none";
     const camp = castCampForChip(name, color === "none" ? "" : color);
-    const rank = castCampRank(camp);
+    const rank = isUnknownCastName(name) ? 99 : castCampRank(camp);
     chip.dataset.campRank = String(rank);
     const key = rank + "|" + color;
     if (!groups.has(key)) groups.set(key, { rank, color, chips: [] });
@@ -2226,7 +2233,7 @@ async function renderChapterCast() {
     caption.textContent = name;
     chip.append(avatar, caption);
     chip.addEventListener("click", () => { void openCharacterCard(label); });
-    const knownCamp = castFactionCamp(name);
+    const knownCamp = unknownChip ? "" : castFactionCamp(name);
     if (knownCamp) chip.dataset.camp = knownCamp;
     if (unknownChip) chip.dataset.campRank = "99";
     if (!unknownChip) {
@@ -2803,7 +2810,7 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
   card.classList.toggle("has-faction", Boolean(color));
   // Remember the camp colour so the cast strip can show it as a status dot.
   const castName = byId("character-card-name")?.textContent || "";
-  if (castName) {
+  if (castName && !isUnknownCastName(castName)) {
     const key = normalizeCharacterKey(castName);
     let changed = false;
     if (color && characterFactionColors.get(key) !== color) { rememberCastColor(key, color); changed = true; }
