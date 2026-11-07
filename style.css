@@ -619,6 +619,8 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .update-banner .primary-button { min-height:40px; padding:0 14px; font-size:13px; }
 .reader-topbar-actions { display:flex; align-items:center; gap:8px; }
 .share-icon { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.app-header .header-share { flex:none; color:var(--text); border-color:color-mix(in srgb,var(--accent) 30%,var(--line)); background:color-mix(in srgb,var(--accent) 10%,var(--surface-2)); }
+.app-header .header-share .share-icon { width:19px; height:19px; }
 
 /* หน้าตั้งค่าแบบพับได้: เหลือแต่หัวข้อก่อน แตะเพื่อกางออก */
 .settings-fold { padding:0 11px; }
@@ -907,9 +909,8 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 
 /* หัวบทจัดกลางจอ: ปุ่มแชร์ลอยมุมขวา ไม่ดันชื่อเรื่องให้เยื้อง */
 .reader-topbar { position:relative; display:block; }
-.reader-hero { padding:0 46px; }
-.reader-topbar-actions { position:absolute; top:0; right:0; }
-@media (max-width:360px) { .reader-hero { padding:0 40px; } }
+.reader-hero { padding:0; }
+@media (max-width:360px) { .reader-hero { padding:0; } }
 
 /* จัดกลุ่มชิปตามสีกรอบ: สีเดียวกันอยู่ติดกัน เรียงกลุ่มตามสี */
 .cast-group { display:flex; flex:0 0 auto; gap:8px; }
@@ -933,7 +934,6 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 
 /* ระยะห่างกระชับขึ้น: หัวบท → รูป → ตัวละครในตอนนี้ */
 .reader-topbar { padding-top:max(8px, env(safe-area-inset-top, 0px)); margin:0 auto 4px; }
-.reader-topbar-actions { top:max(8px, env(safe-area-inset-top, 0px)); right:0; }
 .reader-hero { gap:4px; }
 .reader-content { padding-top:8px; }
 .reader-content > :has(+ .chapter-cast) { margin-bottom:0; }
@@ -947,4 +947,3 @@ body.page-mode .reader-content img:not(.emoji-img) { height:auto !important; }
 /* ปุ่มแชร์/เมนูอยู่ข้างชื่อตอน ไม่ทับข้อความ */
 .reader-topbar { display:flex; align-items:flex-start; gap:8px; }
 .reader-hero { flex:1 1 auto; min-width:0; padding:0; }
-.reader-topbar-actions { position:static; top:auto; right:auto; flex:none; }

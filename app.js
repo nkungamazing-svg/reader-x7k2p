@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.0";
+const APP_VERSION = "2.1.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.1", note: "ย้ายปุ่มแชร์ไปแถบหัวเรื่องและตัดปุ่มเมนูที่ซ้ำกับปุ่ม ☰ ออก ชื่อตอนจึงอยู่กลางจอเต็มความกว้าง" },
   { version: "2.1.0", note: "ไฮไลต์ย่อหน้าตอนฟังเสียงตรงกับที่อ่านแล้ว: เลขย่อหน้าไม่เพี้ยนหลังตัดหัวข้อซ้ำ/ช่องว่างรอบภาพ และไฮไลต์ติดตอนเสียงเริ่มจริง" },
   { version: "2.0.9", note: "ลบย่อหน้าว่างรอบภาพที่ทำให้เกิดช่องโหว่บน-ล่างภาพแนวนอน" },
   { version: "2.0.8", note: "ภาพแนวนอนไม่เหลือช่องว่างบน/ล่าง และปุ่มแชร์ไม่ทับชื่อตอนแล้ว" },
@@ -3947,7 +3948,7 @@ function bindEvents() {
   for (const count of CHAPTER_COLUMNS) byId(`cols-${count}`).addEventListener("click", () => setChapterColumns(count));
   byId("menu-toggle").addEventListener("click", () => setSidebarOpen(!document.body.classList.contains("sidebar-open")));
   byId("share-chapter")?.addEventListener("click", () => { void shareCurrentChapter(); });
-  byId("reader-menu").addEventListener("click", () => setSidebarOpen(true));
+  byId("reader-menu")?.addEventListener("click", () => setSidebarOpen(true));
   document.addEventListener("click", event => { if (event.target === document.body && document.body.classList.contains("sidebar-open")) setSidebarOpen(false); });
   byId("chapter-previous").addEventListener("click", () => goToAdjacentChapter(-1));
   byId("chapter-next").addEventListener("click", () => goToAdjacentChapter(1));
