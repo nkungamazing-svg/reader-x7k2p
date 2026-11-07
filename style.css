@@ -904,6 +904,8 @@ button.wiki-field:focus-visible { outline:2px solid color-mix(in srgb,var(--char
 .cast-avatar { position:relative; display:grid; place-items:center; width:64px; height:64px; overflow:hidden; border:2px solid var(--cast-color,var(--line)); border-radius:14px; background:var(--surface-2) center top/cover no-repeat; color:var(--muted); font-size:20px; font-weight:800; transition:transform .14s ease; }
 .cast-avatar::after { content:""; position:absolute; right:3px; bottom:3px; width:9px; height:9px; border-radius:50%; background:var(--cast-color,var(--muted)); box-shadow:0 0 0 2px color-mix(in srgb,var(--surface) 82%,transparent); }
 .cast-chip:active .cast-avatar { transform:scale(.96); }
+.cast-avatar.is-unknown { border-style:dashed; background:var(--surface-2); color:var(--muted); font-size:22px; }
+.cast-avatar.is-unknown::after { content:none; }
 .cast-name { max-width:100%; overflow:hidden; font-size:9.5px; line-height:1.3; text-align:center; text-overflow:ellipsis; white-space:nowrap; }
 body.page-mode .chapter-cast { margin:6px 0 10px; }
 
@@ -918,7 +920,7 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 
 /* รูปย่อต้องไม่ล้นกรอบ: ยึดติดกรอบ 64px เสมอ แม้รูปต้นทางจะใหญ่แค่ไหน */
 .cast-avatar { position:relative; overflow:hidden; }
-.cast-avatar img.cast-avatar-image {
+.reader-content .cast-avatar img.cast-avatar-image {
   position:absolute;
   inset:0;
   display:block;
@@ -942,8 +944,8 @@ body.page-mode .chapter-cast { margin:6px 0 10px; }
 body.page-mode .chapter-cast { margin:4px 0 8px; }
 
 /* กล่องรูปสูงตามสัดส่วนจริง: ภาพแนวนอนไม่เหลือช่องว่างบน/ล่างจาก object-fit */
-.reader-content img:not(.emoji-img) { height:auto !important; }
-body.page-mode .reader-content img:not(.emoji-img) { height:auto !important; }
+.reader-content img:not(.emoji-img):not(.cast-avatar-image) { height:auto !important; }
+body.page-mode .reader-content img:not(.emoji-img):not(.cast-avatar-image) { height:auto !important; }
 /* ปุ่มแชร์/เมนูอยู่ข้างชื่อตอน ไม่ทับข้อความ */
 .reader-topbar { display:flex; align-items:flex-start; gap:8px; }
 .reader-hero { flex:1 1 auto; min-width:0; padding:0; }

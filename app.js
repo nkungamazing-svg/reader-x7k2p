@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.1";
+const APP_VERSION = "2.1.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.2", note: "รูปตัวละครในตอนนี้เต็มกรอบทุกคน ชิปที่ยังไม่รู้จักขึ้นเป็นกรอบ ? เส้นประ และเสียงอ่านออกชื่อว่า “ไม่ทราบชื่อ” แทนคำว่า คำถาม" },
   { version: "2.1.1", note: "ย้ายปุ่มแชร์ไปแถบหัวเรื่องและตัดปุ่มเมนูที่ซ้ำกับปุ่ม ☰ ออก ชื่อตอนจึงอยู่กลางจอเต็มความกว้าง" },
   { version: "2.1.0", note: "ไฮไลต์ย่อหน้าตอนฟังเสียงตรงกับที่อ่านแล้ว: เลขย่อหน้าไม่เพี้ยนหลังตัดหัวข้อซ้ำ/ช่องว่างรอบภาพ และไฮไลต์ติดตอนเสียงเริ่มจริง" },
   { version: "2.0.9", note: "ลบย่อหน้าว่างรอบภาพที่ทำให้เกิดช่องโหว่บน-ล่างภาพแนวนอน" },
@@ -2160,8 +2161,10 @@ async function renderChapterCast() {
   const speakers = new Map();
   for (const label of content.querySelectorAll(".noat-speaker-label")) {
     const name = characterThaiName(label);
-    if (!name || name.length > 40 || /^[\s?？.·…\-–—]+$/u.test(name)) continue;
-    if (!speakers.has(name)) speakers.set(name, label);
+    if (!name || name.length > 40) continue;
+    const unknownSpeaker = /^[\s?？.·…\-–—]+$/u.test(name);
+    const speakerKey = unknownSpeaker ? "???" : name;
+    if (!speakers.has(speakerKey)) speakers.set(speakerKey, label);
   }
   const entries = [...speakers.entries()].slice(0, 24);
   if (!entries.length) return;
@@ -2170,19 +2173,23 @@ async function renderChapterCast() {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "cast-chip";
+    const unknownChip = name === "???";
     chip.dataset.name = name;
-    chip.setAttribute("aria-label", "ดูข้อมูลตัวละคร " + name);
+    chip.setAttribute("aria-label", unknownChip ? "ตัวละครที่ยังไม่รู้จัก" : "ดูข้อมูลตัวละคร " + name);
     const avatar = document.createElement("span");
-    avatar.className = "cast-avatar";
+    avatar.className = unknownChip ? "cast-avatar is-unknown" : "cast-avatar";
     avatar.textContent = "?";
     const caption = document.createElement("span");
     caption.className = "cast-name";
     caption.textContent = name;
     chip.append(avatar, caption);
     chip.addEventListener("click", () => { void openCharacterCard(label); });
-    const color = castFactionColor(name);
-    if (color) avatar.style.setProperty("--cast-color", color);
+    if (!unknownChip) {
+      const color = castFactionColor(name);
+      if (color) avatar.style.setProperty("--cast-color", color);
+    }
     row.append(chip);
+    if (unknownChip) continue;
     const query = table[normalizeCharacterKey(name)] || "";
     if (query) {
       void (async () => {
@@ -2278,10 +2285,15 @@ function saveReadingPosition() {
   state.scrollTimer = setTimeout(() => persistReadingPosition().catch(error => showStatus(`บันทึกตำแหน่งอ่านไม่สำเร็จ: ${error.message}`)), 500);
 }
 
+// ป้ายชื่อที่ยังไม่รู้จักขึ้นเป็น "???" แต่เสียงอ่านไม่ควรออกว่า "คำถาม"
+function speakableText(text) {
+  return text.replace(/[?？]{2,}/gu, " ไม่ทราบชื่อ ").replace(/\s+/gu, " ").trim();
+}
+
 function buildSpeechQueue() {
   const content = byId("reader-content");
   const blocks = indexReaderBlocks(content);
-  return blocks.flatMap(block => splitSpeechText(block.textContent.replace(/\s+/gu, " ").trim())
+  return blocks.flatMap(block => splitSpeechText(speakableText(block.textContent))
     .map(text => ({ text, blockIndex: Number(block.dataset.blockIndex) })));
 }
 
