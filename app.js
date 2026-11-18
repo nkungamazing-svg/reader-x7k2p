@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.3.0";
+const APP_VERSION = "2.4.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.0", note: "หน้า “คำอ่าน” กับ “ชื่อตัวละคร” รวมเป็นหน้าเดียว สลับด้วยแท็บ (ไม่ต้องเดาว่าอยู่อันไหน) และเพิ่มฟอนต์ให้เลือกอีก 4 แบบ (Prompt · Kanit · IBM Plex Sans Thai · Pridi) ฝังไฟล์ไว้ในแอป ใช้ได้ตอนออฟไลน์" },
   { version: "2.3.0", note: "การ์ดตัวละคร: จับคู่ชื่อกับ characters.json ได้ยืดหยุ่นขึ้น (ชื่อต้น คำสลับลำดับ) จึงขึ้นรูปได้เกือบทุกคนเหมือนในคลังแปล และแท็กบนการ์ด (อาชีพ · เผ่า · ค่าย) เป็นไทยทั้งหมด" },
   { version: "2.2.9", note: "หน้าตั้งค่าสั้นลง: รวม 7 หมวดเหลือ 4 (การอ่าน · เสียงอ่าน · ธีมและเอฟเฟกต์ · ซิงก์และข้อมูล) ย้ายตัวเลือกที่ใช้นาน ๆ ครั้งไว้ใน “ขั้นสูง” และเปิดครั้งแรกกางแค่หมวดแรก — ตัวเลือกเดิมอยู่ครบทุกตัว" },
   { version: "2.2.7", note: "หัวเว็บธีมรี:ซีโร่: รูปตัวละครที่ไม่ขึ้นเพราะเว็บต้นทางบล็อก referrer จะโหลดได้ และถ้ารูปไหนพังจริงจะข้ามไปคนถัดไปแทนการค้างเป็นโลโก้แอป" },
@@ -927,10 +928,11 @@ function characterSourceBadge(meta) {
 }
 
 async function openCharacterNames() {
-  const sheet = byId("character-names-sheet");
+  const sheet = byId("glossary-sheet");
   if (!sheet) return;
   const search = byId("character-names-search");
   if (search) search.value = "";
+  setGlossaryTab("names");
   await paintCharacterNames();
   if (typeof sheet.showModal === "function") sheet.showModal();
   else sheet.setAttribute("open", "");
@@ -1008,10 +1010,25 @@ async function paintGlossary() {
   }
 }
 
+/* คลังคำอ่านกับตารางชื่อเคยเป็นสองหน้าแยก แต่ทั้งคู่คือ “คำ ↔ คำแปล” ชุดเดียวกัน
+   จึงรวมเป็นหน้าเดียวและสลับด้วยแท็บ จะได้ไม่ต้องเดาว่าต้องเปิดอันไหน */
+function setGlossaryTab(tab) {
+  const names = tab === "names";
+  const readingPanel = byId("glossary-panel-reading");
+  const namesPanel = byId("glossary-panel-names");
+  if (!readingPanel || !namesPanel) return;
+  readingPanel.hidden = names;
+  namesPanel.hidden = !names;
+  byId("glossary-tab-reading")?.setAttribute("aria-selected", String(!names));
+  byId("glossary-tab-names")?.setAttribute("aria-selected", String(names));
+  void (names ? paintCharacterNames() : paintGlossary());
+}
+
 async function openGlossary() {
   const sheet = byId("glossary-sheet");
   if (!sheet) return;
   byId("glossary-search").value = "";
+  setGlossaryTab("reading");
   await paintGlossary();
   if (typeof sheet.showModal === "function") sheet.showModal();
   else sheet.setAttribute("open", "");
@@ -4318,6 +4335,8 @@ function bindEvents() {
   byId("search").addEventListener("input", scheduleContentSearch);
   byId("notes-open")?.addEventListener("click", openNotesSheet);
   byId("glossary-open")?.addEventListener("click", () => { void openGlossary(); });
+  byId("glossary-tab-reading")?.addEventListener("click", () => { setGlossaryTab("reading"); });
+  byId("glossary-tab-names")?.addEventListener("click", () => { setGlossaryTab("names"); });
   // Typing a reading here keeps working offline; the extension still owns the synced table.
   byId("pronunciation-form")?.addEventListener("submit", async event => {
     event.preventDefault();
@@ -4774,7 +4793,7 @@ function installPageGestures() {
   });
 }
 
-const FONT_STACKS = { noto: '"Noto Sans Thai", sans-serif', system: '-apple-system, "SF Pro Text", "Thonburi", "Noto Sans Thai", sans-serif', sarabun: '"Sarabun", "Noto Sans Thai", sans-serif', "noto-serif": '"Noto Serif Thai", "Noto Sans Thai", serif' };
+const FONT_STACKS = { noto: '"Noto Sans Thai", sans-serif', system: '-apple-system, "SF Pro Text", "Thonburi", "Noto Sans Thai", sans-serif', sarabun: '"Sarabun", "Noto Sans Thai", sans-serif', "noto-serif": '"Noto Serif Thai", "Noto Sans Thai", serif', prompt: '"Prompt", "Noto Sans Thai", sans-serif', kanit: '"Kanit", "Noto Sans Thai", sans-serif', "ibm-plex": '"IBM Plex Sans Thai", "Noto Sans Thai", sans-serif', pridi: '"Pridi", "Noto Serif Thai", "Noto Sans Thai", serif' };
 
 function setFontFamily(value) {
   state.fontFamily = FONT_STACKS[value] ? value : "noto";

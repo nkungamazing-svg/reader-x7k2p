@@ -212,27 +212,30 @@
   </dialog>
   <dialog id="glossary-sheet" class="bookmark-sheet glossary-sheet" aria-label="คลังคำอ่านและชื่อตัวละคร">
     <div class="bookmark-sheet-head">
-      <div><h3>คลังคำอ่าน</h3><p id="glossary-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
+      <div><h3>คลังคำอ่านและชื่อตัวละคร</h3><p id="glossary-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
       <form method="dialog"><button class="icon-button" aria-label="ปิดคลังคำอ่าน">×</button></form>
     </div>
-    <input id="glossary-search" class="search-input" type="search" placeholder="ค้นคำหรือชื่อ…" autocomplete="off" aria-label="ค้นในคลังคำอ่าน">
-    <form id="pronunciation-form" class="pronunciation-form" autocomplete="off">
-      <input id="pronunciation-word" class="search-input" type="text" placeholder="คำในบท" aria-label="คำที่ต้องการกำหนดคำอ่าน" required>
-      <input id="pronunciation-reading" class="search-input" type="text" placeholder="อ่านว่า" aria-label="คำอ่าน" required>
-      <button class="primary-button" type="submit">เพิ่ม</button>
-    </form>
-    <p class="settings-hint">เพิ่มเองได้ที่นี่ (เก็บในเครื่องนี้) — ชุดหลักมาจากตารางคำอ่านในส่วนขยาย</p>
-    <div id="glossary-list" class="glossary-list"></div>
-    <p id="glossary-empty" class="settings-hint">คำอ่านมาจากตารางคำอ่านในไฟล์สำรอง และชื่อตัวละครจะถูกจดเมื่อคุณแก้ชื่อในการ์ดตัวละคร</p>
-  </dialog>
-  <dialog id="character-names-sheet" class="bookmark-sheet glossary-sheet" aria-label="ตารางชื่อตัวละคร">
-    <div class="bookmark-sheet-head">
-      <div><h3>ตารางชื่อตัวละคร</h3><p id="character-names-sub" class="settings-hint">ยังไม่มีรายการ</p></div>
-      <form method="dialog"><button class="icon-button" aria-label="ปิดตารางชื่อตัวละคร">×</button></form>
+    <div class="glossary-tabs" role="tablist" aria-label="เลือกหมวดในคลัง">
+      <button id="glossary-tab-reading" class="theme-choice" type="button" role="tab" aria-selected="true" aria-controls="glossary-panel-reading">คำอ่าน</button>
+      <button id="glossary-tab-names" class="theme-choice" type="button" role="tab" aria-selected="false" aria-controls="glossary-panel-names">ชื่อตัวละคร</button>
     </div>
-    <input id="character-names-search" class="search-input" type="search" placeholder="ค้นชื่อไทยหรือชื่ออังกฤษ…" autocomplete="off" aria-label="ค้นในตารางชื่อตัวละคร">
-    <div id="character-names-list" class="glossary-list"></div>
-    <p id="character-names-empty" class="settings-hint">ชื่อจะถูกเพิ่มเมื่อซิงก์คลังคำศัพท์ หรือนำเข้าไฟล์ JSON</p>
+    <div id="glossary-panel-reading" class="glossary-panel" role="tabpanel" aria-labelledby="glossary-tab-reading">
+      <input id="glossary-search" class="search-input" type="search" placeholder="ค้นคำอ่านหรือชื่อ…" autocomplete="off" aria-label="ค้นในคลังคำอ่าน">
+      <form id="pronunciation-form" class="pronunciation-form" autocomplete="off">
+        <input id="pronunciation-word" class="search-input" type="text" placeholder="คำในบท" aria-label="คำที่ต้องการกำหนดคำอ่าน" required>
+        <input id="pronunciation-reading" class="search-input" type="text" placeholder="อ่านว่า" aria-label="คำอ่าน" required>
+        <button class="primary-button" type="submit">เพิ่ม</button>
+      </form>
+      <p class="settings-hint">เพิ่มเองได้ที่นี่ (เก็บในเครื่องนี้) — ชุดหลักมาจากตารางคำอ่านในส่วนขยาย</p>
+      <div id="glossary-list" class="glossary-list"></div>
+      <p id="glossary-empty" class="settings-hint">คำอ่านมาจากตารางคำอ่านในไฟล์สำรอง และชื่อตัวละครจะถูกจดเมื่อคุณแก้ชื่อในการ์ดตัวละคร</p>
+    </div>
+    <div id="glossary-panel-names" class="glossary-panel" role="tabpanel" aria-labelledby="glossary-tab-names" hidden>
+      <p id="character-names-sub" class="settings-hint">ยังไม่มีรายการ</p>
+      <input id="character-names-search" class="search-input" type="search" placeholder="ค้นชื่อไทยหรือชื่ออังกฤษ…" autocomplete="off" aria-label="ค้นในตารางชื่อตัวละคร">
+      <div id="character-names-list" class="glossary-list"></div>
+      <p id="character-names-empty" class="settings-hint">ชื่อจะถูกเพิ่มเมื่อซิงก์คลังคำศัพท์ หรือนำเข้าไฟล์ JSON</p>
+    </div>
   </dialog>
   <dialog id="notes-sheet" class="bookmark-sheet notes-sheet" aria-label="ไฮไลต์และโน้ต">
     <div class="bookmark-sheet-head">
@@ -268,7 +271,7 @@
       <details class="settings-group settings-fold" data-fold="reading">
         <summary><h3>การอ่าน</h3></summary>
         <div class="type-preview" aria-hidden="true"><span class="type-preview-sample">กาลครั้งหนึ่งนานมาแล้ว มีเรื่องเล่าที่ถูกส่งต่อกันมา</span></div>
-        <div class="setting-row"><label for="font-family">ฟอนต์ข้อความ</label><select id="font-family"><option value="noto">Noto Sans Thai (มาตรฐาน)</option><option value="system">ฟอนต์ระบบ iOS</option><option value="sarabun">Sarabun (หัวกลม)</option><option value="noto-serif">Noto Serif Thai (มีเชิง)</option></select></div>
+        <div class="setting-row"><label for="font-family">ฟอนต์ข้อความ</label><select id="font-family"><option value="noto">Noto Sans Thai (มาตรฐาน)</option><option value="system">ฟอนต์ระบบ iOS</option><option value="sarabun">Sarabun (หัวกลม)</option><option value="noto-serif">Noto Serif Thai (มีเชิง)</option><option value="prompt" style="font-family:Prompt,sans-serif">Prompt (เหลี่ยมทันสมัย)</option><option value="kanit" style="font-family:Kanit,sans-serif">Kanit (แน่น อ่านเร็ว)</option><option value="ibm-plex" style="font-family:'IBM Plex Sans Thai',sans-serif">IBM Plex Sans Thai (เรียบสะอาด)</option><option value="pridi" style="font-family:Pridi,serif">Pridi (มีเชิง อ่านยาวสบาย)</option></select></div>
         <div class="setting-row"><span>ขนาดตัวอักษร</span><div class="font-size-row"><button id="font-down" class="tool-button square-button" type="button" aria-label="ลดขนาดตัวอักษร">A−</button><output id="font-size-label">19</output><button id="font-up" class="tool-button square-button" type="button" aria-label="เพิ่มขนาดตัวอักษร">A+</button></div></div>
         <div class="setting-row"><label for="line-height">ระยะบรรทัด</label><div class="range-row"><input id="line-height" type="range" min="1.4" max="2.6" step="0.1" value="1.9"><output id="line-height-output">1.9</output></div></div>
         <div class="setting-row text-width-row"><label for="text-width">ความกว้างข้อความ</label><div class="range-row"><input id="text-width" type="range" min="320" max="900" step="20" value="760"><output id="text-width-output">760px</output></div></div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-2.3.0";
+const CACHE_NAME = "noat-mobile-reader-2.4.0";
 // รูปในบท (คนละโดเมนกับแอป) ถูกเก็บแยกไว้ เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่
 const IMAGE_CACHE = "noat-reader-images";
 const IMAGE_PATTERN = /\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[/?#]|$)/i;
@@ -71,7 +71,35 @@ const APP_FILES = [
   "./fonts/sarabun-latin-ext-400.woff2",
   "./fonts/sarabun-latin-ext-600.woff2",
   "./fonts/sarabun-thai-400.woff2",
-  "./fonts/sarabun-thai-600.woff2"
+  "./fonts/sarabun-thai-600.woff2",
+  "./fonts/OFL-ibm-plex.txt",
+  "./fonts/OFL-kanit.txt",
+  "./fonts/OFL-pridi.txt",
+  "./fonts/OFL-prompt.txt",
+  "./fonts/ibm-plex-latin-400.woff2",
+  "./fonts/ibm-plex-latin-600.woff2",
+  "./fonts/ibm-plex-latin-ext-400.woff2",
+  "./fonts/ibm-plex-latin-ext-600.woff2",
+  "./fonts/ibm-plex-thai-400.woff2",
+  "./fonts/ibm-plex-thai-600.woff2",
+  "./fonts/kanit-latin-400.woff2",
+  "./fonts/kanit-latin-600.woff2",
+  "./fonts/kanit-latin-ext-400.woff2",
+  "./fonts/kanit-latin-ext-600.woff2",
+  "./fonts/kanit-thai-400.woff2",
+  "./fonts/kanit-thai-600.woff2",
+  "./fonts/pridi-latin-400.woff2",
+  "./fonts/pridi-latin-600.woff2",
+  "./fonts/pridi-latin-ext-400.woff2",
+  "./fonts/pridi-latin-ext-600.woff2",
+  "./fonts/pridi-thai-400.woff2",
+  "./fonts/pridi-thai-600.woff2",
+  "./fonts/prompt-latin-400.woff2",
+  "./fonts/prompt-latin-600.woff2",
+  "./fonts/prompt-latin-ext-400.woff2",
+  "./fonts/prompt-latin-ext-600.woff2",
+  "./fonts/prompt-thai-400.woff2",
+  "./fonts/prompt-thai-600.woff2"
 ];
 
 // App shell files are fetched fresh so a new release shows up on the next load;
