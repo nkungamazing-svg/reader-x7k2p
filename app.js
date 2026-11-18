@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.9";
+const APP_VERSION = "2.2.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.0", note: "เก็บกวาดโค้ดภายใน (แคชรูป ลำดับตอน และรูปไอคอน) ให้อ่านง่ายขึ้น โดยหน้าตาและการทำงานเหมือนเดิม" },
   { version: "2.1.9", note: "รูปในบทถูกเก็บไว้ในเครื่องหลังซิงก์ อ่านออฟไลน์แล้วรูปยังขึ้นครบ" },
   { version: "2.1.8", note: "ซิงก์รอบใหม่จะอัปเดตลำดับสารบัญของบทเก่าที่มีอยู่แล้วด้วย ตอนจึงเรียงตามเว็บต้นทางเหมือนในคลัง" },
   { version: "2.1.7", note: "รูปไอคอน/อิโมจิในบทไม่ขยายเต็มความกง้างแล้ว และเพิ่มระยะท้ายบทให้อ่านบรรทัดสุดท้ายได้พ้นแถบเครื่องมือ" },
@@ -301,13 +302,10 @@ function chapterTocOrder(item) {
   return Number.isFinite(value) ? value : null;
 }
 
+// วันที่เผยแพร่ซ่อนอยู่ใน URL ของเว็บนิยายแทบทุกเจ้า: /2021/01/02/…
 function chapterPublishTime(item) {
-  const direct = Number(item?.publishedAt);
-  if (Number.isFinite(direct) && direct > 0) return direct;
   const match = String(item?.sourceUrl || "").match(/(?:^|\/)(\d{4})\/(\d{2})\/(\d{2})(?:\/|$)/);
-  if (!match) return null;
-  const time = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  return Number.isFinite(time) ? time : null;
+  return match ? Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
 }
 
 function sortChapters(items) {
@@ -1888,10 +1886,8 @@ function isSmallRemoteImage(image) {
   return !Number.isFinite(height) || height <= 0 || height <= 200;
 }
 
-let remoteImageFailures = 0;
-
 function makeRemoteImageFallback(image, source) {
-  // ไม่มีเน็ต หรือเป็นอิโมจิตัวเล็ก: ไม่ต้องขึ้นกล่อง "ต้องมีอินเทอร์เน็ต" กลางบท
+  // ไม่มีเน็ต หรือเป็นอิโมจิตัวเล็ก: เอาออกเงียบ ๆ ไม่ต้องขึ้นกล่องกลางบท
   if (isSmallRemoteImage(image) || navigator.onLine === false) {
     image.addEventListener("error", () => image.remove(), { once: true });
     return;
@@ -1902,12 +1898,7 @@ function makeRemoteImageFallback(image, source) {
   retry.addEventListener("click", () => { fallback.hidden = true; image.hidden = false; image.src = source; });
   fallback.append(message, retry);
   image.insertAdjacentElement("afterend", fallback);
-  image.addEventListener("error", () => {
-    remoteImageFailures += 1;
-    // แจ้งเฉพาะสองรูปแรก ถ้าพลาดต่อเนื่อง (เช่นบทที่เต็มไปด้วยอิโมจิ) เอาออกเงียบ ๆ เพื่อให้อ่านได้
-    if (remoteImageFailures > 2) { image.remove(); fallback.remove(); return; }
-    image.hidden = true; fallback.hidden = false;
-  }, { passive: true });
+  image.addEventListener("error", () => { image.hidden = true; fallback.hidden = false; }, { passive: true });
 }
 
 function safeChapterFragment(html, baseUrl = "") {
@@ -2013,12 +2004,13 @@ function closeReader() {
 function markSmallImages(root) {
   for (const image of root.querySelectorAll("img")) {
     const apply = () => {
-      if (!image.naturalWidth || !image.naturalHeight) return;
-      const small = image.naturalWidth <= 200 && image.naturalHeight <= 200;
-      image.classList.toggle("emoji-img", small);
-      // รูปสี่เหลี่ยมจัตุรัสขนาดไม่เกิน 512px (ไอคอนหัวข้อ/สติกเกอร์) ไม่ควรขยายเต็มหน้ากว้าง
-      const square = Math.abs(image.naturalWidth - image.naturalHeight) <= Math.max(2, image.naturalWidth * 0.04);
-      image.classList.toggle("icon-img", !small && square && image.naturalWidth <= 512);
+      const width = image.naturalWidth, height = image.naturalHeight;
+      if (!width || !height) return;
+      const emoji = width <= 200 && height <= 200;
+      // รูปสี่เหลี่ยมจัตุรัสไม่เกิน 512px (ไอคอน/สติกเกอร์) ไม่ควรขยายเต็มหน้ากว้าง
+      const icon = !emoji && width <= 512 && Math.abs(width - height) <= Math.max(2, width * 0.04);
+      image.classList.toggle("emoji-img", emoji);
+      image.classList.toggle("icon-img", icon);
     };
     if (image.complete) apply();
     else image.addEventListener("load", apply, { once: true });
@@ -2078,7 +2070,6 @@ function indexReaderBlocks(content) {
 
 function renderChapterContent(item) {
   const content = byId("reader-content");
-  remoteImageFailures = 0;
   content.replaceChildren();
   content.append(safeChapterFragment(item.html, item.sourceUrl || ""));
   indexReaderBlocks(content);
@@ -3937,9 +3928,9 @@ function startAutoSyncWatch() {
 
 /* ---------- เก็บรูปในบทไว้ในเครื่อง (อ่านออฟไลน์แล้วรูปยังอยู่) ---------- */
 const IMAGE_WARM_CONCURRENCY = 3;
-const IMAGE_WARM_LIMIT = 300;
-let imageWarmRunning = false;
-let imageWarmDone = -1;
+const IMAGE_WARM_BATCH = 300;
+const warmedImages = new Set();
+let imageWarming = false;
 
 function chapterImageUrls(chapters) {
   const urls = new Set();
@@ -3955,31 +3946,29 @@ function chapterImageUrls(chapters) {
   return [...urls];
 }
 
+/* ดาวน์โหลดรูปของบทที่บันทึกไว้เข้าแคช service worker เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่ */
 async function warmChapterImages({ quiet = false } = {}) {
-  if (imageWarmRunning || navigator.onLine === false || !state.loadRemoteImages) return 0;
-  if (imageWarmDone === state.chapters.length) return 0;
-  if (navigator.connection?.saveData) return 0;
-  const urls = chapterImageUrls(state.chapters).slice(0, IMAGE_WARM_LIMIT);
-  if (!urls.length) { imageWarmDone = state.chapters.length; return 0; }
-  imageWarmRunning = true;
-  const queue = urls.slice();
+  if (imageWarming || !state.loadRemoteImages || navigator.onLine === false) return;
+  if (navigator.connection?.saveData) return;
+  const queue = chapterImageUrls(state.chapters).filter(url => !warmedImages.has(url)).slice(0, IMAGE_WARM_BATCH);
+  if (!queue.length) return;
+  imageWarming = true;
   let done = 0;
   try {
     const worker = async () => {
-      for (let url = queue.shift(); url; url = queue.shift()) {
+      while (queue.length) {
+        const url = queue.shift();
         try { await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" }); } catch (_) {}
+        warmedImages.add(url);
         done += 1;
         if (!quiet && done % 20 === 0) paintSyncHint(`เก็บรูปไว้อ่านออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`);
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-    imageWarmDone = state.chapters.length;
-    if (!quiet && done) {
-      paintSyncHint(`เก็บรูปในบทไว้ใช้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
-      showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
-    }
-  } finally { imageWarmRunning = false; }
-  return done;
+    if (quiet) return;
+    paintSyncHint(`เก็บรูปในบทไว้ใช้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
+    showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
+  } finally { imageWarming = false; }
 }
 
 async function syncChapters({ manual = false } = {}) {
