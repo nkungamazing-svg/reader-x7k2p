@@ -646,6 +646,15 @@ body.chapter-grid[data-chapter-cols="6"] .chapter-link .mini-progress { display:
 .settings-fold > summary h3 { margin:0; }
 .settings-fold > summary::after { flex:none; width:8px; height:8px; margin-right:3px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); content:""; transform:rotate(45deg) translate(-1px,-1px); transition:transform .18s ease; }
 .settings-fold[open] > summary::after { transform:rotate(-135deg) translate(-2px,-2px); }
+/* ตัวเลือกที่ใช้นาน ๆ ครั้ง: ซ่อนไว้ใน “ขั้นสูง” ให้เมนูตั้งค่าสั้นลง */
+.settings-advanced { margin:8px 0 10px; padding:0 10px; border:1px dashed color-mix(in srgb,var(--line) 85%,transparent); border-radius:12px; background:color-mix(in srgb,var(--text) 2%,transparent); }
+.settings-advanced > summary { display:flex; align-items:center; min-height:46px; cursor:pointer; color:var(--muted); font-size:12px; font-weight:700; list-style:none; }
+.settings-advanced > summary::-webkit-details-marker { display:none; }
+.settings-advanced > summary::after { width:7px; height:7px; margin-left:auto; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); content:""; transform:rotate(45deg); transition:transform .18s ease; }
+.settings-advanced[open] > summary::after { transform:rotate(-135deg); }
+.settings-advanced .setting-row,.settings-advanced .switch-row { min-height:56px; }
+/* แถวตั้งค่ากระชับขึ้น ลดพื้นที่ว่างที่ไม่จำเป็น */
+.settings-sheet .setting-row,.settings-sheet .switch-row { min-height:56px; padding:7px 2px; }
 .settings-fold[open] { padding-bottom:8px; }
 .settings-fold > summary:focus-visible { outline:2px solid var(--accent-strong); outline-offset:-2px; border-radius:10px; }
 .settings-subtitle { margin:14px 1px 0; padding-top:12px; border-top:1px dashed color-mix(in srgb,var(--line) 80%,transparent); color:var(--accent-strong); font-size:10.5px; font-weight:800; letter-spacing:.06em; }

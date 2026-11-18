@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.8";
+const APP_VERSION = "2.2.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.9", note: "หน้าตั้งค่าสั้นลง: รวม 7 หมวดเหลือ 4 (การอ่าน · เสียงอ่าน · ธีมและเอฟเฟกต์ · ซิงก์และข้อมูล) ย้ายตัวเลือกที่ใช้นาน ๆ ครั้งไว้ใน “ขั้นสูง” และเปิดครั้งแรกกางแค่หมวดแรก — ตัวเลือกเดิมอยู่ครบทุกตัว" },
   { version: "2.2.7", note: "หัวเว็บธีมรี:ซีโร่: รูปตัวละครที่ไม่ขึ้นเพราะเว็บต้นทางบล็อก referrer จะโหลดได้ และถ้ารูปไหนพังจริงจะข้ามไปคนถัดไปแทนการค้างเป็นโลโก้แอป" },
   { version: "2.2.6", note: "เก็บกวาดโค้ดตัวเลข “พร้อมออฟไลน์” ให้เล็กลง (การเทียบ URL และการเรียกซ้ำหลังวอร์มรูป) ผลลัพธ์เหมือนเดิม" },
   { version: "2.2.5", note: "หน้าตั้งค่าเพิ่มบรรทัด “พร้อมออฟไลน์” บอกจำนวนตอนที่มีข้อความในเครื่องครบ และรูปที่เก็บไว้แล้ว เอาไว้เช็กก่อนออกเดินทาง" },
@@ -1337,12 +1338,13 @@ async function continueSpeechNextChapter() {
 /* ---------- หน้าตั้งค่า: เปิดทุกหมวดไว้ แล้วจำว่าผู้ใช้ย่อหมวดไหน ---------- */
 function bindSettingsFolds() {
   const folds = [...document.querySelectorAll("#settings-sheet .settings-fold")];
-  for (const fold of folds) {
+  folds.forEach((fold, index) => {
     const key = fold.dataset.fold;
-    if (!key) continue;
-    // ครั้งแรกที่ยังไม่เคยเลือก: กางไว้ให้เห็นทุกหมวด ไม่ต้องมาไล่เปิดทีละอัน
-    fold.open = state.settingsFolds[key] !== false;
-  }
+    if (!key) return;
+    // ครั้งแรกที่ยังไม่เคยเลือก: กางแค่หมวดแรก หมวดอื่นพับไว้ให้เมนูตั้งค่าสั้น
+    const saved = state.settingsFolds[key];
+    fold.open = typeof saved === "boolean" ? saved : index === 0;
+  });
   for (const fold of folds) {
     const key = fold.dataset.fold;
     if (!key) continue;
