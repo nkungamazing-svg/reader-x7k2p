@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.6";
+const APP_VERSION = "2.2.7";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.7", note: "หัวเว็บธีมรี:ซีโร่: รูปตัวละครที่ไม่ขึ้นเพราะเว็บต้นทางบล็อก referrer จะโหลดได้ และถ้ารูปไหนพังจริงจะข้ามไปคนถัดไปแทนการค้างเป็นโลโก้แอป" },
   { version: "2.2.6", note: "เก็บกวาดโค้ดตัวเลข “พร้อมออฟไลน์” ให้เล็กลง (การเทียบ URL และการเรียกซ้ำหลังวอร์มรูป) ผลลัพธ์เหมือนเดิม" },
   { version: "2.2.5", note: "หน้าตั้งค่าเพิ่มบรรทัด “พร้อมออฟไลน์” บอกจำนวนตอนที่มีข้อความในเครื่องครบ และรูปที่เก็บไว้แล้ว เอาไว้เช็กก่อนออกเดินทาง" },
   { version: "2.2.4", note: "เตรียมออฟไลน์ครบขึ้น: เก็บรูปของทุกบทในคลัง (เดิมหยุดที่ 300 รูปแรก) และขอสิทธิ์เก็บข้อมูลถาวรกันข้อมูลถูกล้าง" },
@@ -1730,7 +1731,8 @@ function waitForCoverTiles(limit = 1300) {
 function resetCoverHeader() {
   const avatar = byId("brand-avatar");
   const name = byId("brand-name");
-  if (avatar) avatar.src = themeLogoPath();
+  // รูปที่ค้างโหลดอยู่ต้องไม่ย้อนมาเขียนทับโลโก้ทีหลัง
+  if (avatar) { avatar.onerror = null; avatar.src = themeLogoPath(); }
   if (name) name.textContent = "Re:NovelTH";
   document.querySelector(".brand-logo")?.classList.remove("swapping");
   document.querySelector(".brand")?.classList.remove("swapping");
@@ -1757,14 +1759,31 @@ function startCoverRotation(pool) {
   const logo = document.querySelector(".brand-logo");
   const brand = document.querySelector(".brand");
   if (!avatar || !name || !logo) return;
-  if (!avatar.dataset.fallback) {
-    avatar.dataset.fallback = "1";
-    avatar.addEventListener("error", () => { avatar.src = themeLogoPath(); });
-  }
+  // รูปจากวิกิตอบ 403 เมื่อมี referrer ของแอปติดไป จึงขอบบแบบไม่ส่ง referrer เหมือนรูปในชิป
+  avatar.referrerPolicy = "no-referrer";
+  const broken = new Set();
   let index = Math.floor(Math.random() * pool.length);
   const paint = () => {
-    const item = pool[index % pool.length];
-    avatar.src = coverImageUrl(item.image);
+    // ข้ามรูปที่เคยโหลดไม่ผ่าน ไม่ให้หัวเว็บค้างเป็นโลโก้แอปเพราะคนเดียว
+    let item = null;
+    for (let step = 0; step < pool.length && !item; step += 1) {
+      const candidate = pool[(index + step) % pool.length];
+      if (!broken.has(candidate.image)) item = candidate;
+    }
+    if (!item) { avatar.onerror = null; avatar.src = themeLogoPath(); name.textContent = "Re:NovelTH"; return; }
+    const source = String(item.image);
+    const small = coverImageUrl(source);
+    // รูปย่อ 240px บางไฟล์ไม่มีจริง — ถ้าพลาดให้ลองไฟล์ต้นฉบับก่อนตัดคนนั้นทิ้ง
+    const show = url => {
+      avatar.onerror = () => {
+        if (avatar.getAttribute("src") !== url) return;
+        if (url !== source) { show(source); return; }
+        broken.add(source);
+        paint();
+      };
+      avatar.src = url;
+    };
+    show(small);
     name.textContent = item.title || item.name || "Re:NovelTH";
   };
   paint();
