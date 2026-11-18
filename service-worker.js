@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-2.4.6";
+const CACHE_NAME = "noat-mobile-reader-2.4.7";
 // รูปในบท (คนละโดเมนกับแอป) ถูกเก็บแยกไว้ เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่
 const IMAGE_CACHE = "noat-reader-images";
 const IMAGE_PATTERN = /\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[/?#]|$)/i;
@@ -99,7 +99,19 @@ const APP_FILES = [
   "./fonts/prompt-latin-ext-400.woff2",
   "./fonts/prompt-latin-ext-600.woff2",
   "./fonts/prompt-thai-400.woff2",
-  "./fonts/prompt-thai-600.woff2"
+  "./fonts/prompt-thai-600.woff2",
+  // ภาพเปิดแอปของ iOS: อ้างอยู่ใน index.html ถ้าไม่เก็บไว้จะเห็นเป็นพื้นว่างตอนไม่มีเน็ต
+  "./splash/splash-750x1334.png",
+  "./splash/splash-828x1792.png",
+  "./splash/splash-1080x2340.png",
+  "./splash/splash-1125x2436.png",
+  "./splash/splash-1170x2532.png",
+  "./splash/splash-1179x2556.png",
+  "./splash/splash-1206x2622.png",
+  "./splash/splash-1242x2688.png",
+  "./splash/splash-1284x2778.png",
+  "./splash/splash-1290x2796.png",
+  "./splash/splash-1320x2868.png"
 ];
 
 // App shell files are fetched fresh so a new release shows up on the next load;
