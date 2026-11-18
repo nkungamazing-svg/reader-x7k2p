@@ -5,10 +5,14 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.1.5";
+const APP_VERSION = "2.1.9";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.1.9", note: "รูปในบทถูกเก็บไว้ในเครื่องหลังซิงก์ อ่านออฟไลน์แล้วรูปยังขึ้นครบ" },
+  { version: "2.1.8", note: "ซิงก์รอบใหม่จะอัปเดตลำดับสารบัญของบทเก่าที่มีอยู่แล้วด้วย ตอนจึงเรียงตามเว็บต้นทางเหมือนในคลัง" },
+  { version: "2.1.7", note: "รูปไอคอน/อิโมจิในบทไม่ขยายเต็มความกง้างแล้ว และเพิ่มระยะท้ายบทให้อ่านบรรทัดสุดท้ายได้พ้นแถบเครื่องมือ" },
+  { version: "2.1.6", note: "เรียงตอนตามสารบัญเว็บเหมือนในคลัง (บทคั่นอยู่ถูกที่) และเลิกขึ้นกล่อง “ต้องมีอินเทอร์เน็ต” กับอิโมจิเล็ก ๆ ในบท" },
   { version: "2.1.5", note: "ชิปที่ยังไม่รู้จัก (???) ไปอยู่ท้ายแถบตัวละครเสมอ ไม่ติดไปกับค่ายที่เคยจำไว้" },
   { version: "2.1.3", note: "ตัวละครที่ไม่มีรูปขึ้นกรอบ ? เส้นประทั้งในการ์ดและแถบตัวละคร และแถบตัวละครเรียงค่ายเอมิเลียก่อน ส่วนที่ยังไม่รู้จักไปอยู่ท้ายสุด" },
   { version: "2.1.2", note: "รูปตัวละครในตอนนี้เต็มกรอบทุกคน ชิปที่ยังไม่รู้จักขึ้นเป็นกรอบ ? เส้นประ และเสียงอ่านออกชื่อว่า “ไม่ทราบชื่อ” แทนคำว่า คำถาม" },
@@ -290,11 +294,40 @@ function chapterParts(item) {
   return { arc: Number.isFinite(Number(arcValue)) && arcValue !== "" ? Number(arcValue) : null, chapter: Number.isFinite(Number(chapterValue)) && chapterValue !== "" ? Number(chapterValue) : null };
 }
 
+/* สารบัญของเว็บคือลำดับการอ่านจริง (บทคั่นไม่มีเลขจึงอยู่ระหว่างตอน 43 กับ 44 ได้)
+   ลำดับนี้ติดมากับข้อมูลที่ซิงก์จากคลัง ตอนที่ยังไม่มีสารบัญจะใช้วันที่เผยแพร่ใน URL */
+function chapterTocOrder(item) {
+  const value = Number(item?.tocOrder);
+  return Number.isFinite(value) ? value : null;
+}
+
+function chapterPublishTime(item) {
+  const direct = Number(item?.publishedAt);
+  if (Number.isFinite(direct) && direct > 0) return direct;
+  const match = String(item?.sourceUrl || "").match(/(?:^|\/)(\d{4})\/(\d{2})\/(\d{2})(?:\/|$)/);
+  if (!match) return null;
+  const time = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return Number.isFinite(time) ? time : null;
+}
+
 function sortChapters(items) {
   const mode = byId("sort").value;
   return [...items].sort((a, b) => {
     if (mode === "recent") return Number(b.savedAt || 0) - Number(a.savedAt || 0);
-    const left = chapterParts(a), right = chapterParts(b), direction = mode === "desc" ? -1 : 1;
+    const direction = mode === "desc" ? -1 : 1;
+    const leftToc = chapterTocOrder(a), rightToc = chapterTocOrder(b);
+    if (leftToc !== null && rightToc !== null && leftToc !== rightToc) return (leftToc - rightToc) * direction;
+    // บทที่ไม่มีอยู่ในสารบัญยังไม่รู้ตำแหน่ง จึงต่อท้ายบทที่รู้ตำแหน่งแล้ว
+    if (leftToc !== null && rightToc === null) return -1;
+    if (leftToc === null && rightToc !== null) return 1;
+    const left = chapterParts(a), right = chapterParts(b);
+    // บทคั่น/บทนำไม่มีเลขของตัวเองในสารบัญ วันที่เผยแพร่จึงคุมลำดับก่อนมี tocOrder
+    const leftRank = chapterIsInterlude(a) ? null : left.chapter;
+    const rightRank = chapterIsInterlude(b) ? null : right.chapter;
+    if (leftRank == null || rightRank == null) {
+      const leftPublished = chapterPublishTime(a), rightPublished = chapterPublishTime(b);
+      if (leftPublished !== null && rightPublished !== null && leftPublished !== rightPublished) return (leftPublished - rightPublished) * direction;
+    }
     for (const key of ["arc", "chapter"]) {
       if (left[key] == null && right[key] != null) return 1;
       if (left[key] != null && right[key] == null) return -1;
@@ -390,8 +423,12 @@ function renderChapterList() {
     const count = document.createElement("small"); count.textContent = readCount ? `${readCount}/${items.length} ตอน` : `${items.length} ตอน`;
     heading.append(name, count); group.append(heading);
     const arcs = new Map();
+    // บทคั่นไม่มีเลข arc ของตัวเอง เคยตกไปอยู่นอกกลุ่มปนกับเรื่องอื่น — ให้อยู่
+    // ต่อจากบทที่เพิ่งผ่านมา เพื่อให้ลำดับตรงกับสารบัญเว็บเหมือนในคลัง
+    let previousArc = null;
     for (const item of items) {
-      const arc = chapterParts(item).arc;
+      const arc = chapterParts(item).arc ?? (chapterIsInterlude(item) ? previousArc : null);
+      if (arc != null) previousArc = arc;
       const key = arc == null ? "ไม่ระบุ Arc" : `Arc ${arc}`;
       if (!arcs.has(key)) arcs.set(key, []);
       arcs.get(key).push(item);
@@ -1843,14 +1880,34 @@ function installAmbientGuards() {
   document.addEventListener("visibilitychange", () => { if (document.hidden) pauseAmbient(); else resumeAmbient(); });
 }
 
+/* อิโมจิ/สติกเกอร์เล็ก ๆ เป็นของประดับ ไม่ใช่ภาพประกอบ — โหลดไม่ได้ก็เอาออกเงียบ ๆ */
+function isSmallRemoteImage(image) {
+  const width = Number(image.getAttribute("width"));
+  const height = Number(image.getAttribute("height"));
+  if (!Number.isFinite(width) || width <= 0 || width > 200) return false;
+  return !Number.isFinite(height) || height <= 0 || height <= 200;
+}
+
+let remoteImageFailures = 0;
+
 function makeRemoteImageFallback(image, source) {
+  // ไม่มีเน็ต หรือเป็นอิโมจิตัวเล็ก: ไม่ต้องขึ้นกล่อง "ต้องมีอินเทอร์เน็ต" กลางบท
+  if (isSmallRemoteImage(image) || navigator.onLine === false) {
+    image.addEventListener("error", () => image.remove(), { once: true });
+    return;
+  }
   const fallback = document.createElement("div"); fallback.className = "remote-image-error"; fallback.hidden = true;
   const message = document.createElement("span"); message.textContent = "รูปโหลดไม่ได้ (ต้องมีอินเทอร์เน็ต)";
   const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "ลองใหม่";
   retry.addEventListener("click", () => { fallback.hidden = true; image.hidden = false; image.src = source; });
   fallback.append(message, retry);
   image.insertAdjacentElement("afterend", fallback);
-  image.addEventListener("error", () => { image.hidden = true; fallback.hidden = false; }, { passive: true });
+  image.addEventListener("error", () => {
+    remoteImageFailures += 1;
+    // แจ้งเฉพาะสองรูปแรก ถ้าพลาดต่อเนื่อง (เช่นบทที่เต็มไปด้วยอิโมจิ) เอาออกเงียบ ๆ เพื่อให้อ่านได้
+    if (remoteImageFailures > 2) { image.remove(); fallback.remove(); return; }
+    image.hidden = true; fallback.hidden = false;
+  }, { passive: true });
 }
 
 function safeChapterFragment(html, baseUrl = "") {
@@ -1957,7 +2014,11 @@ function markSmallImages(root) {
   for (const image of root.querySelectorAll("img")) {
     const apply = () => {
       if (!image.naturalWidth || !image.naturalHeight) return;
-      image.classList.toggle("emoji-img", image.naturalWidth <= 200 && image.naturalHeight <= 200);
+      const small = image.naturalWidth <= 200 && image.naturalHeight <= 200;
+      image.classList.toggle("emoji-img", small);
+      // รูปสี่เหลี่ยมจัตุรัสขนาดไม่เกิน 512px (ไอคอนหัวข้อ/สติกเกอร์) ไม่ควรขยายเต็มหน้ากว้าง
+      const square = Math.abs(image.naturalWidth - image.naturalHeight) <= Math.max(2, image.naturalWidth * 0.04);
+      image.classList.toggle("icon-img", !small && square && image.naturalWidth <= 512);
     };
     if (image.complete) apply();
     else image.addEventListener("load", apply, { once: true });
@@ -2017,6 +2078,7 @@ function indexReaderBlocks(content) {
 
 function renderChapterContent(item) {
   const content = byId("reader-content");
+  remoteImageFailures = 0;
   content.replaceChildren();
   content.append(safeChapterFragment(item.html, item.sourceUrl || ""));
   indexReaderBlocks(content);
@@ -3790,6 +3852,7 @@ async function importBackup(mode) {
   state.imported = null; byId("import-dialog").close();
   state.speechQueue = []; state.speechIndex = 0;
   await refreshChapters();
+  void warmChapterImages();
   if (state.chapters.length) {
     const first = sortChapters(state.chapters)[0]; await openChapter(first.id);
   }
@@ -3872,6 +3935,53 @@ function startAutoSyncWatch() {
   window.addEventListener("focus", runSync);
 }
 
+/* ---------- เก็บรูปในบทไว้ในเครื่อง (อ่านออฟไลน์แล้วรูปยังอยู่) ---------- */
+const IMAGE_WARM_CONCURRENCY = 3;
+const IMAGE_WARM_LIMIT = 300;
+let imageWarmRunning = false;
+let imageWarmDone = -1;
+
+function chapterImageUrls(chapters) {
+  const urls = new Set();
+  for (const item of chapters) {
+    const html = String(item?.html || "");
+    if (!html) continue;
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    for (const image of doc.querySelectorAll("img[src]")) {
+      const value = String(image.getAttribute("src") || "").trim();
+      if (/^https?:\/\//i.test(value)) urls.add(value);
+    }
+  }
+  return [...urls];
+}
+
+async function warmChapterImages({ quiet = false } = {}) {
+  if (imageWarmRunning || navigator.onLine === false || !state.loadRemoteImages) return 0;
+  if (imageWarmDone === state.chapters.length) return 0;
+  if (navigator.connection?.saveData) return 0;
+  const urls = chapterImageUrls(state.chapters).slice(0, IMAGE_WARM_LIMIT);
+  if (!urls.length) { imageWarmDone = state.chapters.length; return 0; }
+  imageWarmRunning = true;
+  const queue = urls.slice();
+  let done = 0;
+  try {
+    const worker = async () => {
+      for (let url = queue.shift(); url; url = queue.shift()) {
+        try { await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" }); } catch (_) {}
+        done += 1;
+        if (!quiet && done % 20 === 0) paintSyncHint(`เก็บรูปไว้อ่านออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`);
+      }
+    };
+    await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
+    imageWarmDone = state.chapters.length;
+    if (!quiet && done) {
+      paintSyncHint(`เก็บรูปในบทไว้ใช้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
+      showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
+    }
+  } finally { imageWarmRunning = false; }
+  return done;
+}
+
 async function syncChapters({ manual = false } = {}) {
   if (state.syncing) return;
   const url = state.syncUrl;
@@ -3891,7 +4001,9 @@ async function syncChapters({ manual = false } = {}) {
       if (!previous) { added += 1; touched.add(chapter.id); continue; }
       const changed = previous.html !== chapter.html
         || String(previous.savedAt ?? "") !== String(chapter.savedAt ?? "")
-        || normalizeTitle(previous) !== normalizeTitle(chapter);
+        || normalizeTitle(previous) !== normalizeTitle(chapter)
+        // ลำดับสารบัญเป็นข้อมูลใหม่จากคลัง บทที่เคยซิงก์ไว้จึงต้องรับค่า tocOrder ด้วย
+        || (chapter.tocOrder !== undefined && Number(previous.tocOrder) !== Number(chapter.tocOrder));
       if (!changed) continue;
       // Keep the reader's place in a chapter whose text was revised upstream.
       for (const key of SYNC_PROGRESS_KEYS) if (previous[key] !== undefined) chapter[key] = previous[key];
@@ -3930,6 +4042,7 @@ async function syncChapters({ manual = false } = {}) {
     if (tableUpdated) summary.push(`คำอ่านแก้ไข ${tableUpdated.toLocaleString("th-TH")}`);
     if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
     else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
+    void warmChapterImages();
   } catch (error) {
     paintSyncHint(`ซิงก์ไม่สำเร็จ: ${error.message}`);
     if (manual) showStatus(`ซิงก์ไม่สำเร็จ: ${error.message}`, 0);
@@ -4575,6 +4688,7 @@ async function initialize() {
     byId("remote-images-toggle").checked = state.loadRemoteImages;
     byId("wake-lock-toggle").checked = state.keepScreenAwake;
     await refreshChapters(); bindEvents(); startReadingClock(); paintReadingStats();
+    void warmChapterImages({ quiet: true });
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);

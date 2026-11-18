@@ -1,4 +1,7 @@
-const CACHE_NAME = "noat-mobile-reader-2.1.5";
+const CACHE_NAME = "noat-mobile-reader-2.1.9";
+// รูปในบท (คนละโดเมนกับแอป) ถูกเก็บแยกไว้ เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่
+const IMAGE_CACHE = "noat-reader-images";
+const IMAGE_PATTERN = /\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[/?#]|$)/i;
 const APP_FILES = [
   "characters.json",
   "./characters-local.json",
@@ -109,10 +112,30 @@ async function cacheFirst(request) {
   }
 }
 
+/* Cache-first for pictures: a chapter opened once online keeps its images offline.
+   Opaque responses (image hosts without CORS) still render inside an <img>. */
+async function imageFirst(request) {
+  const cache = await caches.open(IMAGE_CACHE);
+  const cached = await cache.match(request, { ignoreVary: true });
+  if (cached) return cached;
+  try {
+    const response = await fetch(request);
+    if (response && (response.ok || response.type === "opaque")) cache.put(request, response.clone()).catch(() => {});
+    return response;
+  } catch (_) {
+    return Response.error();
+  }
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
+  if (request.method !== "GET") return;
   const url = new URL(request.url);
-  if (request.method !== "GET" || url.origin !== self.location.origin) return;
+  if (request.destination === "image" || IMAGE_PATTERN.test(url.pathname + url.search)) {
+    event.respondWith(imageFirst(request));
+    return;
+  }
+  if (url.origin !== self.location.origin) return;
   const fresh = request.mode === "navigate" || FRESH_EXTENSIONS.some(extension => url.pathname.endsWith(extension));
   event.respondWith(fresh ? networkFirst(request) : cacheFirst(request));
 });

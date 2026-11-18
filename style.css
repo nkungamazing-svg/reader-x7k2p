@@ -203,7 +203,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
   body.sidebar-locked { position:fixed; inset-inline:0; width:100%; overflow:hidden; touch-action:pan-y; }
   .reader-shell { padding:12px 12px calc(20px + var(--safe-bottom)); }
   .reader { min-height:calc(100dvh - 75px); padding-bottom:calc(70px + var(--safe-bottom)); }
-  .reader-content { padding-bottom:calc(110px + var(--safe-bottom)); line-height:var(--reader-line-height,1.9); }
+  .reader-content { padding-bottom:calc(170px + var(--safe-bottom)); line-height:var(--reader-line-height,1.9); }
   .audio-bar { gap:4px; padding-right:max(8px,env(safe-area-inset-right)); padding-left:max(8px,env(safe-area-inset-left)); }
   .settings-sheet { max-height:min(82dvh,720px); }
 }
@@ -419,6 +419,16 @@ body.scroll-mode.chrome-hidden .audio-bar { opacity:0; transform:translateY(110%
 /* ---------- Keep emoji-sized images at text scale ---------- */
 .reader-content img.emoji-img,
 body.page-mode .reader-content img.emoji-img { display:inline-block; width:auto; height:1.4em; max-height:1.4em; max-width:2.6em; margin:0 .1em; vertical-align:-.22em; break-inside:auto; }
+
+/* รูปไอคอนสี่เหลี่ยม (เช่นรูปหัวข้อ "สรุปตอนนี้") ไม่ขยายเต็มความกว้าง */
+.reader-content img.icon-img,
+body.page-mode .reader-content img.icon-img { display:block; width:auto; height:auto; max-width:min(45%,180px); max-height:180px; margin:1em auto; border-radius:14px; }
+.reader-content .noat-chapter-summary img { display:inline-block; width:1.25em !important; max-width:1.25em !important; height:1.25em !important; max-height:1.25em !important; margin:0 .1em 0 0; vertical-align:-.2em; }
+
+/* กล่องสรุปท้ายบท: อ่านได้ชัด ไม่ชนแถบเครื่องมือล่าง */
+.reader-content .noat-chapter-summary { margin:18px 0 14px; padding:14px 16px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+.reader-content .noat-chapter-summary :is(h1,h2,h3) { margin:0 0 8px; color:var(--accent-strong); font-size:1.02em; }
+.reader-content .noat-summary-body { margin:0; white-space:pre-line; }
 
 /* ---------- Tap affordances in paged mode ---------- */
 .tap-hint { position:fixed; inset:0; z-index:35; display:grid; grid-template-columns:30% 40% 30%; align-items:center; pointer-events:none; opacity:1; transition:opacity .3s ease; }
