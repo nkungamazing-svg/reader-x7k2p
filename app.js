@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "2.2.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.1", note: "ตอนที่ URL บอกว่าอยู่อาร์คไหนแต่ไม่มีเลขตอน (เช่น ปิดม่าน/บทคั่น) จะถูกจัดด้วยวันที่เผยแพร่เหมือนเว็บต้นทาง ไม่ถูกนับเป็นตอนที่ 8 อีก" },
   { version: "2.2.0", note: "เก็บกวาดโค้ดภายใน (แคชรูป ลำดับตอน และรูปไอคอน) ให้อ่านง่ายขึ้น โดยหน้าตาและการทำงานเหมือนเดิม" },
   { version: "2.1.9", note: "รูปในบทถูกเก็บไว้ในเครื่องหลังซิงก์ อ่านออฟไลน์แล้วรูปยังขึ้นครบ" },
   { version: "2.1.8", note: "ซิงก์รอบใหม่จะอัปเดตลำดับสารบัญของบทเก่าที่มีอยู่แล้วด้วย ตอนจึงเรียงตามเว็บต้นทางเหมือนในคลัง" },
@@ -285,14 +286,25 @@ function novelLabel(item) {
   try { return new URL(item.sourceUrl).hostname.replace(/^www\./i, ""); } catch { return "เรื่องไม่ระบุชื่อ"; }
 }
 
+/* ที่อยู่ในเว็บต้นทางเป็นภาษาอังกฤษและไม่ถูกแปล — …/arc-8-chapter-74-love/,
+   …/arc-8-curtains-close-priscilla-barielle/ — จึงเชื่อถือได้กว่าชื่อไทย:
+   หน้าไหนบอก arc แต่ไม่มี `chapter-N` แปลว่าไม่ใช่ตอนที่มีเลข (บทคั่น/ปิดม่าน) */
 function chapterParts(item) {
   const title = `${item.title || ""} ${item.translatedTitle || ""}`;
+  const slug = String(item.sourceUrl || "");
+  const slugArc = slug.match(/\barc[-_ ]?(\d+)(?=[-/]|$)/i);
+  const slugChapter = slug.match(/\bchapter[-_ ]?(\d+)(?=[-/]|$)/i);
   const arcMatch = title.match(/\bArc\s*(\d+)\b|อาร์ค\s*(\d+)/iu);
   const chapterMatch = title.match(/\bChapter\s*(\d+)\b|บทที่\s*(\d+)|ตอนที่\s*(\d+)/iu);
   const interludeMatch = title.match(/บทคั่น\s*(\d+)|(?:\binterlude\b|幕間)\s*(\d+)/iu);
-  const arcValue = item.arcNumber ?? item.arc ?? arcMatch?.[1] ?? arcMatch?.[2];
-  const chapterValue = item.chapterNumber ?? item.episodeNumber ?? chapterMatch?.[1] ?? chapterMatch?.[2] ?? chapterMatch?.[3] ?? interludeMatch?.[1] ?? interludeMatch?.[2];
-  return { arc: Number.isFinite(Number(arcValue)) && arcValue !== "" ? Number(arcValue) : null, chapter: Number.isFinite(Number(chapterValue)) && chapterValue !== "" ? Number(chapterValue) : null };
+  const arcValue = item.arcNumber ?? item.arc ?? slugArc?.[1] ?? arcMatch?.[1] ?? arcMatch?.[2];
+  const chapterValue = item.chapterNumber ?? item.episodeNumber
+    ?? (slugArc ? slugChapter?.[1] ?? null : chapterMatch?.[1] ?? chapterMatch?.[2] ?? chapterMatch?.[3] ?? interludeMatch?.[1] ?? interludeMatch?.[2]);
+  const toNumber = value => {
+    if (value == null || value === "") return null;
+    return Number.isFinite(Number(value)) ? Number(value) : null;
+  };
+  return { arc: toNumber(arcValue), chapter: toNumber(chapterValue) };
 }
 
 /* สารบัญของเว็บคือลำดับการอ่านจริง (บทคั่นไม่มีเลขจึงอยู่ระหว่างตอน 43 กับ 44 ได้)
@@ -3867,7 +3879,11 @@ function paintSyncHint(message = "") {
   if (!hint) return;
   if (message) { hint.textContent = message; return; }
   if (!state.syncUrl) { hint.textContent = "ยังไม่ได้ตั้งลิงก์ · วางลิงก์ไฟล์สำรองแล้วกด “บันทึกลิงก์”"; return; }
-  hint.textContent = `ซิงก์ล่าสุด: ${syncTimeLabel(state.syncedAt)}`;
+  // Telling readers how many chapters carry the site's table-of-contents position
+  // makes "why is the order still wrong" answerable without a debugger.
+  const withOrder = state.chapters.filter(item => Number.isFinite(Number(item.tocOrder))).length;
+  const orderHint = state.chapters.length ? ` · ลำดับสารบัญ ${withOrder}/${state.chapters.length}` : "";
+  hint.textContent = `ซิงก์ล่าสุด: ${syncTimeLabel(state.syncedAt)}${orderHint}`;
 }
 
 function normalizeSyncUrl(value) {
