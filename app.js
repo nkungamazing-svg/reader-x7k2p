@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.7";
+const APP_VERSION = "2.4.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.8", note: "รูปตัวละครออฟไลน์: ปุ่ม “เก็บรูปเลย” ในหมวดซิงก์ (และทำงานเบา ๆ หลังซิงก์) เก็บรูปของชื่อในตารางครั้งละ 60 คน ข้ามรูปที่มีแล้ว ไม่ทำเมื่อออฟไลน์หรือเปิด Save-Data แล้วรายงานจำนวนรูปกับพื้นที่ที่ใช้" },
   { version: "2.4.7", note: "ออฟไลน์: เพิ่มภาพเปิดแอปของ iOS (splash 11 ไฟล์) เข้า precache ของ service worker — ไฟล์ที่ index.html อ้างถึงทุกไฟล์ถูกเก็บไว้ในเครื่องแล้ว รวมถึงฟอนต์ ไอคอน ธีม และ characters.json" },
   { version: "2.4.6", note: "แถว “ตัวละครในตอนนี้” แยกป้ายที่รวมหลายคนออกเป็นรายคน (“คูนา & ฮอลี”, “อนาสตาเชีย & อ๊อตโต”, “และ/กับ/–/・/,”) แต่ละชิปมีรูปของตัวเอง และไม่ซ้ำกับคนที่ปรากฏเดี่ยวอยู่แล้ว" },
   { version: "2.4.5", note: "ตัวละครที่ยัง “?”: แอปเทียบเสียงชื่อไทยกับชื่ออังกฤษใน characters.json เอง (เบอร์สเต็ทส์ → Berstetz Fondalfon, โมกุโร → Moguro Hagane, การ์ฟิล, อนาสตาเซีย ฯลฯ) รับเฉพาะเมื่อชนะชัดเจน ไม่เดาผิดคน แล้วจดคู่ชื่อไว้ให้ชิปใช้ต่อ (ที่มา “เดาจากเสียงชื่อ”)" },
@@ -4540,6 +4541,97 @@ async function warmChapterImages({ quiet = false } = {}) {
   } finally { imageWarming = false; void paintOfflineReady(); }
 }
 
+/* ---------- อุ่นรูปตัวละครไว้ใช้ออฟไลน์ (จำกัดจำนวนต่อครั้ง) ---------- */
+const PORTRAIT_WARM_LIMIT = 60;
+const PORTRAIT_WARM_CONCURRENCY = 3;
+let portraitWarming = false;
+
+/* เลือกชื่อที่ควรเก็บรูปก่อน: คนที่ปรากฏในบทที่ซิงก์ไว้ → ที่เหลือในตารางชื่อ
+   ตัดชื่อซ้ำ และหั่นตาม limit เพื่อไม่ให้กินเน็ตทีเดียวเยอะ */
+function portraitWarmTargets(table, chapters, limit = PORTRAIT_WARM_LIMIT) {
+  const latin = /^[A-Za-z]/u;
+  const text = (chapters || []).map(item => String(item?.html || "")).join("\n");
+  const seen = new Set();
+  const ranked = [];
+  for (const [thai, title] of Object.entries(table || {})) {
+    const english = typeof title === "string" ? title.trim() : "";
+    if (!thai || !latin.test(english)) continue;
+    const key = english.toLocaleLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const hits = text ? text.split(thai).length - 1 : 0;
+    ranked.push({ thai, title: english, hits });
+  }
+  ranked.sort((a, b) => b.hits - a.hits || a.title.localeCompare(b.title));
+  return ranked.slice(0, Math.max(0, limit));
+}
+
+function formatSize(bytes) {
+  if (!bytes) return "0 KB";
+  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
+  return Math.max(1, Math.round(bytes / 1024)).toLocaleString("th-TH") + " KB";
+}
+
+async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIMIT } = {}) {
+  if (portraitWarming || !state.loadRemoteImages || navigator.onLine === false) return { done: 0, bytes: 0 };
+  if (navigator.connection?.saveData) return { done: 0, bytes: 0 };
+  const hint = byId("portrait-warm-hint");
+  const table = await characterNameTable();
+  const targets = portraitWarmTargets(table, state.chapters, limit);
+  if (!targets.length) {
+    if (hint) hint.textContent = "ยังไม่มีชื่อในตารางให้เก็บรูป — นำเข้าคลังคำศัพท์หรือซิงก์ก่อน";
+    return { done: 0, bytes: 0 };
+  }
+  portraitWarming = true;
+  const before = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
+  const queue = [...targets];
+  let done = 0, bytes = 0, skipped = 0;
+  if (hint) hint.textContent = `กำลังเก็บรูป ${targets.length.toLocaleString("th-TH")} คน…`;
+  try {
+    const worker = async () => {
+      while (queue.length) {
+        const { thai, title } = queue.shift();
+        let url = "";
+        try {
+          const entry = await characterIndexEntry(title);
+          url = entry?.image || (await lookupCharacterImage(title));
+        } catch (_) { url = ""; }
+        if (!url) continue;
+        void rememberCharacterPortrait(thai, url);
+        if (await countCachedImages([url])) { skipped += 1; continue; }
+        try {
+          // ขอแบบ CORS ก่อน เพื่อให้รู้ขนาดไฟล์จริง
+          const response = await fetch(url, { mode: "cors", credentials: "omit", referrerPolicy: "no-referrer" });
+          if (response.ok) {
+            const blob = await response.clone().blob();
+            bytes += blob.size || 0;
+            done += 1;
+          }
+        } catch (_) {
+          try {
+            await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
+            done += 1;
+          } catch (_) { /* ปล่อยไว้ ไว้ลองครั้งหน้า */ }
+        }
+        if (hint && !quiet) hint.textContent = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`;
+      }
+    };
+    await Promise.all(Array.from({ length: PORTRAIT_WARM_CONCURRENCY }, worker));
+  } finally { portraitWarming = false; }
+  let used = bytes;
+  if (!used && navigator.storage?.estimate) {
+    const after = (await navigator.storage.estimate()).usage || 0;
+    used = Math.max(0, after - before);
+  }
+  const message = done
+    ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${skipped ? ` · มีอยู่แล้ว ${skipped.toLocaleString("th-TH")}` : ""}`
+    : "รูปตัวละครในตารางถูกเก็บไว้แล้วทั้งหมด";
+  if (hint) hint.textContent = message;
+  if (!quiet) showStatus(message, 9000);
+  void paintOfflineReady();
+  return { done, bytes: used };
+}
+
 async function syncChapters({ manual = false } = {}) {
   if (state.syncing) return;
   const url = state.syncUrl;
@@ -4602,6 +4694,7 @@ async function syncChapters({ manual = false } = {}) {
     if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
     else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
     void warmChapterImages();
+    void warmCharacterPortraits({ quiet: true });
   } catch (error) {
     paintSyncHint(`ซิงก์ไม่สำเร็จ: ${error.message}`);
     if (manual) showStatus(`ซิงก์ไม่สำเร็จ: ${error.message}`, 0);
@@ -4665,6 +4758,7 @@ function bindEvents() {
   byId("glossary-search")?.addEventListener("input", () => { void paintGlossary(); });
   byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
   byId("offline-check")?.addEventListener("click", () => { void paintOfflineReady(); });
+  byId("portrait-warm")?.addEventListener("click", () => { void warmCharacterPortraits(); });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
   byId("note-highlight")?.addEventListener("click", () => addNote(""));
   byId("note-add")?.addEventListener("click", () => {
