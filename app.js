@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.4";
+const APP_VERSION = "2.5.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.5", note: "หน้าสรุปออฟไลน์: เพิ่มหลอดโหลดพร้อมตัวเลขนับ “เก็บรูป 37/497 รูป (7%)” ทั้งตอนเก็บรูปในบทและรูปตัวละคร · แผงใช้ความสูงคงที่ เนื้อหายุบ/ขยายภายในโดยไม่ดันหน้าต่างให้เปลี่ยนขนาด" },
   { version: "2.5.4", note: "หน้าสรุปออฟไลน์ไม่กระตุก/หดตอนกดเก็บรูปแล้ว: วาดเนื้อหาใหม่แบบสลับทีเดียว กำหนดความสูงขั้นต่ำของแผงไว้ และให้สถานะคืบหน้าอัปเดตเป็นจังหวะแทนทุกภาพ" },
   { version: "2.5.3", note: "หน้าสรุปออฟไลน์กระชับขึ้น: ซ่อนปุ่มที่ไม่มีอะไรให้เก็บ (และซ่อนแถวปุ่มทั้งแถวถ้าไม่มีงาน), ตัดข้อความซ้ำสองบรรทัด, ย่อข้อความเป็น “ยังไม่มีตอน — ซิงก์ก่อน”" },
   { version: "2.5.2", note: "หน้าสรุปออฟไลน์แสดงแคชของเวอร์ชันที่ใช้อยู่จริง (เดิมหยิบแคชเก่าที่ยังค้างอยู่มาแสดง) · ปุ่มทั้งสองตอบสถานะทุกครั้งที่กด" },
@@ -1210,6 +1211,7 @@ async function openOfflineSummary() {
   }
   const status = byId("offline-status");
   if (status) status.textContent = "";
+  offlineProgressHide();
   await paintOfflineSummary();
 }
 
@@ -4644,6 +4646,31 @@ function offlineStatus(text) {
   if (hint) hint.textContent = text;
 }
 
+/* หลอดโหลด + ตัวเลขนับ เช่น “เก็บรูป 37/497 รูป (7%)” */
+function offlineProgress(done, total, label = "เก็บรูป") {
+  const box = byId("offline-progress");
+  const bar = byId("offline-progress-bar");
+  const text = byId("offline-progress-text");
+  const safeTotal = Math.max(0, Number(total) || 0);
+  const safeDone = Math.max(0, Math.min(Number(done) || 0, safeTotal));
+  const percent = safeTotal ? Math.round(safeDone / safeTotal * 100) : 0;
+  if (box) box.hidden = false;
+  if (bar) bar.style.width = percent + "%";
+  if (text) {
+    const format = value => value.toLocaleString("th-TH");
+    text.textContent = `${label} ${format(safeDone)}/${format(safeTotal)} รูป (${percent}%)`;
+  }
+}
+
+function offlineProgressHide() {
+  const box = byId("offline-progress");
+  if (box) box.hidden = true;
+  const bar = byId("offline-progress-bar");
+  if (bar) bar.style.width = "0%";
+  const text = byId("offline-progress-text");
+  if (text) text.textContent = "";
+}
+
 /* URL รูปที่มีอยู่ในแคชแล้ว — ใช้ตัดสินว่า “ยังขาด” จริงหรือไม่ */
 async function cachedImageKeys() {
   const keys = new Set();
@@ -4671,7 +4698,9 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
   }
   imageWarming = true;
   let done = 0, failed = 0;
-  offlineStatus(`กำลังเก็บรูปในบท ${queue.length.toLocaleString("th-TH")} รูป…`);
+  const total = queue.length + 0;
+  offlineProgress(0, total, "เก็บรูปในบท");
+  offlineStatus(`กำลังเก็บรูปในบท ${total.toLocaleString("th-TH")} รูป…`);
   try {
     const worker = async () => {
       while (queue.length) {
@@ -4683,11 +4712,12 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
         } catch (_) { ok = false; }
         // นับเฉพาะที่โหลดสำเร็จ ถ้าพลาดให้ลองใหม่ได้เมื่อกดอีกครั้ง
         if (ok) { warmedImages.add(url); done += 1; } else { failed += 1; }
-        if (!quiet && (done + failed) % 20 === 0) offlineStatus(`เก็บรูปในบท ${done.toLocaleString("th-TH")}/${(done + failed + queue.length).toLocaleString("th-TH")}`);
+        offlineProgress(done + failed, total, "เก็บรูปในบท");
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
   } finally { imageWarming = false; void paintOfflineReady(); }
+  offlineProgress(done + failed, total, "เก็บรูปในบท");
   const message = failed
     ? `เก็บรูปในบทได้ ${done.toLocaleString("th-TH")} รูป · โหลดไม่สำเร็จ ${failed.toLocaleString("th-TH")} รูป (กดอีกครั้งได้)`
     : `เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`;
@@ -4745,7 +4775,9 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   const before = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
   const queue = [...targets];
   let done = 0, bytes = 0, skipped = 0, failed = 0;
-  offlineStatus(`กำลังเก็บรูปตัวละคร ${targets.length.toLocaleString("th-TH")} คน…`);
+  const total = targets.length;
+  offlineProgress(0, total, "เก็บรูปตัวละคร");
+  offlineStatus(`กำลังเก็บรูปตัวละคร ${total.toLocaleString("th-TH")} คน…`);
   try {
     const worker = async () => {
       while (queue.length) {
@@ -4772,8 +4804,9 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
             done += 1;
           } catch (_) { failed += 1; }
         }
+        offlineProgress(done + skipped + failed, total, "เก็บรูปตัวละคร");
         if ((done + failed) % 3 === 0) {
-          const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")}/${targets.length.toLocaleString("th-TH")} · ${formatSize(bytes)}`;
+          const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`;
           if (hint && !quiet) hint.textContent = line;
           offlineStatus(line);
         }
@@ -4786,6 +4819,7 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
     const after = (await navigator.storage.estimate()).usage || 0;
     used = Math.max(0, after - before);
   }
+  offlineProgress(total, total, "เก็บรูปตัวละคร");
   const message = done
     ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${skipped ? ` · มีอยู่แล้ว ${skipped.toLocaleString("th-TH")}` : ""}`
     : skipped ? "รูปตัวละครในตารางถูกเก็บไว้แล้วทั้งหมด" : "ยังหารูปของชื่อในตารางไม่ได้ — ลองกดซ้ำหรือนำเข้าชื่ออังกฤษ";
