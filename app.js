@@ -3,12 +3,14 @@
 const DB_NAME = "noat-mobile-reader";
 const DB_VERSION = 1;
 const CHAPTERS = "chapters";
+const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.4";
+const APP_VERSION = "2.2.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.5", note: "หน้าตั้งค่าเพิ่มบรรทัด “พร้อมออฟไลน์” บอกจำนวนตอนที่มีข้อความในเครื่องครบ และรูปที่เก็บไว้แล้ว เอาไว้เช็กก่อนออกเดินทาง" },
   { version: "2.2.4", note: "เตรียมออฟไลน์ครบขึ้น: เก็บรูปของทุกบทในคลัง (เดิมหยุดที่ 300 รูปแรก) และขอสิทธิ์เก็บข้อมูลถาวรกันข้อมูลถูกล้าง" },
   { version: "2.2.3", note: "ธีมรี:ซีโร่: รูปบนหัวเว็บเปลี่ยนตามตัวละครของตอนที่กำลังอ่าน แทนการสุ่มจากทั้งเรื่อง" },
   { version: "2.2.2", note: "แผงรายการบทเต็มความสูงจรดขอบบน–ล่าง เผยรายการได้มากขึ้น ไม่เป็นกล่องลอยเว้นขอบอีก" },
@@ -1040,6 +1042,43 @@ async function pruneFinishedChapters() {
   await refreshChapters();
   showStatus(`ลบ ${finished.length.toLocaleString("th-TH")} ตอนที่อ่านจบแล้ว`, 4000);
   await paintStorageUsage();
+  await paintOfflineReady();
+}
+
+/* ---------- ความพร้อมอ่านออฟไลน์: ข้อความในเครื่อง + รูปที่เก็บไว้ ---------- */
+// แคชรูปเทียบด้วย origin+pathname เพราะ URL ในบทกับ URL ที่ถูกขออาจต่างกันแค่การเข้ารหัส
+function cachedImageKey(value) {
+  try { const url = new URL(value); return url.origin + url.pathname; } catch (_) { return String(value); }
+}
+
+async function paintOfflineReady() {
+  const hint = byId("offline-hint");
+  if (!hint) return;
+  if (!state.chapters.length) { hint.textContent = "ยังไม่มีตอนในเครื่อง · ซิงก์จากส่วนขยายก่อน"; return; }
+  const chapters = state.chapters;
+  const withText = chapters.filter(item => String(item.html || "").trim().length > 0).length;
+  const urls = chapterImageUrls(chapters);
+  let cached = 0;
+  if (urls.length && globalThis.caches) {
+    try {
+      const present = new Set();
+      for (const request of await (await caches.open(IMAGE_CACHE)).keys()) {
+        present.add(cachedImageKey(request.url));
+        try { present.add(decodeURI(request.url).split("#")[0]); } catch (_) {}
+      }
+      for (const url of urls) {
+        if (present.has(cachedImageKey(url))) cached += 1;
+        else { try { if (present.has(decodeURI(url))) cached += 1; } catch (_) {} }
+      }
+    } catch (_) {}
+  }
+  const count = value => value.toLocaleString("th-TH");
+  const missing = urls.length - cached;
+  const parts = [`ข้อความ ${count(withText)}/${count(chapters.length)} ตอน`];
+  if (urls.length) parts.push(`รูป ${count(cached)}/${count(urls.length)} รูป`);
+  if (missing > 0) parts.push(navigator.onLine === false ? "ยังขาดรูป · ต่อเน็ตเพื่อเก็บเพิ่ม" : "กำลังเก็บรูปที่เหลือ…");
+  else if (withText === chapters.length) parts.push("ครบแล้ว อ่านได้แม้ไม่มีเน็ต");
+  hint.textContent = `พร้อมออฟไลน์ · ${parts.join(" · ")}`;
 }
 
 /* ---------- ไฮไลต์และโน้ตส่วนตัว ---------- */
@@ -4000,9 +4039,10 @@ async function warmChapterImages({ quiet = false } = {}) {
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-    if (quiet) return;
-    paintSyncHint(`เก็บรูปในบทไว้ใช้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
+    if (quiet) { void paintOfflineReady(); return; }
+    paintSyncHint(`เก็บรูปในบทไว้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
     showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
+    void paintOfflineReady();
   } finally { imageWarming = false; }
 }
 
@@ -4058,6 +4098,7 @@ async function syncChapters({ manual = false } = {}) {
     state.syncedAt = Date.now();
     await writeSetting("syncedAt", state.syncedAt);
     paintSyncHint();
+    void paintOfflineReady();
     const summary = [];
     if (added) summary.push(`ใหม่ ${added.toLocaleString("th-TH")} บท`);
     if (updated) summary.push(`แก้ไข ${updated.toLocaleString("th-TH")} บท`);
@@ -4127,6 +4168,7 @@ function bindEvents() {
   });
   byId("glossary-search")?.addEventListener("input", () => { void paintGlossary(); });
   byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
+  byId("offline-check")?.addEventListener("click", () => { void paintOfflineReady(); });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
   byId("note-highlight")?.addEventListener("click", () => addNote(""));
   byId("note-add")?.addEventListener("click", () => {
@@ -4714,6 +4756,7 @@ async function initialize() {
     // ขอสิทธิ์เก็บข้อมูลถาวร กันเบราว์เซอร์ล้างบทที่ซิงก์ไว้ระหว่างเดินทาง
     void navigator.storage?.persist?.().catch(() => {});
     await refreshChapters(); bindEvents(); startReadingClock(); paintReadingStats();
+    void paintOfflineReady();
     void warmChapterImages({ quiet: true });
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
