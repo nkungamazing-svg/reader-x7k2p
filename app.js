@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.0";
+const APP_VERSION = "2.4.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.1", note: "ชิป “ตัวละครในตอนนี้”: ลองใช้ชื่ออังกฤษจากป้าย/ตารางให้ครบขึ้น จำรูปที่เคยได้ไว้ใช้ซ้ำ (ขึ้นทันทีและไม่ต้องเน็ต) และแก้ชื่อในการ์ดแล้วชิปได้รูปทันทีโดยไม่ต้องเปิดบทใหม่" },
   { version: "2.4.0", note: "หน้า “คำอ่าน” กับ “ชื่อตัวละคร” รวมเป็นหน้าเดียว สลับด้วยแท็บ (ไม่ต้องเดาว่าอยู่อันไหน) และเพิ่มฟอนต์ให้เลือกอีก 4 แบบ (Prompt · Kanit · IBM Plex Sans Thai · Pridi) ฝังไฟล์ไว้ในแอป ใช้ได้ตอนออฟไลน์" },
   { version: "2.3.0", note: "การ์ดตัวละคร: จับคู่ชื่อกับ characters.json ได้ยืดหยุ่นขึ้น (ชื่อต้น คำสลับลำดับ) จึงขึ้นรูปได้เกือบทุกคนเหมือนในคลังแปล และแท็กบนการ์ด (อาชีพ · เผ่า · ค่าย) เป็นไทยทั้งหมด" },
   { version: "2.2.9", note: "หน้าตั้งค่าสั้นลง: รวม 7 หมวดเหลือ 4 (การอ่าน · เสียงอ่าน · ธีมและเอฟเฟกต์ · ซิงก์และข้อมูล) ย้ายตัวเลือกที่ใช้นาน ๆ ครั้งไว้ใน “ขั้นสูง” และเปิดครั้งแรกกางแค่หมวดแรก — ตัวเลือกเดิมอยู่ครบทุกตัว" },
@@ -2353,6 +2354,8 @@ async function renderChapterCast() {
   headerCastPool = [];
   headerPoolSignature = "";
   void syncRezeroCover();
+  // แทนที่แถวเดิมเมื่อวาดซ้ำ (หลังแก้ชื่อ/ได้รูปใหม่) ไม่ให้ซ้อนกันเป็นหลายแถว
+  content.querySelector("#chapter-cast")?.remove();
   const section = document.createElement("section");
   section.id = "chapter-cast";
   section.className = "chapter-cast";
@@ -2406,7 +2409,22 @@ async function renderChapterCast() {
     }
     row.append(chip);
     if (unknownChip) continue;
-    const query = table[normalizeCharacterKey(name)] || "";
+    // เดิมถ้าชื่อไทยไม่อยู่ในตารางจะไม่ลองเลยทั้งที่ป้ายอาจมีชื่ออังกฤษติดมา
+    // (dataset/title จากส่วนขยาย) หรือเคยจำรูปของคนนี้ไว้แล้ว
+    const query = characterQuery(label) || table[normalizeCharacterKey(name)] || "";
+    const rememberedPortrait = await readCharacterPortrait(name);
+    if (rememberedPortrait) {
+      const cached = document.createElement("img");
+      cached.className = "cast-avatar-image";
+      cached.alt = "";
+      cached.decoding = "async";
+      cached.referrerPolicy = "no-referrer";
+      cached.src = rememberedPortrait;
+      avatar.classList.remove("is-unknown");
+      avatar.textContent = "";
+      avatar.append(cached);
+      headerCastPool.push({ title: name, image: rememberedPortrait });
+    }
     if (query) {
       void (async () => {
         const entry = await characterIndexEntry(query);
@@ -2447,9 +2465,16 @@ async function renderChapterCast() {
           probe.onerror = () => resolve(false);
           probe.src = url;
         });
-        if (await canLoad(entry?.image || "")) { paint(entry.image); return; }
-        const fallback = await lookupCharacterImage(query);
-        if (await canLoad(fallback)) paint(fallback);
+        if (await canLoad(entry?.image || "")) {
+          paint(entry.image);
+          void rememberCharacterPortrait(name, entry.image);
+          return;
+        }
+        const fallback = rememberedPortrait || await lookupCharacterImage(query);
+        if (await canLoad(fallback)) {
+          paint(fallback);
+          void rememberCharacterPortrait(name, fallback);
+        }
       })();
     }
   }
@@ -2706,6 +2731,39 @@ function decorateSpeakerLabels(root) {
     const name = (label.dataset.character || label.dataset.name || label.textContent || "").trim();
     if (name) label.setAttribute("aria-label", `ดูรูปตัวละคร ${name}`);
   }
+}
+
+/* รูปของแต่ละชื่อเคยหาได้แล้วก็ไม่ต้องยิงซ้ำ (และใช้ได้ตอนออฟไลน์)
+   เก็บแบบ map ชื่อไทย → URL ไม่หนักและไม่ต้องพึ่งเน็ตทุกครั้งที่เปิดบท */
+const CHARACTER_PORTRAITS_KEY = "characterPortraits";
+let characterPortraitCache = null;
+
+async function characterPortraitTable() {
+  if (!characterPortraitCache) {
+    const stored = await readSetting(CHARACTER_PORTRAITS_KEY, {});
+    characterPortraitCache = stored && typeof stored === "object" ? stored : {};
+  }
+  return characterPortraitCache;
+}
+
+async function readCharacterPortrait(name) {
+  const key = normalizeCharacterKey(name);
+  if (!key) return "";
+  const table = await characterPortraitTable();
+  return typeof table[key] === "string" ? table[key] : "";
+}
+
+async function rememberCharacterPortrait(name, url) {
+  const key = normalizeCharacterKey(name);
+  const value = String(url || "").trim();
+  if (!key || !/^https?:\/\//.test(value)) return;
+  const table = await characterPortraitTable();
+  if (table[key] === value) return;
+  table[key] = value;
+  if (Object.keys(table).length > 400) {
+    for (const stale of Object.keys(table).slice(0, 100)) delete table[stale];
+  }
+  void writeSetting(CHARACTER_PORTRAITS_KEY, table);
 }
 
 function characterThaiName(label) {
@@ -3144,6 +3202,8 @@ function setCharacterFigure(image, thai) {
   state.characterCardThai = thai || state.characterCardThai;
   figure.classList.toggle("is-placeholder", !image);
   if (!image) { setCharacterUnknownFigure(); return; }
+  // จำรูปของชื่อนี้ไว้ ให้ชิปและหัวเว็บใช้ซ้ำได้ทันทีในตอนถัด ๆ ไป
+  void rememberCharacterPortrait(thai, image);
   const img = document.createElement("img");
   img.alt = thai; img.referrerPolicy = "no-referrer"; img.decoding = "async"; img.src = image;
   img.classList.add("zoomable");
@@ -3805,6 +3865,8 @@ async function applyCharacterName(title) {
   const token = state.characterCardToken;
   const thai = byId("character-card-name").textContent || "ตัวละคร";
   await rememberCharacterName(thai, title);
+  // ชื่อเปลี่ยน = ชิปตัวละครในบทนี้ต้องได้รูปด้วย ไม่ต้องกลับมาเปิดบทใหม่
+  void renderChapterCast();
   const image = await lookupCharacterImage(title);
   if (byId("character-card").hidden || token !== state.characterCardToken) return;
   setCharacterTitle(title);
