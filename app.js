@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.4";
+const APP_VERSION = "2.4.5";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.5", note: "ตัวละครที่ยัง “?”: แอปเทียบเสียงชื่อไทยกับชื่ออังกฤษใน characters.json เอง (เบอร์สเต็ทส์ → Berstetz Fondalfon, โมกุโร → Moguro Hagane, การ์ฟิล, อนาสตาเซีย ฯลฯ) รับเฉพาะเมื่อชนะชัดเจน ไม่เดาผิดคน แล้วจดคู่ชื่อไว้ให้ชิปใช้ต่อ (ที่มา “เดาจากเสียงชื่อ”)" },
   { version: "2.4.4", note: "คลังคำศัพท์ไทย ↔ อังกฤษย้ายมาไว้ในหมวดซิงก์: “นำเข้าไฟล์” รับได้หลายรูปแบบ ({\"ไทย\":\"English\"}, [{ src, dest }], [\"English\", \"ไทย\"], novelGlossaries ในไฟล์สำรอง) แล้วจดชื่อให้ทันที — รูปตัวละครขึ้นเองโดยไม่ต้องทำอะไรต่อ" },
   { version: "2.4.3", note: "เปิดการ์ดตัวละครที่รู้ชื่ออังกฤษอยู่แล้ว (จากป้ายหรือตาราง) แอปจะจดคู่ชื่อไทย–อังกฤษลงตารางเอง (ที่มา “จากป้ายชื่อ”) และเติมรูปให้ชิปของคนนั้นในบททันที โดยไม่ต้องรอเนื้อหามีชื่ออังกฤษในวงเล็บ" },
   { version: "2.4.2", note: "ตัวละครขึ้นรูปเองโดยไม่ต้องซิงก์: ถ้าในเนื้อเรื่องมี “ชื่อไทย (ชื่ออังกฤษ)” แอปจะจดคู่ชื่อนั้นให้อัตโนมัติ (รับเฉพาะที่ตรงกับ characters.json) แล้วชิปได้รูปทันที — ดูที่มาได้ในคลังว่า “จากเนื้อเรื่อง”" },
@@ -930,6 +931,7 @@ function characterSourceBadge(meta) {
   if (kind === "manual") return "แก้ชื่อเอง";
   if (kind === "text") return "จากเนื้อเรื่อง";
   if (kind === "label") return "จากป้ายชื่อ";
+  if (kind === "sound") return "เดาจากเสียงชื่อ";
   return "ไม่ทราบที่มา";
 }
 
@@ -2452,7 +2454,8 @@ async function renderChapterCast() {
     if (unknownChip) continue;
     // เดิมถ้าชื่อไทยไม่อยู่ในตารางจะไม่ลองเลยทั้งที่ป้ายอาจมีชื่ออังกฤษติดมา
     // (dataset/title จากส่วนขยาย) หรือเคยจำรูปของคนนี้ไว้แล้ว
-    const query = characterQuery(label) || table[normalizeCharacterKey(name)] || "";
+    // เหมือนคลังแปล: ชื่อจากป้าย → ตารางชื่อ → เทียบเสียงกับ characters.json
+    const query = await characterTitleFor(label);
     const rememberedPortrait = await readCharacterPortrait(name);
     if (rememberedPortrait) {
       const cached = document.createElement("img");
@@ -2823,11 +2826,113 @@ async function characterNameTable() {
   return state.characterNames;
 }
 
+/* เทียบ “เสียงชื่อ” ไทยกับชื่ออังกฤษใน characters.json
+   ฝั่งคอมไม่ต้องใช้เพราะมี glossary ของส่วนขยาย แต่มือถือใช้แทนได้:
+   เบอร์สเต็ทส์ → Berstetz, โมกุโร → Moguro — รับเฉพาะกรณีที่ชนะชัดเจน ไม่เดา */
+const THAI_SOUND_CONS = {
+  "ก": "k", "ข": "kh", "ฃ": "kh", "ค": "kh", "ฅ": "kh", "ฆ": "kh", "ง": "ng", "จ": "ch", "ฉ": "ch",
+  "ช": "ch", "ซ": "s", "ฌ": "ch", "ญ": "y", "ฎ": "d", "ฏ": "t", "ฐ": "th", "ฑ": "th", "ฒ": "th",
+  "ณ": "n", "ด": "d", "ต": "t", "ถ": "th", "ท": "th", "ธ": "th", "น": "n", "บ": "b", "ป": "p",
+  "ผ": "ph", "ฝ": "f", "พ": "ph", "ฟ": "f", "ภ": "ph", "ม": "m", "ร": "r", "ล": "l",
+  "ว": "w", "ศ": "s", "ษ": "s", "ส": "s", "ห": "h", "ฬ": "l", "ฮ": "h", "ย": "y"
+};
+const THAI_SOUND_PRE = { "เ": "e", "แ": "ae", "โ": "o", "ใ": "ai", "ไ": "ai" };
+const THAI_SOUND_POST = { "ะ": "a", "ั": "a", "า": "a", "ำ": "am", "ิ": "i", "ี": "i", "ึ": "ue", "ื": "ue", "ุ": "u", "ู": "u", "็": "", "่": "", "้": "", "๊": "", "๋": "", "ํ": "", "ๅ": "", "ๆ": "", "ฯ": "", " ": "", "-": "", ".": "" };
+
+function thaiSoundName(text) {
+  const s = String(text || "");
+  let out = "";
+  let pending = "";
+  let usedPre = false;
+  for (let i = 0; i < s.length; i += 1) {
+    const ch = s[i];
+    if (ch in THAI_SOUND_PRE) { pending += THAI_SOUND_PRE[ch]; continue; }
+    if (ch === "อ") {
+      const isCons = s[i + 1] && s[i + 1] in THAI_SOUND_CONS;
+      if (pending) { out += pending; pending = ""; usedPre = true; if (isCons) continue; out += "o"; continue; }
+      out += isCons ? "a" : "o";
+      continue;
+    }
+    if (ch in THAI_SOUND_CONS) {
+      if (s[i + 1] === "์") { i += 1; pending = ""; usedPre = false; continue; } // การ์/ท์ ไม่ออกเสียง
+      out += THAI_SOUND_CONS[ch] + pending;
+      usedPre = Boolean(pending);
+      pending = "";
+      continue;
+    }
+    if (ch === "์") { out = out.replace(/[a-z]+$/u, ""); continue; }
+    if (ch in THAI_SOUND_POST) {
+      const vowel = THAI_SOUND_POST[ch];
+      // “เลีย” = lia ไม่ใช่ leia — สระหลังตัดสระนำหน้าที่เติมไว้
+      if (vowel && usedPre) { out = out.replace(/[aeiou]+$/u, ""); usedPre = false; }
+      out += vowel;
+      continue;
+    }
+  }
+  out += pending;
+  return out.replace(/[^a-z]/gu, "");
+}
+
+function soundKey(text) {
+  return String(text || "").toLowerCase()
+    .replace(/ph/gu, "f").replace(/th/gu, "t").replace(/kh/gu, "k")
+    .replace(/[cq]/gu, "k").replace(/g/gu, "k").replace(/z/gu, "s").replace(/x/gu, "ks")
+    .replace(/v/gu, "w").replace(/y/gu, "i")
+    .replace(/(.)\1+/gu, "$1")
+    .replace(/[^a-z]/gu, "");
+}
+
+function soundDistance(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i += 1) {
+    const cur = [i];
+    for (let j = 1; j <= n; j += 1) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[n];
+}
+
+function soundAlike(a, b) {
+  if (!a || !b) return 0;
+  return 1 - soundDistance(a, b) / Math.max(a.length, b.length);
+}
+
+async function soundCharacterMatch(name) {
+  if (!/[ก-๙]/u.test(name)) return null;
+  const query = soundKey(thaiSoundName(name));
+  if (query.length < 4) return null;
+  const index = await characterIndex();
+  let best = null, second = 0;
+  for (const entry of index.all || []) {
+    for (const part of new Set([entry.title, ...String(entry.title || "").split(/\s+/u)].filter(Boolean))) {
+      const score = soundAlike(query, soundKey(part));
+      if (!best || score > best.score) {
+        if (best && best.entry !== entry) second = Math.max(second, best.score);
+        best = { entry, score };
+      } else if (entry !== best.entry) {
+        second = Math.max(second, score);
+      }
+    }
+  }
+  // ต้องมั่นใจ: คะแนนสูงและชนะคนถัดไปชัดเจน ไม่งั้นปล่อยเป็น ? ไว้ก่อน
+  if (!best || best.score < 0.72 || best.score - second < 0.12) return null;
+  return best.entry;
+}
+
 async function characterTitleFor(label) {
   const direct = characterQuery(label);
   if (direct) return direct;
+  const thai = characterThaiName(label);
   const table = await characterNameTable();
-  return table[normalizeCharacterKey(characterThaiName(label))] || "";
+  const known = table[normalizeCharacterKey(thai)];
+  if (known) return known;
+  const guess = await soundCharacterMatch(thai);
+  if (!guess) return "";
+  void rememberCharacterName(thai, guess.title, "sound");
+  return guess.title;
 }
 
 async function rememberCharacterName(thai, title, kind = "manual") {
