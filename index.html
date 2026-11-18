@@ -296,28 +296,30 @@
         <div id="custom-theme-editor" class="custom-theme" hidden>
           <p class="theme-group-title">ตั้งสีเอง</p>
           <div class="custom-colors">
-            <label class="custom-color"><span>พื้นหลัง</span><input id="custom-page" type="color" value="#121524"></label>
-            <label class="custom-color"><span>ตัวอักษร</span><input id="custom-text" type="color" value="#dfe5f4"></label>
-            <label class="custom-color"><span>การ์ด/เมนู</span><input id="custom-surface" type="color" value="#1a2036"></label>
-            <label class="custom-color"><span>สีเน้น</span><input id="custom-accent" type="color" value="#8c82ff"></label>
+            <label class="custom-color"><span>พื้นหลังหน้ากระดาษ</span><input id="custom-page" type="color" value="#121524"></label>
+            <label class="custom-color"><span>สีตัวอักษร</span><input id="custom-text" type="color" value="#dfe5f4"></label>
+            <label class="custom-color"><span>การ์ดและเมนู</span><input id="custom-surface" type="color" value="#1a2036"></label>
+            <label class="custom-color"><span>สีเน้น · ปุ่ม/ไฮไลต์</span><input id="custom-accent" type="color" value="#8c82ff"></label>
           </div>
-          <div class="setting-row"><span>สีโลโก้ (องศาสี)</span><div class="range-row"><input id="custom-hue" type="range" min="0" max="360" step="1" value="0"><output id="custom-hue-output">0°</output></div></div>
-          <div class="setting-row"><span>ความอิ่มสีโลโก้</span><div class="range-row"><input id="custom-sat" type="range" min="0" max="200" step="5" value="100"><output id="custom-sat-output">100%</output></div></div>
-          <div class="setting-row"><span>ความสว่างโลโก้</span><div class="range-row"><input id="custom-bright" type="range" min="60" max="160" step="5" value="100"><output id="custom-bright-output">100%</output></div></div>
-          <div class="setting-row"><label for="custom-sky">เอฟเฟกต์หัวเว็บ</label><select id="custom-sky"><option value="none">ไม่มี</option><option value="snow">หิมะ</option><option value="stars">ดาวตก</option><option value="sparks">ประกาย</option></select></div>
+          <div class="logo-swatch-row"><span class="logo-swatch" aria-hidden="true"></span><small class="setting-hint">สีโลโก้ที่ได้ตอนนี้</small></div>
+          <div class="setting-row"><span>โทนสีโลโก้</span><div class="range-row"><input id="custom-hue" class="hue-range" type="range" min="0" max="360" step="1" value="0"><output id="custom-hue-output">0°</output></div><small class="setting-hint">เลื่อนบนแถบสีเพื่อหมุนสีทั้งวงล้อ: 0° แดง · 60° เหลือง · 120° เขียว · 200° ฟ้า · 280° ม่วง</small></div>
+          <div class="setting-row"><span>ความสดของสีโลโก้</span><div class="range-row"><input id="custom-sat" type="range" min="0" max="200" step="5" value="100"><output id="custom-sat-output">100%</output></div><small class="setting-hint">0% = สีจางเป็นเทา · 100% = ปกติ · 200% = สีสดจัด</small></div>
+          <div class="setting-row"><span>ความสว่างโลโก้</span><div class="range-row"><input id="custom-bright" type="range" min="60" max="160" step="5" value="100"><output id="custom-bright-output">100%</output></div><small class="setting-hint">ต่ำกว่า 100% = เข้มลง · สูงกว่า 100% = สว่างขึ้น</small></div>
+          <div class="setting-row"><label for="custom-sky">ของตกแต่งหัวเว็บ</label><select id="custom-sky"><option value="none">ไม่มี</option><option value="snow">หิมะร่วง</option><option value="stars">ดาวตก</option><option value="sparks">ประกายไฟ</option></select><small class="setting-hint">ของที่ลอยอยู่หลังโลโก้ด้านบน ไม่กระทบตอนอ่าน</small></div>
           <div class="theme-row"><button id="custom-random" class="theme-choice" type="button">🎲 สุ่มชุดสี</button><button id="custom-reset" class="theme-choice" type="button">↺ คืนค่าเดิม</button></div>
         </div>
         <div id="rezero-theme-editor" class="custom-theme" hidden>
           <p class="theme-group-title">ปรับธีมรี:ซีโร่</p>
           <small class="setting-hint">แก้สีและเอฟเฟกต์ได้เอง รูปตอนเข้าแอปกับโลโก้และชื่อที่หัวเว็บยังอยู่ครบ</small>
           <div class="custom-colors">
-            <label class="custom-color"><span>สีเน้น</span><input id="rezero-accent" type="color" value="#8c82ff" aria-label="สีเน้นของธีมรี:ซีโร่"></label>
+            <label class="custom-color"><span>สีเน้น · ปุ่ม/ไฮไลต์</span><input id="rezero-accent" type="color" value="#8c82ff" aria-label="สีเน้นของธีมรี:ซีโร่"></label>
           </div>
-          <div class="setting-row"><span>ความสว่างพื้นหลัง</span><div class="range-row"><input id="rezero-light" type="range" min="0" max="100" step="5" value="50"><output id="rezero-light-output">50%</output></div></div>
-          <div class="setting-row"><span>สีโลโก้ (องศาสี)</span><div class="range-row"><input id="rezero-hue" type="range" min="0" max="360" step="1" value="0"><output id="rezero-hue-output">0°</output></div></div>
-          <div class="setting-row"><span>ความอิ่มสีโลโก้</span><div class="range-row"><input id="rezero-sat" type="range" min="0" max="200" step="5" value="100"><output id="rezero-sat-output">100%</output></div></div>
-          <div class="setting-row"><span>ความสว่างโลโก้</span><div class="range-row"><input id="rezero-bright" type="range" min="60" max="160" step="5" value="100"><output id="rezero-bright-output">100%</output></div></div>
-          <div class="setting-row"><label for="rezero-sky">เอฟเฟกต์หัวเว็บ</label><select id="rezero-sky"><option value="snow" selected>หิมะ</option><option value="stars">ดาวตก</option><option value="sparks">ประกาย</option><option value="none">ไม่มี</option></select></div>
+          <div class="setting-row"><span>ความสว่างพื้นหลัง</span><div class="range-row"><input id="rezero-light" type="range" min="0" max="100" step="5" value="50"><output id="rezero-light-output">50%</output></div><small class="setting-hint">0% = ดำสนิท · 50% = ค่ากลางที่ตั้งไว้ · 100% = สว่างมาก</small></div>
+          <div class="logo-swatch-row"><span class="logo-swatch" aria-hidden="true"></span><small class="setting-hint">สีโลโก้ที่ได้ตอนนี้</small></div>
+          <div class="setting-row"><span>โทนสีโลโก้</span><div class="range-row"><input id="rezero-hue" class="hue-range" type="range" min="0" max="360" step="1" value="0"><output id="rezero-hue-output">0°</output></div><small class="setting-hint">เลื่อนบนแถบสีเพื่อหมุนสีทั้งวงล้อ: 0° แดง · 60° เหลือง · 120° เขียว · 200° ฟ้า · 280° ม่วง</small></div>
+          <div class="setting-row"><span>ความสดของสีโลโก้</span><div class="range-row"><input id="rezero-sat" type="range" min="0" max="200" step="5" value="100"><output id="rezero-sat-output">100%</output></div><small class="setting-hint">0% = สีจางเป็นเทา · 100% = ปกติ · 200% = สีสดจัด</small></div>
+          <div class="setting-row"><span>ความสว่างโลโก้</span><div class="range-row"><input id="rezero-bright" type="range" min="60" max="160" step="5" value="100"><output id="rezero-bright-output">100%</output></div><small class="setting-hint">ต่ำกว่า 100% = เข้มลง · สูงกว่า 100% = สว่างขึ้น</small></div>
+          <div class="setting-row"><label for="rezero-sky">ของตกแต่งหัวเว็บ</label><select id="rezero-sky"><option value="snow" selected>หิมะร่วง</option><option value="stars">ดาวตก</option><option value="sparks">ประกายไฟ</option><option value="none">ไม่มี</option></select><small class="setting-hint">ของที่ลอยอยู่หลังโลโก้ด้านบน ไม่กระทบตอนอ่าน</small></div>
           <label class="switch-row"><span>ดาวตกตอนเข้าแอป</span><input id="rezero-shooting" type="checkbox" checked><i aria-hidden="true"></i></label>
           <label class="switch-row"><span>ผงดาวจาง ๆ ในหน้าอ่าน</span><input id="rezero-dust" type="checkbox" checked><i aria-hidden="true"></i></label>
           <div class="theme-row"><button id="rezero-random" class="theme-choice" type="button">🎲 สุ่มชุดสี</button><button id="rezero-reset" class="theme-choice" type="button">↺ คืนค่าเดิม</button></div>

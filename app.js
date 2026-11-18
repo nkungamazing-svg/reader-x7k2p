@@ -6,7 +6,7 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.7";
+const APP_VERSION = "2.2.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
@@ -1689,7 +1689,8 @@ async function loadCoverPool() {
   return state.coverPool;
 }
 
-/* ขอภาพขนาดเล็กลง (240px) พอสำหรับช่องละ 1/3 จอ จะได้ขึ้นเร็วขึ้นมาก */
+/* ขอภาพขนาดเล็กลง (240px) พอสำหรับช่องละ 1/3 จอ จะได้ขึ้นเร็วขึ้นมาก — ใช้กับภาพช่องคอลลาจเท่านั้น
+   (รูปในเครื่องส่วนใหญ่ไม่มีส่วนนี้จึงไม่ถูกเปลี่ยน และหัวเว็บไม่ใช้แล้วเพราะต้องแชร์ URL เดียวกับชิป) */
 function coverImageUrl(url) {
   return String(url).replace(/scale-to-width-down\/\d+/, "scale-to-width-down/240");
 }
@@ -1732,7 +1733,7 @@ function resetCoverHeader() {
   const avatar = byId("brand-avatar");
   const name = byId("brand-name");
   // รูปที่ค้างโหลดอยู่ต้องไม่ย้อนมาเขียนทับโลโก้ทีหลัง
-  if (avatar) { avatar.onerror = null; avatar.src = themeLogoPath(); }
+  if (avatar) { avatar.onerror = null; avatar.onload = null; avatar.src = themeLogoPath(); }
   if (name) name.textContent = "Re:NovelTH";
   document.querySelector(".brand-logo")?.classList.remove("swapping");
   document.querySelector(".brand")?.classList.remove("swapping");
@@ -1770,20 +1771,23 @@ function startCoverRotation(pool) {
       const candidate = pool[(index + step) % pool.length];
       if (!broken.has(candidate.image)) item = candidate;
     }
-    if (!item) { avatar.onerror = null; avatar.src = themeLogoPath(); name.textContent = "Re:NovelTH"; return; }
+    if (!item) { avatar.onerror = null; avatar.onload = null; avatar.src = themeLogoPath(); name.textContent = "Re:NovelTH"; return; }
+    // ใช้ URL เดียวกับที่ชิปตัวละครโหลดไปแล้ว (แคชใบเดียวกัน) — เดิมแปลงเป็นขนาด 240 จึงเป็น URL คนละตัว
+    // ที่วิกิตอบกลับมาเป็นภาพเปล่าพร้อมสถานะ 404 ซึ่งเบราว์เซอร์ถือว่าโหลดสำเร็จและไม่ยิง error → หัวเว็บค้างเป็นช่องว่าง
     const source = String(item.image);
-    const small = coverImageUrl(source);
-    // รูปย่อ 240px ของวิกิมีครบทุกไฟล์ที่ใช้อยู่ แต่รูปใหม่/โฮสต์อื่นอาจไม่มี — พลาดแล้วลองต้นฉบับก่อนตัดคนนั้นทิ้ง
-    const show = url => {
-      avatar.onerror = () => {
-        if (avatar.getAttribute("src") !== url) return;
-        if (url !== source) { show(source); return; }
-        broken.add(source);
-        paint();
-      };
-      avatar.src = url;
+    const drop = () => {
+      if (avatar.getAttribute("src") !== source) return;
+      broken.add(source);
+      paint();
     };
-    show(small);
+    avatar.onerror = drop;
+    // ต้นทางบางทีก็ส่งภาพเปล่า (มีขนาดจิ๋ว) มาพร้อมสถานะ 200 จึงต้องวัดขนาดเองด้วย
+    avatar.onload = () => {
+      if (avatar.getAttribute("src") !== source) return;
+      if (avatar.naturalWidth > 16 && avatar.naturalHeight > 16) return;
+      drop();
+    };
+    avatar.src = source;
     name.textContent = item.title || item.name || "Re:NovelTH";
   };
   paint();
