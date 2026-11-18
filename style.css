@@ -776,9 +776,13 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .glossary-row .tool-button { flex:none; min-height:44px; }
 .offline-summary { display:grid; gap:8px; min-height:210px; max-height:46vh; overflow:auto; }
 #offline-status, #offline-progress-text { min-height:1.4em; margin:0; }
-/* ความสูงคงที่: เนื้อหาข้างในเปลี่ยนได้ แต่แผงไม่หด/ขยายตาม */
-#offline-sheet[open] { display:grid; grid-template-rows:auto minmax(0,1fr) auto auto auto auto; gap:8px; height:min(78dvh,560px); }
-#offline-sheet .offline-summary { min-height:0; max-height:none; overflow:auto; }
+/* ความสูงคงที่: เนื้อหาข้างในเปลี่ยนได้ แต่แผงไม่หด/ขยายตาม
+   ใช้ flex เพื่อไม่ต้องนับจำนวนลูก (head, รายการ, missing, หลอด, ข้อความหลอด, สถานะ, แถวปุ่ม)
+   และ overflow:hidden กันเนื้อหาล้นออกนอกแผงบนจอเตี้ย */
+#offline-sheet[open] { display:flex; flex-direction:column; gap:8px; height:min(78dvh,560px); overflow:hidden; }
+#offline-sheet > * { flex:none; }
+#offline-sheet > .offline-summary { flex:1 1 auto; min-height:0; max-height:none; overflow:auto; }
+#offline-sheet > .offline-summary-actions { flex:none; }
 .offline-progress { height:8px; border-radius:99px; background:var(--line); overflow:hidden; }
 .offline-progress[hidden] { display:none; }
 .offline-progress > i { display:block; height:100%; width:0; border-radius:99px; background:var(--accent-strong); transition:width .25s ease; }
