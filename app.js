@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.3";
+const APP_VERSION = "2.5.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.4", note: "หน้าสรุปออฟไลน์ไม่กระตุก/หดตอนกดเก็บรูปแล้ว: วาดเนื้อหาใหม่แบบสลับทีเดียว กำหนดความสูงขั้นต่ำของแผงไว้ และให้สถานะคืบหน้าอัปเดตเป็นจังหวะแทนทุกภาพ" },
   { version: "2.5.3", note: "หน้าสรุปออฟไลน์กระชับขึ้น: ซ่อนปุ่มที่ไม่มีอะไรให้เก็บ (และซ่อนแถวปุ่มทั้งแถวถ้าไม่มีงาน), ตัดข้อความซ้ำสองบรรทัด, ย่อข้อความเป็น “ยังไม่มีตอน — ซิงก์ก่อน”" },
   { version: "2.5.2", note: "หน้าสรุปออฟไลน์แสดงแคชของเวอร์ชันที่ใช้อยู่จริง (เดิมหยิบแคชเก่าที่ยังค้างอยู่มาแสดง) · ปุ่มทั้งสองตอบสถานะทุกครั้งที่กด" },
   { version: "2.5.1", note: "แก้ปุ่มในหน้าสรุปออฟไลน์: เลิกปิดปุ่มเงียบ ๆ กดแล้วมีสถานะบอกทุกครั้ง (กำลังเก็บ/สำเร็จ/พลาดกี่รูป/ต้องต่อเน็ต/ปิดโหลดรูปอยู่) · เก็บรูปในบทไม่นับรูปที่โหลดไม่สำเร็จว่าสำเร็จแล้ว จึงกดซ้ำเพื่อลองใหม่ได้ และข้ามรูปที่มีในแคชแล้ว" },
@@ -1151,7 +1152,6 @@ function offlineMissingText(summary) {
 async function paintOfflineSummary() {
   const box = byId("offline-summary");
   if (!box) return null;
-  box.textContent = "";
   const summary = await offlineReadiness();
   const percent = (a, b) => (b ? Math.round(a / b * 100) + "%" : "—");
   const rows = [
@@ -1163,6 +1163,8 @@ async function paintOfflineSummary() {
     ["ฟอนต์ที่พร้อมใช้", `${summary.fonts.toLocaleString("th-TH")} ไฟล์ (ฝังในแอป ไม่ใช้ CDN)`],
     ["พื้นที่ใช้ไป", formatSize(summary.usage)]
   ];
+  // สร้างใน fragment แล้วสลับทีเดียว — ไม่มีการเคลียร์จนแผงหุบแล้วขยาย
+  const fragment = document.createDocumentFragment();
   for (const [label, value] of rows) {
     const row = document.createElement("div");
     row.className = "glossary-row";
@@ -1174,8 +1176,9 @@ async function paintOfflineSummary() {
     detail.textContent = value;
     text.append(strong, detail);
     row.append(text);
-    box.append(row);
+    fragment.append(row);
   }
+  box.replaceChildren(fragment);
   const sub = byId("offline-sheet-sub");
   if (sub) sub.textContent = navigator.onLine === false ? "ออฟไลน์อยู่" : "";
   const missing = byId("offline-missing");
@@ -1193,10 +1196,9 @@ async function paintOfflineSummary() {
     portraitButton.hidden = portraitsPending <= 0;
     portraitButton.textContent = `เก็บรูปตัวละคร (${portraitsPending.toLocaleString("th-TH")})`;
   }
-  const refreshButton = byId("offline-refresh");
-  if (refreshButton) refreshButton.hidden = imagesPending <= 0 && portraitsPending <= 0;
+  // แถวปุ่มคงอยู่เสมอ (สูงคงที่) — เหลือแค่ “ตรวจใหม่” เมื่อไม่มีงาน
   const actions = byId("offline-actions");
-  if (actions) actions.hidden = imagesPending <= 0 && portraitsPending <= 0;
+  if (actions) actions.hidden = false;
   return summary;
 }
 
@@ -4681,7 +4683,7 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
         } catch (_) { ok = false; }
         // นับเฉพาะที่โหลดสำเร็จ ถ้าพลาดให้ลองใหม่ได้เมื่อกดอีกครั้ง
         if (ok) { warmedImages.add(url); done += 1; } else { failed += 1; }
-        if (!quiet && (done + failed) % 20 === 0) offlineStatus(`เก็บรูปในบทแล้ว ${done.toLocaleString("th-TH")} รูป · พลาด ${failed.toLocaleString("th-TH")}`);
+        if (!quiet && (done + failed) % 20 === 0) offlineStatus(`เก็บรูปในบท ${done.toLocaleString("th-TH")}/${(done + failed + queue.length).toLocaleString("th-TH")}`);
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
@@ -4770,8 +4772,11 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
             done += 1;
           } catch (_) { failed += 1; }
         }
-        if (hint && !quiet) hint.textContent = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)} · พลาด ${failed.toLocaleString("th-TH")}`;
-        offlineStatus(`เก็บรูปตัวละครแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`);
+        if ((done + failed) % 3 === 0) {
+          const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")}/${targets.length.toLocaleString("th-TH")} · ${formatSize(bytes)}`;
+          if (hint && !quiet) hint.textContent = line;
+          offlineStatus(line);
+        }
       }
     };
     await Promise.all(Array.from({ length: PORTRAIT_WARM_CONCURRENCY }, worker));

@@ -774,7 +774,9 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .glossary-text strong { font-size:13px; }
 .glossary-text small { color:var(--accent-strong); font-size:11px; font-weight:700; }
 .glossary-row .tool-button { flex:none; min-height:44px; }
-.offline-summary { display:grid; gap:8px; max-height:52vh; overflow:auto; }
+.offline-summary { display:grid; gap:8px; min-height:210px; max-height:46vh; overflow:auto; }
+#offline-status { min-height:1.4em; }
+#offline-sheet { min-height:400px; }
 .offline-summary .glossary-row { align-items:flex-start; }
 .offline-summary-actions { flex-wrap:wrap; margin-top:2px; }
 .offline-summary-actions .tool-button { flex:1 1 140px; min-height:44px; }
