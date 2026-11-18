@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.8";
+const APP_VERSION = "2.5.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.0", note: "หน้าสรุปความพร้อมออฟไลน์: ตั้งค่า → ซิงก์และข้อมูล → “ดูสรุป” แสดงจำนวนตอน ข้อความ รูปในบท รูปตัวละคร ฟอนต์ แคชที่ใช้ และพื้นที่ที่ใช้ พร้อมบอกว่ายังขาดอะไร และกดเก็บเพิ่มได้จากหน้านั้นเลย · เพิ่มฟอนต์ Mali ฝังมาในแอป (ไทย/ละติน 400/600)" },
   { version: "2.4.8", note: "รูปตัวละครออฟไลน์: ปุ่ม “เก็บรูปเลย” ในหมวดซิงก์ (และทำงานเบา ๆ หลังซิงก์) เก็บรูปของชื่อในตารางครั้งละ 60 คน ข้ามรูปที่มีแล้ว ไม่ทำเมื่อออฟไลน์หรือเปิด Save-Data แล้วรายงานจำนวนรูปกับพื้นที่ที่ใช้" },
   { version: "2.4.7", note: "ออฟไลน์: เพิ่มภาพเปิดแอปของ iOS (splash 11 ไฟล์) เข้า precache ของ service worker — ไฟล์ที่ index.html อ้างถึงทุกไฟล์ถูกเก็บไว้ในเครื่องแล้ว รวมถึงฟอนต์ ไอคอน ธีม และ characters.json" },
   { version: "2.4.6", note: "แถว “ตัวละครในตอนนี้” แยกป้ายที่รวมหลายคนออกเป็นรายคน (“คูนา & ฮอลี”, “อนาสตาเชีย & อ๊อตโต”, “และ/กับ/–/・/,”) แต่ละชิปมีรูปของตัวเอง และไม่ซ้ำกับคนที่ปรากฏเดี่ยวอยู่แล้ว" },
@@ -1094,6 +1095,105 @@ async function countCachedImages(urls) {
     for (const request of await (await caches.open(IMAGE_CACHE)).keys()) present.add(imageCacheKey(request.url));
     return urls.filter(url => present.has(imageCacheKey(url))).length;
   } catch (_) { return 0; }
+}
+
+/* ---------- สรุปความพร้อมออฟไลน์ (ตอน/รูปในบท/รูปตัวละคร/ฟอนต์/แคช) ---------- */
+async function offlineReadiness() {
+  const chapters = state.chapters || [];
+  const withText = chapters.filter(item => String(item.html || "").trim()).length;
+  const images = chapterImageUrls(chapters);
+  const imagesCached = await countCachedImages(images);
+  const table = await characterNameTable();
+  const targets = portraitWarmTargets(table, chapters, 1000);
+  const portraits = await characterPortraitTable();
+  const urls = targets.map(item => portraits[normalizeCharacterKey(item.thai)] || "").filter(Boolean);
+  const portraitsCached = await countCachedImages(urls);
+  let cacheName = "";
+  try {
+    const keys = globalThis.caches ? await caches.keys() : [];
+    cacheName = keys.find(key => key.startsWith("noat-mobile-reader-")) || "";
+  } catch (_) { cacheName = ""; }
+  const usage = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
+  return {
+    appVersion: APP_VERSION,
+    cacheName,
+    chapters: chapters.length,
+    chaptersWithText: withText,
+    images: images.length,
+    imagesCached,
+    portraits: targets.length,
+    portraitsKnown: urls.length,
+    portraitsCached,
+    fonts: document.fonts?.size || 0,
+    usage
+  };
+}
+
+function offlineMissingText(summary) {
+  if (!summary.chapters) return "ยังไม่มีตอนในเครื่อง — ซิงก์จากลิงก์หรือนำเข้าไฟล์สำรองก่อน";
+  const gaps = [];
+  if (summary.imagesCached < summary.images) gaps.push(`รูปในบท ${summary.images - summary.imagesCached} รูป`);
+  if (summary.portraitsCached < summary.portraitsKnown) gaps.push(`รูปตัวละคร ${summary.portraitsKnown - summary.portraitsCached} คน`);
+  if (summary.portraitsKnown < summary.portraits) gaps.push(`ชื่อที่ยังไม่มีรูป ${summary.portraits - summary.portraitsKnown} คน`);
+  if (summary.chaptersWithText < summary.chapters) gaps.push(`ตอนที่ยังไม่มีข้อความ ${summary.chapters - summary.chaptersWithText} ตอน`);
+  if (!gaps.length) return "ครบแล้ว — อ่านได้ทั้งหมดแม้ไม่มีเน็ต";
+  return "ยังขาด: " + gaps.join(" · ");
+}
+
+async function paintOfflineSummary() {
+  const box = byId("offline-summary");
+  if (!box) return null;
+  box.textContent = "";
+  const summary = await offlineReadiness();
+  const percent = (a, b) => (b ? Math.round(a / b * 100) + "%" : "—");
+  const rows = [
+    ["แอป", summary.appVersion],
+    ["แคชที่ใช้", summary.cacheName || "ยังไม่พร้อม (service worker ยังไม่ทำงาน)"],
+    ["ตอนในเครื่อง", `${summary.chapters.toLocaleString("th-TH")} ตอน · มีข้อความ ${summary.chaptersWithText.toLocaleString("th-TH")} (${percent(summary.chaptersWithText, summary.chapters)})`],
+    ["รูปในบท", `${summary.imagesCached.toLocaleString("th-TH")}/${summary.images.toLocaleString("th-TH")} (${percent(summary.imagesCached, summary.images)})`],
+    ["รูปตัวละคร", `${summary.portraitsCached.toLocaleString("th-TH")}/${summary.portraits.toLocaleString("th-TH")} (${percent(summary.portraitsCached, summary.portraits)})`],
+    ["ฟอนต์ที่พร้อมใช้", `${summary.fonts.toLocaleString("th-TH")} ไฟล์ (ฝังในแอป ไม่ใช้ CDN)`],
+    ["พื้นที่ใช้ไป", formatSize(summary.usage)]
+  ];
+  for (const [label, value] of rows) {
+    const row = document.createElement("div");
+    row.className = "glossary-row";
+    const text = document.createElement("div");
+    text.className = "glossary-text";
+    const strong = document.createElement("strong");
+    strong.textContent = label;
+    const detail = document.createElement("small");
+    detail.textContent = value;
+    text.append(strong, detail);
+    row.append(text);
+    box.append(row);
+  }
+  const sub = byId("offline-sheet-sub");
+  if (sub) sub.textContent = navigator.onLine === false ? "ตอนนี้ออฟไลน์ · ตัวเลขคือของที่อยู่ในเครื่อง" : "ต่อเน็ตอยู่ · กดเก็บเพิ่มได้เลย";
+  const missing = byId("offline-missing");
+  if (missing) missing.textContent = offlineMissingText(summary);
+  const imagesButton = byId("offline-warm-images");
+  if (imagesButton) {
+    const pending = summary.images - summary.imagesCached;
+    imagesButton.textContent = pending > 0 ? `เก็บรูปในบท (${pending.toLocaleString("th-TH")})` : "รูปในบทครบแล้ว";
+    imagesButton.toggleAttribute("disabled", pending <= 0 || navigator.onLine === false);
+  }
+  const portraitButton = byId("offline-warm-portraits");
+  if (portraitButton) {
+    const pending = summary.portraits - summary.portraitsCached;
+    portraitButton.textContent = pending > 0 ? `เก็บรูปตัวละคร (${pending.toLocaleString("th-TH")})` : "รูปตัวละครครบแล้ว";
+    portraitButton.toggleAttribute("disabled", pending <= 0 || navigator.onLine === false);
+  }
+  return summary;
+}
+
+async function openOfflineSummary() {
+  const sheet = byId("offline-sheet");
+  if (!sheet) return;
+  if (!sheet.open) {
+    if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
+  }
+  await paintOfflineSummary();
 }
 
 async function paintOfflineReady() {
@@ -4759,6 +4859,16 @@ function bindEvents() {
   byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
   byId("offline-check")?.addEventListener("click", () => { void paintOfflineReady(); });
   byId("portrait-warm")?.addEventListener("click", () => { void warmCharacterPortraits(); });
+  byId("offline-open")?.addEventListener("click", () => { void openOfflineSummary(); });
+  byId("offline-refresh")?.addEventListener("click", () => { void paintOfflineSummary(); });
+  byId("offline-warm-images")?.addEventListener("click", async () => {
+    await warmChapterImages();
+    void paintOfflineSummary();
+  });
+  byId("offline-warm-portraits")?.addEventListener("click", async () => {
+    await warmCharacterPortraits();
+    void paintOfflineSummary();
+  });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
   byId("note-highlight")?.addEventListener("click", () => addNote(""));
   byId("note-add")?.addEventListener("click", () => {
@@ -5197,7 +5307,7 @@ function installPageGestures() {
   });
 }
 
-const FONT_STACKS = { noto: '"Noto Sans Thai", sans-serif', system: '-apple-system, "SF Pro Text", "Thonburi", "Noto Sans Thai", sans-serif', sarabun: '"Sarabun", "Noto Sans Thai", sans-serif', "noto-serif": '"Noto Serif Thai", "Noto Sans Thai", serif', prompt: '"Prompt", "Noto Sans Thai", sans-serif', kanit: '"Kanit", "Noto Sans Thai", sans-serif', "ibm-plex": '"IBM Plex Sans Thai", "Noto Sans Thai", sans-serif', pridi: '"Pridi", "Noto Serif Thai", "Noto Sans Thai", serif' };
+const FONT_STACKS = { noto: '"Noto Sans Thai", sans-serif', system: '-apple-system, "SF Pro Text", "Thonburi", "Noto Sans Thai", sans-serif', sarabun: '"Sarabun", "Noto Sans Thai", sans-serif', "noto-serif": '"Noto Serif Thai", "Noto Sans Thai", serif', prompt: '"Prompt", "Noto Sans Thai", sans-serif', kanit: '"Kanit", "Noto Sans Thai", sans-serif', "ibm-plex": '"IBM Plex Sans Thai", "Noto Sans Thai", sans-serif', pridi: '"Pridi", "Noto Serif Thai", "Noto Sans Thai", serif', mali: '"Mali", "Noto Sans Thai", sans-serif' };
 
 function setFontFamily(value) {
   state.fontFamily = FONT_STACKS[value] ? value : "noto";

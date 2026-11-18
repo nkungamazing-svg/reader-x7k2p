@@ -271,7 +271,7 @@
       <details class="settings-group settings-fold" data-fold="reading">
         <summary><h3>การอ่าน</h3></summary>
         <div class="type-preview" aria-hidden="true"><span class="type-preview-sample">กาลครั้งหนึ่งนานมาแล้ว มีเรื่องเล่าที่ถูกส่งต่อกันมา</span></div>
-        <div class="setting-row"><label for="font-family">ฟอนต์ข้อความ</label><select id="font-family"><option value="noto">Noto Sans Thai (มาตรฐาน)</option><option value="system">ฟอนต์ระบบ iOS</option><option value="sarabun">Sarabun (หัวกลม)</option><option value="noto-serif">Noto Serif Thai (มีเชิง)</option><option value="prompt" style="font-family:Prompt,sans-serif">Prompt (เหลี่ยมทันสมัย)</option><option value="kanit" style="font-family:Kanit,sans-serif">Kanit (แน่น อ่านเร็ว)</option><option value="ibm-plex" style="font-family:'IBM Plex Sans Thai',sans-serif">IBM Plex Sans Thai (เรียบสะอาด)</option><option value="pridi" style="font-family:Pridi,serif">Pridi (มีเชิง อ่านยาวสบาย)</option></select></div>
+        <div class="setting-row"><label for="font-family">ฟอนต์ข้อความ</label><select id="font-family"><option value="noto">Noto Sans Thai (มาตรฐาน)</option><option value="system">ฟอนต์ระบบ iOS</option><option value="sarabun">Sarabun (หัวกลม)</option><option value="noto-serif">Noto Serif Thai (มีเชิง)</option><option value="prompt" style="font-family:Prompt,sans-serif">Prompt (เหลี่ยมทันสมัย)</option><option value="kanit" style="font-family:Kanit,sans-serif">Kanit (แน่น อ่านเร็ว)</option><option value="ibm-plex" style="font-family:'IBM Plex Sans Thai',sans-serif">IBM Plex Sans Thai (เรียบสะอาด)</option><option value="pridi" style="font-family:Pridi,serif">Pridi (มีเชิง อ่านยาวสบาย)</option><option value="mali" style="font-family:Mali,sans-serif">Mali (ลายมือ น่ารัก)</option></select></div>
         <div class="setting-row"><span>ขนาดตัวอักษร</span><div class="font-size-row"><button id="font-down" class="tool-button square-button" type="button" aria-label="ลดขนาดตัวอักษร">A−</button><output id="font-size-label">19</output><button id="font-up" class="tool-button square-button" type="button" aria-label="เพิ่มขนาดตัวอักษร">A+</button></div></div>
         <div class="setting-row"><label for="line-height">ระยะบรรทัด</label><div class="range-row"><input id="line-height" type="range" min="1.4" max="2.6" step="0.1" value="1.9"><output id="line-height-output">1.9</output></div></div>
         <div class="setting-row text-width-row"><label for="text-width">ความกว้างข้อความ</label><div class="range-row"><input id="text-width" type="range" min="320" max="900" step="20" value="760"><output id="text-width-output">760px</output></div></div>
@@ -358,7 +358,7 @@
         <label class="switch-row"><span>ซิงก์อัตโนมัติเมื่อเปิดแอป</span><input id="sync-toggle" type="checkbox" checked><i aria-hidden="true"></i></label>
         <div class="setting-row"><span>คลังคำศัพท์ไทย ↔ อังกฤษ</span><div class="row-actions"><button id="glossary-import-open" class="tool-button" type="button">นำเข้าไฟล์</button><button id="glossary-view" class="tool-button" type="button">ดูรายการ</button></div><small class="setting-hint">ไฟล์ที่มีคู่ชื่อก็ได้ เช่น {"โมกุโร":"Moguro Hagane"} หรือ [{src,dest}] หรือไฟล์สำรองของส่วนขยาย — รู้ชื่ออังกฤษแล้วรูปจะขึ้นเอง</small></div>
         <div class="setting-row"><span>พร้อมออฟไลน์</span>
-          <div class="row-actions"><button id="offline-check" class="tool-button" type="button">ตรวจอีกครั้ง</button></div>
+          <div class="row-actions"><button id="offline-open" class="tool-button" type="button">ดูสรุป</button><button id="offline-check" class="tool-button" type="button">ตรวจอีกครั้ง</button></div>
           <small id="offline-hint" class="setting-hint">กำลังตรวจข้อความและรูปที่เก็บไว้ในเครื่อง…</small>
         </div>
         <div class="setting-row"><span>รูปตัวละครออฟไลน์</span><div class="row-actions"><button id="portrait-warm" class="tool-button" type="button">เก็บรูปเลย</button></div><small id="portrait-warm-hint" class="setting-hint">เก็บรูปของชื่อในตารางไว้ล่วงหน้า (ครั้งละ 60 คน · ข้ามรูปที่มีอยู่ในเครื่องแล้ว)</small></div>
@@ -392,6 +392,20 @@
       </details>
     </div>
   </dialog>
+  <dialog id="offline-sheet" class="bookmark-sheet glossary-sheet" aria-label="สรุปความพร้อมออฟไลน์">
+    <div class="bookmark-sheet-head">
+      <div><h3>พร้อมออฟไลน์แค่ไหน</h3><p id="offline-sheet-sub" class="settings-hint">กำลังตรวจ…</p></div>
+      <form method="dialog"><button class="icon-button" aria-label="ปิดสรุปออฟไลน์">×</button></form>
+    </div>
+    <div id="offline-summary" class="offline-summary"></div>
+    <p id="offline-missing" class="settings-hint">กำลังตรวจ…</p>
+    <div class="row-actions offline-summary-actions">
+      <button id="offline-warm-images" class="tool-button" type="button">เก็บรูปในบท</button>
+      <button id="offline-warm-portraits" class="tool-button" type="button">เก็บรูปตัวละคร</button>
+      <button id="offline-refresh" class="tool-button" type="button">ตรวจใหม่</button>
+    </div>
+  </dialog>
+
   <dialog id="import-dialog" class="import-dialog">
     <form method="dialog" class="dialog-head"><strong>นำเข้าไฟล์สำรอง</strong><button class="icon-button" value="cancel" aria-label="ปิด">×</button></form>
     <p>รองรับไฟล์สำรอง Novel AI Translator (JSON) การตรวจรูปแบบจะเสร็จก่อนเขียนข้อมูล</p>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-2.4.8";
+const CACHE_NAME = "noat-mobile-reader-2.5.0";
 // รูปในบท (คนละโดเมนกับแอป) ถูกเก็บแยกไว้ เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่
 const IMAGE_CACHE = "noat-reader-images";
 const IMAGE_PATTERN = /\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[/?#]|$)/i;
@@ -100,6 +100,13 @@ const APP_FILES = [
   "./fonts/prompt-latin-ext-600.woff2",
   "./fonts/prompt-thai-400.woff2",
   "./fonts/prompt-thai-600.woff2",
+  "./fonts/OFL-mali.txt",
+  "./fonts/mali-thai-400.woff2",
+  "./fonts/mali-thai-600.woff2",
+  "./fonts/mali-latin-400.woff2",
+  "./fonts/mali-latin-600.woff2",
+  "./fonts/mali-latin-ext-400.woff2",
+  "./fonts/mali-latin-ext-600.woff2",
   // ภาพเปิดแอปของ iOS: อ้างอยู่ใน index.html ถ้าไม่เก็บไว้จะเห็นเป็นพื้นว่างตอนไม่มีเน็ต
   "./splash/splash-750x1334.png",
   "./splash/splash-828x1792.png",
