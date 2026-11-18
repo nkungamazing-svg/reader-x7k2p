@@ -778,6 +778,7 @@ body.page-mode .note-tools { bottom:calc(var(--page-strip) + var(--page-bar) + 1
 .offline-summary .glossary-row { align-items:flex-start; }
 .offline-summary-actions { flex-wrap:wrap; margin-top:2px; }
 .offline-summary-actions .tool-button { flex:1 1 140px; min-height:44px; }
+.offline-summary-actions[hidden], .offline-summary-actions .tool-button[hidden] { display:none; }
 .pronunciation-form { display:flex; align-items:center; gap:6px; margin:6px 0 2px; }
 .pronunciation-form .search-input { flex:1 1 0; min-width:0; }
 .pronunciation-form .primary-button { flex:none; min-height:44px; }
