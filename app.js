@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.3";
+const APP_VERSION = "2.2.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.4", note: "เตรียมออฟไลน์ครบขึ้น: เก็บรูปของทุกบทในคลัง (เดิมหยุดที่ 300 รูปแรก) และขอสิทธิ์เก็บข้อมูลถาวรกันข้อมูลถูกล้าง" },
   { version: "2.2.3", note: "ธีมรี:ซีโร่: รูปบนหัวเว็บเปลี่ยนตามตัวละครของตอนที่กำลังอ่าน แทนการสุ่มจากทั้งเรื่อง" },
   { version: "2.2.2", note: "แผงรายการบทเต็มความสูงจรดขอบบน–ล่าง เผยรายการได้มากขึ้น ไม่เป็นกล่องลอยเว้นขอบอีก" },
   { version: "2.2.1", note: "ตอนที่ URL บอกว่าอยู่อาร์คไหนแต่ไม่มีเลขตอน (เช่น ปิดม่าน/บทคั่น) จะถูกจัดด้วยวันที่เผยแพร่เหมือนเว็บต้นทาง ไม่ถูกนับเป็นตอนที่ 8 อีก" },
@@ -3962,7 +3963,6 @@ function startAutoSyncWatch() {
 
 /* ---------- เก็บรูปในบทไว้ในเครื่อง (อ่านออฟไลน์แล้วรูปยังอยู่) ---------- */
 const IMAGE_WARM_CONCURRENCY = 3;
-const IMAGE_WARM_BATCH = 300;
 const warmedImages = new Set();
 let imageWarming = false;
 
@@ -3984,7 +3984,8 @@ function chapterImageUrls(chapters) {
 async function warmChapterImages({ quiet = false } = {}) {
   if (imageWarming || !state.loadRemoteImages || navigator.onLine === false) return;
   if (navigator.connection?.saveData) return;
-  const queue = chapterImageUrls(state.chapters).filter(url => !warmedImages.has(url)).slice(0, IMAGE_WARM_BATCH);
+  // เก็บให้ครบทุกบทในคลัง ไม่ใช่แค่ชุดแรก ไม่อย่างนั้นรูปของบทท้าย ๆ จะหายตอนออฟไลน์
+  const queue = chapterImageUrls(state.chapters).filter(url => !warmedImages.has(url));
   if (!queue.length) return;
   imageWarming = true;
   let done = 0;
@@ -4710,6 +4711,8 @@ async function initialize() {
     byId("follow-toggle").checked = state.followEnabled;
     byId("remote-images-toggle").checked = state.loadRemoteImages;
     byId("wake-lock-toggle").checked = state.keepScreenAwake;
+    // ขอสิทธิ์เก็บข้อมูลถาวร กันเบราว์เซอร์ล้างบทที่ซิงก์ไว้ระหว่างเดินทาง
+    void navigator.storage?.persist?.().catch(() => {});
     await refreshChapters(); bindEvents(); startReadingClock(); paintReadingStats();
     void warmChapterImages({ quiet: true });
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
