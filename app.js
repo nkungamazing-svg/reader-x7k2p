@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.5.1";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.1", note: "แก้ปุ่มในหน้าสรุปออฟไลน์: เลิกปิดปุ่มเงียบ ๆ กดแล้วมีสถานะบอกทุกครั้ง (กำลังเก็บ/สำเร็จ/พลาดกี่รูป/ต้องต่อเน็ต/ปิดโหลดรูปอยู่) · เก็บรูปในบทไม่นับรูปที่โหลดไม่สำเร็จว่าสำเร็จแล้ว จึงกดซ้ำเพื่อลองใหม่ได้ และข้ามรูปที่มีในแคชแล้ว" },
   { version: "2.5.0", note: "หน้าสรุปความพร้อมออฟไลน์: ตั้งค่า → ซิงก์และข้อมูล → “ดูสรุป” แสดงจำนวนตอน ข้อความ รูปในบท รูปตัวละคร ฟอนต์ แคชที่ใช้ และพื้นที่ที่ใช้ พร้อมบอกว่ายังขาดอะไร และกดเก็บเพิ่มได้จากหน้านั้นเลย · เพิ่มฟอนต์ Mali ฝังมาในแอป (ไทย/ละติน 400/600)" },
   { version: "2.4.8", note: "รูปตัวละครออฟไลน์: ปุ่ม “เก็บรูปเลย” ในหมวดซิงก์ (และทำงานเบา ๆ หลังซิงก์) เก็บรูปของชื่อในตารางครั้งละ 60 คน ข้ามรูปที่มีแล้ว ไม่ทำเมื่อออฟไลน์หรือเปิด Save-Data แล้วรายงานจำนวนรูปกับพื้นที่ที่ใช้" },
   { version: "2.4.7", note: "ออฟไลน์: เพิ่มภาพเปิดแอปของ iOS (splash 11 ไฟล์) เข้า precache ของ service worker — ไฟล์ที่ index.html อ้างถึงทุกไฟล์ถูกเก็บไว้ในเครื่องแล้ว รวมถึงฟอนต์ ไอคอน ธีม และ characters.json" },
@@ -1172,17 +1173,16 @@ async function paintOfflineSummary() {
   if (sub) sub.textContent = navigator.onLine === false ? "ตอนนี้ออฟไลน์ · ตัวเลขคือของที่อยู่ในเครื่อง" : "ต่อเน็ตอยู่ · กดเก็บเพิ่มได้เลย";
   const missing = byId("offline-missing");
   if (missing) missing.textContent = offlineMissingText(summary);
+  // ไม่ปิดปุ่ม: กดได้เสมอแล้วบอกเหตุผล ถ้าไม่มีอะไรต้องเก็บหรือออฟไลน์อยู่
   const imagesButton = byId("offline-warm-images");
   if (imagesButton) {
     const pending = summary.images - summary.imagesCached;
-    imagesButton.textContent = pending > 0 ? `เก็บรูปในบท (${pending.toLocaleString("th-TH")})` : "รูปในบทครบแล้ว";
-    imagesButton.toggleAttribute("disabled", pending <= 0 || navigator.onLine === false);
+    imagesButton.textContent = pending > 0 ? `เก็บรูปในบท (${pending.toLocaleString("th-TH")})` : "ตรวจรูปในบทอีกครั้ง";
   }
   const portraitButton = byId("offline-warm-portraits");
   if (portraitButton) {
     const pending = summary.portraits - summary.portraitsCached;
-    portraitButton.textContent = pending > 0 ? `เก็บรูปตัวละคร (${pending.toLocaleString("th-TH")})` : "รูปตัวละครครบแล้ว";
-    portraitButton.toggleAttribute("disabled", pending <= 0 || navigator.onLine === false);
+    portraitButton.textContent = pending > 0 ? `เก็บรูปตัวละคร (${pending.toLocaleString("th-TH")})` : "ตรวจรูปตัวละครอีกครั้ง";
   }
   return summary;
 }
@@ -1193,6 +1193,8 @@ async function openOfflineSummary() {
   if (!sheet.open) {
     if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
   }
+  const status = byId("offline-status");
+  if (status) status.textContent = "";
   await paintOfflineSummary();
 }
 
@@ -4615,30 +4617,64 @@ function chapterImageUrls(chapters) {
 }
 
 /* ดาวน์โหลดรูปของบทที่บันทึกไว้เข้าแคช service worker เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่ */
-async function warmChapterImages({ quiet = false } = {}) {
-  if (imageWarming || !state.loadRemoteImages || navigator.onLine === false) return;
-  if (navigator.connection?.saveData) return;
+/* บอกความคืบหน้าในหน้าสรุปออฟไลน์ (ถ้าเปิดอยู่) และในแถวตั้งค่า */
+function offlineStatus(text) {
+  const sheetLine = byId("offline-status");
+  if (sheetLine) sheetLine.textContent = text;
+  const hint = byId("portrait-warm-hint");
+  if (hint) hint.textContent = text;
+}
+
+/* URL รูปที่มีอยู่ในแคชแล้ว — ใช้ตัดสินว่า “ยังขาด” จริงหรือไม่ */
+async function cachedImageKeys() {
+  const keys = new Set();
+  if (!globalThis.caches) return keys;
+  try {
+    for (const request of await (await caches.open(IMAGE_CACHE)).keys()) keys.add(imageCacheKey(request.url));
+  } catch (_) { /* ใช้ชุดว่าง */ }
+  return keys;
+}
+
+async function warmChapterImages({ quiet = false, force = false } = {}) {
+  if (imageWarming) { offlineStatus("กำลังเก็บรูปในบทอยู่…"); return { done: 0, failed: 0 }; }
+  if (!state.loadRemoteImages) { offlineStatus("ปิด “โหลดรูปจากเว็บต้นทาง” อยู่ — เปิดในตั้งค่าก่อน"); return { done: 0, failed: 0 }; }
+  if (navigator.onLine === false) { offlineStatus("ตอนนี้ออฟไลน์ — ต่อเน็ตแล้วกดอีกครั้ง"); return { done: 0, failed: 0 }; }
+  if (navigator.connection?.saveData) { offlineStatus("เบราว์เซอร์เปิดโหมดประหยัดข้อมูล — ปิดก่อนจึงจะเก็บรูปได้"); return { done: 0, failed: 0 }; }
   // เก็บให้ครบทุกบทในคลัง ไม่ใช่แค่ชุดแรก ไม่อย่างนั้นรูปของบทท้าย ๆ จะหายตอนออฟไลน์
-  const queue = chapterImageUrls(state.chapters).filter(url => !warmedImages.has(url));
-  if (!queue.length) return;
+  const all = chapterImageUrls(state.chapters);
+  const cachedKeys = await cachedImageKeys();
+  const queue = all.filter(url => !cachedKeys.has(imageCacheKey(url)) && (force || !warmedImages.has(url)));
+  if (!queue.length) {
+    const message = all.length ? "รูปในบทถูกเก็บครบแล้ว" : "ยังไม่มีรูปในบทที่ซิงก์ไว้";
+    offlineStatus(message);
+    if (!quiet) showStatus(message, 5000);
+    return { done: 0, failed: 0 };
+  }
   imageWarming = true;
-  let done = 0;
+  let done = 0, failed = 0;
+  offlineStatus(`กำลังเก็บรูปในบท ${queue.length.toLocaleString("th-TH")} รูป…`);
   try {
     const worker = async () => {
       while (queue.length) {
         const url = queue.shift();
-        try { await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" }); } catch (_) {}
-        warmedImages.add(url);
-        done += 1;
-        if (!quiet && done % 20 === 0) paintSyncHint(`เก็บรูปไว้อ่านออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`);
+        let ok = false;
+        try {
+          const response = await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
+          ok = Boolean(response);
+        } catch (_) { ok = false; }
+        // นับเฉพาะที่โหลดสำเร็จ ถ้าพลาดให้ลองใหม่ได้เมื่อกดอีกครั้ง
+        if (ok) { warmedImages.add(url); done += 1; } else { failed += 1; }
+        if (!quiet && (done + failed) % 20 === 0) offlineStatus(`เก็บรูปในบทแล้ว ${done.toLocaleString("th-TH")} รูป · พลาด ${failed.toLocaleString("th-TH")}`);
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-    if (!quiet) {
-      paintSyncHint(`เก็บรูปในบทไว้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
-      showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
-    }
   } finally { imageWarming = false; void paintOfflineReady(); }
+  const message = failed
+    ? `เก็บรูปในบทได้ ${done.toLocaleString("th-TH")} รูป · โหลดไม่สำเร็จ ${failed.toLocaleString("th-TH")} รูป (กดอีกครั้งได้)`
+    : `เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`;
+  offlineStatus(message);
+  if (!quiet) { paintSyncHint(message); showStatus(message, 6000); }
+  return { done, failed };
 }
 
 /* ---------- อุ่นรูปตัวละครไว้ใช้ออฟไลน์ (จำกัดจำนวนต่อครั้ง) ---------- */
@@ -4673,20 +4709,22 @@ function formatSize(bytes) {
 }
 
 async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIMIT } = {}) {
-  if (portraitWarming || !state.loadRemoteImages || navigator.onLine === false) return { done: 0, bytes: 0 };
-  if (navigator.connection?.saveData) return { done: 0, bytes: 0 };
+  if (portraitWarming) { offlineStatus("กำลังเก็บรูปตัวละครอยู่…"); return { done: 0, bytes: 0 }; }
+  if (!state.loadRemoteImages) { offlineStatus("ปิด “โหลดรูปจากเว็บต้นทาง” อยู่ — เปิดในตั้งค่าก่อน"); return { done: 0, bytes: 0 }; }
+  if (navigator.onLine === false) { offlineStatus("ตอนนี้ออฟไลน์ — ต่อเน็ตแล้วกดอีกครั้ง"); return { done: 0, bytes: 0 }; }
+  if (navigator.connection?.saveData) { offlineStatus("เบราว์เซอร์เปิดโหมดประหยัดข้อมูล — ปิดก่อนจึงจะเก็บรูปได้"); return { done: 0, bytes: 0 }; }
   const hint = byId("portrait-warm-hint");
   const table = await characterNameTable();
   const targets = portraitWarmTargets(table, state.chapters, limit);
   if (!targets.length) {
-    if (hint) hint.textContent = "ยังไม่มีชื่อในตารางให้เก็บรูป — นำเข้าคลังคำศัพท์หรือซิงก์ก่อน";
+    offlineStatus("ยังไม่มีชื่อในตารางให้เก็บรูป — นำเข้าคลังคำศัพท์หรือซิงก์ก่อน");
     return { done: 0, bytes: 0 };
   }
   portraitWarming = true;
   const before = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
   const queue = [...targets];
-  let done = 0, bytes = 0, skipped = 0;
-  if (hint) hint.textContent = `กำลังเก็บรูป ${targets.length.toLocaleString("th-TH")} คน…`;
+  let done = 0, bytes = 0, skipped = 0, failed = 0;
+  offlineStatus(`กำลังเก็บรูปตัวละคร ${targets.length.toLocaleString("th-TH")} คน…`);
   try {
     const worker = async () => {
       while (queue.length) {
@@ -4706,14 +4744,15 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
             const blob = await response.clone().blob();
             bytes += blob.size || 0;
             done += 1;
-          }
+          } else { failed += 1; }
         } catch (_) {
           try {
             await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
             done += 1;
-          } catch (_) { /* ปล่อยไว้ ไว้ลองครั้งหน้า */ }
+          } catch (_) { failed += 1; }
         }
-        if (hint && !quiet) hint.textContent = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`;
+        if (hint && !quiet) hint.textContent = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)} · พลาด ${failed.toLocaleString("th-TH")}`;
+        offlineStatus(`เก็บรูปตัวละครแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`);
       }
     };
     await Promise.all(Array.from({ length: PORTRAIT_WARM_CONCURRENCY }, worker));
@@ -4725,8 +4764,9 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   }
   const message = done
     ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${skipped ? ` · มีอยู่แล้ว ${skipped.toLocaleString("th-TH")}` : ""}`
-    : "รูปตัวละครในตารางถูกเก็บไว้แล้วทั้งหมด";
+    : skipped ? "รูปตัวละครในตารางถูกเก็บไว้แล้วทั้งหมด" : "ยังหารูปของชื่อในตารางไม่ได้ — ลองกดซ้ำหรือนำเข้าชื่ออังกฤษ";
   if (hint) hint.textContent = message;
+  offlineStatus(message);
   if (!quiet) showStatus(message, 9000);
   void paintOfflineReady();
   return { done, bytes: used };
@@ -4862,7 +4902,8 @@ function bindEvents() {
   byId("offline-open")?.addEventListener("click", () => { void openOfflineSummary(); });
   byId("offline-refresh")?.addEventListener("click", () => { void paintOfflineSummary(); });
   byId("offline-warm-images")?.addEventListener("click", async () => {
-    await warmChapterImages();
+    // force = ลองใหม่ได้เสมอ แต่ข้ามรูปที่อยู่ในแคชแล้ว (ไม่กินเน็ตซ้ำ)
+    await warmChapterImages({ force: true });
     void paintOfflineSummary();
   });
   byId("offline-warm-portraits")?.addEventListener("click", async () => {
