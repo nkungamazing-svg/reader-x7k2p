@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.2";
+const APP_VERSION = "2.4.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.3", note: "เปิดการ์ดตัวละครที่รู้ชื่ออังกฤษอยู่แล้ว (จากป้ายหรือตาราง) แอปจะจดคู่ชื่อไทย–อังกฤษลงตารางเอง (ที่มา “จากป้ายชื่อ”) และเติมรูปให้ชิปของคนนั้นในบททันที โดยไม่ต้องรอเนื้อหามีชื่ออังกฤษในวงเล็บ" },
   { version: "2.4.2", note: "ตัวละครขึ้นรูปเองโดยไม่ต้องซิงก์: ถ้าในเนื้อเรื่องมี “ชื่อไทย (ชื่ออังกฤษ)” แอปจะจดคู่ชื่อนั้นให้อัตโนมัติ (รับเฉพาะที่ตรงกับ characters.json) แล้วชิปได้รูปทันที — ดูที่มาได้ในคลังว่า “จากเนื้อเรื่อง”" },
   { version: "2.4.1", note: "ชิป “ตัวละครในตอนนี้”: ลองใช้ชื่ออังกฤษจากป้าย/ตารางให้ครบขึ้น จำรูปที่เคยได้ไว้ใช้ซ้ำ (ขึ้นทันทีและไม่ต้องเน็ต) และแก้ชื่อในการ์ดแล้วชิปได้รูปทันทีโดยไม่ต้องเปิดบทใหม่" },
   { version: "2.4.0", note: "หน้า “คำอ่าน” กับ “ชื่อตัวละคร” รวมเป็นหน้าเดียว สลับด้วยแท็บ (ไม่ต้องเดาว่าอยู่อันไหน) และเพิ่มฟอนต์ให้เลือกอีก 4 แบบ (Prompt · Kanit · IBM Plex Sans Thai · Pridi) ฝังไฟล์ไว้ในแอป ใช้ได้ตอนออฟไลน์" },
@@ -927,6 +928,7 @@ function characterSourceBadge(meta) {
   if (kind === "import") return "นำเข้าเอง";
   if (kind === "manual") return "แก้ชื่อเอง";
   if (kind === "text") return "จากเนื้อเรื่อง";
+  if (kind === "label") return "จากป้ายชื่อ";
   return "ไม่ทราบที่มา";
 }
 
@@ -2827,15 +2829,32 @@ async function characterTitleFor(label) {
   return table[normalizeCharacterKey(characterThaiName(label))] || "";
 }
 
-async function rememberCharacterName(thai, title) {
+async function rememberCharacterName(thai, title, kind = "manual") {
   const table = await characterNameTable();
   const key = normalizeCharacterKey(thai);
+  if (!key || !title) return false;
   table[key] = title;
   await writeSetting("characterNames", table);
   const sources = { ...(await readCharacterNameSources()) };
-  sources[key] = { kind: "manual" };
+  sources[key] = { kind };
   await writeCharacterNameSources(sources);
   await updateCharacterTableCount();
+  return true;
+}
+
+/* เปิดการ์ดตัวละครที่รู้ชื่ออังกฤษอยู่แล้ว (จากป้ายหรือตาราง) → จดคู่ชื่อไว้เลย
+   ชิปในบทจะได้รูปทันทีโดยไม่ต้องรอให้เนื้อหามีชื่ออังกฤษในวงเล็บ */
+async function rememberNameFromCard(thai, title) {
+  const name = String(thai || "").trim();
+  const english = String(title || "").trim();
+  if (!name || !english || name === "ตัวละคร") return false;
+  if (/^[\s?？.·…\-–—]+$/u.test(name)) return false;
+  const key = normalizeCharacterKey(name);
+  const table = await characterNameTable();
+  const current = table[key];
+  if (current && normalizeCharacterKey(current).toLocaleLowerCase() === normalizeCharacterKey(english).toLocaleLowerCase()) return false;
+  await rememberCharacterName(name, english, current ? "manual" : "label");
+  return !current;
 }
 
 function normalizeCharacterKey(name) {
@@ -3951,6 +3970,8 @@ async function openCharacterCard(label) {
   card.hidden = false;
   const query = await characterTitleFor(label);
   if (card.hidden || token !== state.characterCardToken) return;
+  // รู้ชื่ออังกฤษแล้ว (จากป้ายหรือตาราง) → จดคู่ชื่อไว้ให้ชิปใช้ต่อ
+  if (query && (await rememberNameFromCard(thai, query))) void refreshCastChip(thai);
   setCharacterTitle(query);
   state.characterCardQuery = query;
   state.characterCardThai = thai;
@@ -4007,8 +4028,39 @@ async function openCharacterCard(label) {
     return;
   }
   setCharacterFigure(image, thai);
+  // รูปเพิ่งได้มา → เติมให้ชิปของคนนี้เลย (ไม่ต้องรอปิดการ์ด/เปิดบทใหม่)
+  void refreshCastChip(thai);
   if (portrait.entry?.title) state.characterCardWiki = portrait.entry.title;
   byId("character-card-note").textContent = characterFactionLabel(portrait.entry) || "จาก Re:Zero Wiki · แตะรูปเพื่อดูเต็มจอ";
+}
+
+/* ชิปของคนนี้ในบทปัจจุบัน — เติมรูปให้ทันทีเมื่อเพิ่งได้รูปมา ไม่ต้องเปิดบทใหม่ */
+async function refreshCastChip(name) {
+  const row = chapterCastRow;
+  if (!row || !name) return false;
+  const key = normalizeCharacterKey(name);
+  const chip = [...row.querySelectorAll(".cast-chip")].find(item => normalizeCharacterKey(item.dataset?.name || "") === key);
+  if (!chip) return false;
+  const avatar = chip.querySelector(".cast-avatar");
+  const url = await readCharacterPortrait(name);
+  if (!avatar || !url || avatar.querySelector("img")) return false;
+  const image = document.createElement("img");
+  image.className = "cast-avatar-image";
+  image.alt = "";
+  image.decoding = "async";
+  image.referrerPolicy = "no-referrer";
+  image.src = url;
+  image.addEventListener("error", () => {
+    image.remove();
+    avatar.classList.add("is-unknown");
+    if (!avatar.querySelector("img")) avatar.textContent = "?";
+  }, { once: true });
+  avatar.classList.remove("is-unknown");
+  avatar.textContent = "";
+  avatar.append(image);
+  headerCastPool.push({ title: name, image: url });
+  void syncRezeroCover();
+  return true;
 }
 
 function installCharacterCards() {
