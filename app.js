@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.3";
+const APP_VERSION = "2.4.4";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.4", note: "คลังคำศัพท์ไทย ↔ อังกฤษย้ายมาไว้ในหมวดซิงก์: “นำเข้าไฟล์” รับได้หลายรูปแบบ ({\"ไทย\":\"English\"}, [{ src, dest }], [\"English\", \"ไทย\"], novelGlossaries ในไฟล์สำรอง) แล้วจดชื่อให้ทันที — รูปตัวละครขึ้นเองโดยไม่ต้องทำอะไรต่อ" },
   { version: "2.4.3", note: "เปิดการ์ดตัวละครที่รู้ชื่ออังกฤษอยู่แล้ว (จากป้ายหรือตาราง) แอปจะจดคู่ชื่อไทย–อังกฤษลงตารางเอง (ที่มา “จากป้ายชื่อ”) และเติมรูปให้ชิปของคนนั้นในบททันที โดยไม่ต้องรอเนื้อหามีชื่ออังกฤษในวงเล็บ" },
   { version: "2.4.2", note: "ตัวละครขึ้นรูปเองโดยไม่ต้องซิงก์: ถ้าในเนื้อเรื่องมี “ชื่อไทย (ชื่ออังกฤษ)” แอปจะจดคู่ชื่อนั้นให้อัตโนมัติ (รับเฉพาะที่ตรงกับ characters.json) แล้วชิปได้รูปทันที — ดูที่มาได้ในคลังว่า “จากเนื้อเรื่อง”" },
   { version: "2.4.1", note: "ชิป “ตัวละครในตอนนี้”: ลองใช้ชื่ออังกฤษจากป้าย/ตารางให้ครบขึ้น จำรูปที่เคยได้ไว้ใช้ซ้ำ (ขึ้นทันทีและไม่ต้องเน็ต) และแก้ชื่อในการ์ดแล้วชิปได้รูปทันทีโดยไม่ต้องเปิดบทใหม่" },
@@ -2873,27 +2874,56 @@ async function updateCharacterTableCount() {
     : "";
 }
 
+/* อ่านคลังคำศัพท์จากไฟล์ได้หลายรูปแบบเท่าที่เจอจริง:
+   [{ src, dest }] · ["English", "ไทย"] · [{ en, th }] · { "ไทย": "English" } ·
+   { novelGlossaries: { novelId: { "ไทย": "English" } } } · { glossary|data|terms|entries: [...] }
+   คืนค่าเป็น [ไทย, อังกฤษ, เรื่อง] ให้ตรงกับ applyCharacterNames */
+function glossaryPairs(raw) {
+  const pairs = [];
+  const push = (english, thai, novel) => {
+    const en = String(english || "").replace(/\s+/gu, " ").trim();
+    const th = String(thai || "").replace(/\s+/gu, " ").trim();
+    const book = String(novel || "").trim();
+    if (!en || !th || en === th) return;
+    if (!/[ก-๙]/u.test(th) || !/[A-Za-z]/u.test(en)) return; // ฝั่งไทยต้องมีอักษรไทย ฝั่งอังกฤษต้องมีละติน
+    if (pairs.some(item => item[0] === th && item[1] === en)) return;
+    pairs.push([th, en, book]);
+  };
+  const fromEntry = (entry, novel) => {
+    if (Array.isArray(entry)) return push(entry[0], entry[1], novel);
+    if (!entry || typeof entry !== "object") return;
+    const en = entry.src ?? entry.source ?? entry.en ?? entry.english ?? entry.original ?? entry.term ?? entry.jp ?? entry.japanese ?? entry.name;
+    const th = entry.dest ?? entry.target ?? entry.th ?? entry.thai ?? entry.translation ?? entry.localized;
+    if (en !== undefined && th !== undefined) push(en, th, entry.novel || novel);
+  };
+  // คีย์ห่อที่ไม่ได้เป็นชื่อเรื่อง — ไล่เข้าไปโดยไม่นับเป็นชื่อเรื่อง
+  const WRAPPER = new Set(["glossary", "data", "terms", "entries", "names", "characters", "dict", "dictionary", "content"]);
+  const PER_NOVEL = new Set(["novelGlossaries", "glossaries", "novels", "byNovel"]);
+  const walk = (node, novel = "", depth = 0) => {
+    if (!node || typeof node !== "object" || depth > 6) return;
+    if (Array.isArray(node)) { node.forEach(item => fromEntry(item, novel)); return; }
+    for (const [key, value] of Object.entries(node)) {
+      if (typeof value === "string") {
+        if (/[ก-๙]/u.test(key) && /[A-Za-z]/u.test(value)) push(value, key, novel);
+        else if (/[A-Za-z]/u.test(key) && /[ก-๙]/u.test(value)) push(key, value, novel);
+        continue;
+      }
+      if (!value || typeof value !== "object") continue;
+      if (WRAPPER.has(key)) { walk(value, novel, depth + 1); continue; }
+      if (PER_NOVEL.has(key)) { walk(value, "", depth + 1); continue; }
+      // คีย์อื่นที่เก็บออบเจ็กต์/อาเรย์ = ชื่อเรื่อง แล้วข้างในเป็นคู่ชื่อ
+      walk(value, novel || key, depth + 1);
+    }
+  };
+  walk(raw);
+  return pairs;
+}
+
 async function importCharacterTable(file) {
   const raw = JSON.parse(await file.text());
-  const entries = Array.isArray(raw) ? raw : Array.isArray(raw?.glossary) ? raw.glossary : Array.isArray(raw?.data) ? raw.data : null;
-  if (!Array.isArray(entries)) throw new Error("ไฟล์ต้องเป็นรายการ [{ src, dest }]");
-  const table = await characterNameTable();
-  let added = 0;
-  for (const entry of entries) {
-    if (!entry || typeof entry !== "object") continue;
-    const source = String(entry.src || entry.source || entry.en || "").trim();
-    const target = normalizeCharacterKey(entry.dest || entry.target || entry.th || "");
-    if (!source || !target || source === target) continue;
-    if (!table[target]) { table[target] = source; added += 1; }
-    const bare = normalizeCharacterKey(target.replace(/\([^)]*\)/gu, ""));
-    if (bare && bare !== target && !table[bare]) { table[bare] = source; added += 1; }
-  }
-  const sources = { ...(await readCharacterNameSources()) };
-  for (const key of Object.keys(table)) if (!sources[key]) sources[key] = { kind: "import" };
-  await writeSetting("characterNames", table);
-  await writeCharacterNameSources(sources);
-  await updateCharacterTableCount();
-  return added;
+  const pairs = glossaryPairs(raw);
+  if (!pairs.length) throw new Error("ไม่พบคู่ชื่อไทย–อังกฤษในไฟล์นี้");
+  return applyCharacterNames(pairs);
 }
 
 async function clearCharacterTable() {
@@ -4124,9 +4154,14 @@ function installCharacterCards() {
     if (!file) return;
     try {
       const added = await importCharacterTable(file);
-      showStatus("นำเข้าตารางชื่อแล้ว · เพิ่มใหม่ " + added.toLocaleString("th-TH") + " ชื่อ", 7000);
-    } catch (error) { showStatus("นำเข้าตารางชื่อไม่สำเร็จ: " + error.message, 0); }
+      showStatus("นำเข้าคลังคำศัพท์แล้ว · เพิ่มใหม่ " + added.toLocaleString("th-TH") + " ชื่อ — ชิปในบทจะได้รูปเอง", 7000);
+      // ชื่อใหม่ทำให้ชิปในบทที่เปิดอยู่หยิบรูปได้ทันที
+      void renderChapterCast();
+      if (!byId("glossary-sheet")?.hidden) void paintCharacterNames();
+    } catch (error) { showStatus("นำเข้าคลังคำศัพท์ไม่สำเร็จ: " + error.message, 0); }
   });
+  byId("glossary-import-open")?.addEventListener("click", () => byId("character-table-file").click());
+  byId("glossary-view")?.addEventListener("click", () => { void openCharacterNames(); });
   byId("character-table-clear").addEventListener("click", () => { void clearCharacterTable(); });
   byId("character-names-open")?.addEventListener("click", () => { void openCharacterNames(); });
   byId("character-names-search")?.addEventListener("input", () => { void paintCharacterNames(); });
