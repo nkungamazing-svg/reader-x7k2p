@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.5";
+const APP_VERSION = "2.2.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.6", note: "เก็บกวาดโค้ดตัวเลข “พร้อมออฟไลน์” ให้เล็กลง (การเทียบ URL และการเรียกซ้ำหลังวอร์มรูป) ผลลัพธ์เหมือนเดิม" },
   { version: "2.2.5", note: "หน้าตั้งค่าเพิ่มบรรทัด “พร้อมออฟไลน์” บอกจำนวนตอนที่มีข้อความในเครื่องครบ และรูปที่เก็บไว้แล้ว เอาไว้เช็กก่อนออกเดินทาง" },
   { version: "2.2.4", note: "เตรียมออฟไลน์ครบขึ้น: เก็บรูปของทุกบทในคลัง (เดิมหยุดที่ 300 รูปแรก) และขอสิทธิ์เก็บข้อมูลถาวรกันข้อมูลถูกล้าง" },
   { version: "2.2.3", note: "ธีมรี:ซีโร่: รูปบนหัวเว็บเปลี่ยนตามตัวละครของตอนที่กำลังอ่าน แทนการสุ่มจากทั้งเรื่อง" },
@@ -1042,41 +1043,40 @@ async function pruneFinishedChapters() {
   await refreshChapters();
   showStatus(`ลบ ${finished.length.toLocaleString("th-TH")} ตอนที่อ่านจบแล้ว`, 4000);
   await paintStorageUsage();
-  await paintOfflineReady();
+  void paintOfflineReady();
 }
 
 /* ---------- ความพร้อมอ่านออฟไลน์: ข้อความในเครื่อง + รูปที่เก็บไว้ ---------- */
-// แคชรูปเทียบด้วย origin+pathname เพราะ URL ในบทกับ URL ที่ถูกขออาจต่างกันแค่การเข้ารหัส
-function cachedImageKey(value) {
-  try { const url = new URL(value); return url.origin + url.pathname; } catch (_) { return String(value); }
+// เทียบด้วย origin+pathname ที่ถอดรหัสแล้วและตัด query ทิ้ง: URL ในบทกับ URL ที่ถูกขอ
+// อาจต่างกันแค่การเข้ารหัสอักขระ หรือ ?w=240 ที่เว็บใส่มาตอนย่อรูป
+function imageCacheKey(value) {
+  try {
+    const url = new URL(value);
+    return decodeURI(url.origin + url.pathname);
+  } catch (_) { return String(value); }
+}
+
+async function countCachedImages(urls) {
+  if (!urls.length || !globalThis.caches) return 0;
+  try {
+    const present = new Set();
+    for (const request of await (await caches.open(IMAGE_CACHE)).keys()) present.add(imageCacheKey(request.url));
+    return urls.filter(url => present.has(imageCacheKey(url))).length;
+  } catch (_) { return 0; }
 }
 
 async function paintOfflineReady() {
   const hint = byId("offline-hint");
   if (!hint) return;
-  if (!state.chapters.length) { hint.textContent = "ยังไม่มีตอนในเครื่อง · ซิงก์จากส่วนขยายก่อน"; return; }
   const chapters = state.chapters;
-  const withText = chapters.filter(item => String(item.html || "").trim().length > 0).length;
+  if (!chapters.length) { hint.textContent = "ยังไม่มีตอนในเครื่อง · ซิงก์จากส่วนขยายก่อน"; return; }
+  const withText = chapters.filter(item => String(item.html || "").trim()).length;
   const urls = chapterImageUrls(chapters);
-  let cached = 0;
-  if (urls.length && globalThis.caches) {
-    try {
-      const present = new Set();
-      for (const request of await (await caches.open(IMAGE_CACHE)).keys()) {
-        present.add(cachedImageKey(request.url));
-        try { present.add(decodeURI(request.url).split("#")[0]); } catch (_) {}
-      }
-      for (const url of urls) {
-        if (present.has(cachedImageKey(url))) cached += 1;
-        else { try { if (present.has(decodeURI(url))) cached += 1; } catch (_) {} }
-      }
-    } catch (_) {}
-  }
-  const count = value => value.toLocaleString("th-TH");
-  const missing = urls.length - cached;
-  const parts = [`ข้อความ ${count(withText)}/${count(chapters.length)} ตอน`];
-  if (urls.length) parts.push(`รูป ${count(cached)}/${count(urls.length)} รูป`);
-  if (missing > 0) parts.push(navigator.onLine === false ? "ยังขาดรูป · ต่อเน็ตเพื่อเก็บเพิ่ม" : "กำลังเก็บรูปที่เหลือ…");
+  const cached = await countCachedImages(urls);
+  const thai = value => value.toLocaleString("th-TH");
+  const parts = [`ข้อความ ${thai(withText)}/${thai(chapters.length)} ตอน`];
+  if (urls.length) parts.push(`รูป ${thai(cached)}/${thai(urls.length)} รูป`);
+  if (cached < urls.length) parts.push(navigator.onLine === false ? "ยังขาดรูป · ต่อเน็ตเพื่อเก็บเพิ่ม" : "กำลังเก็บรูปที่เหลือ…");
   else if (withText === chapters.length) parts.push("ครบแล้ว อ่านได้แม้ไม่มีเน็ต");
   hint.textContent = `พร้อมออฟไลน์ · ${parts.join(" · ")}`;
 }
@@ -4039,11 +4039,11 @@ async function warmChapterImages({ quiet = false } = {}) {
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-    if (quiet) { void paintOfflineReady(); return; }
-    paintSyncHint(`เก็บรูปในบทไว้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
-    showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
-    void paintOfflineReady();
-  } finally { imageWarming = false; }
+    if (!quiet) {
+      paintSyncHint(`เก็บรูปในบทไว้ออฟไลน์ ${done.toLocaleString("th-TH")} รูปแล้ว`);
+      showStatus(`เก็บรูปในบทไว้ใช้ออฟไลน์แล้ว ${done.toLocaleString("th-TH")} รูป`, 5000);
+    }
+  } finally { imageWarming = false; void paintOfflineReady(); }
 }
 
 async function syncChapters({ manual = false } = {}) {
