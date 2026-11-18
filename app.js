@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.1";
+const APP_VERSION = "2.4.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.2", note: "ตัวละครขึ้นรูปเองโดยไม่ต้องซิงก์: ถ้าในเนื้อเรื่องมี “ชื่อไทย (ชื่ออังกฤษ)” แอปจะจดคู่ชื่อนั้นให้อัตโนมัติ (รับเฉพาะที่ตรงกับ characters.json) แล้วชิปได้รูปทันที — ดูที่มาได้ในคลังว่า “จากเนื้อเรื่อง”" },
   { version: "2.4.1", note: "ชิป “ตัวละครในตอนนี้”: ลองใช้ชื่ออังกฤษจากป้าย/ตารางให้ครบขึ้น จำรูปที่เคยได้ไว้ใช้ซ้ำ (ขึ้นทันทีและไม่ต้องเน็ต) และแก้ชื่อในการ์ดแล้วชิปได้รูปทันทีโดยไม่ต้องเปิดบทใหม่" },
   { version: "2.4.0", note: "หน้า “คำอ่าน” กับ “ชื่อตัวละคร” รวมเป็นหน้าเดียว สลับด้วยแท็บ (ไม่ต้องเดาว่าอยู่อันไหน) และเพิ่มฟอนต์ให้เลือกอีก 4 แบบ (Prompt · Kanit · IBM Plex Sans Thai · Pridi) ฝังไฟล์ไว้ในแอป ใช้ได้ตอนออฟไลน์" },
   { version: "2.3.0", note: "การ์ดตัวละคร: จับคู่ชื่อกับ characters.json ได้ยืดหยุ่นขึ้น (ชื่อต้น คำสลับลำดับ) จึงขึ้นรูปได้เกือบทุกคนเหมือนในคลังแปล และแท็กบนการ์ด (อาชีพ · เผ่า · ค่าย) เป็นไทยทั้งหมด" },
@@ -925,6 +926,7 @@ function characterSourceBadge(meta) {
   if (kind === "glossary") return "คลังคำศัพท์";
   if (kind === "import") return "นำเข้าเอง";
   if (kind === "manual") return "แก้ชื่อเอง";
+  if (kind === "text") return "จากเนื้อเรื่อง";
   return "ไม่ทราบที่มา";
 }
 
@@ -2347,6 +2349,41 @@ function paintCastFactionDots() {
 }
 
 
+/* ชื่ออังกฤษของตัวละครใหม่มักติดมากับคำแปลในวงเล็บ เช่น “โมกุโร (Moguro Hagane)”
+   ฝั่งคอมดึงชื่อจาก glossary ในตัวส่วนขยายได้ แต่มือถืออ่านสโตร์นั้นไม่ได้
+   จึงจดคู่ชื่อที่เจอในเนื้อเรื่องเอง โดยรับเฉพาะที่ตรงกับ characters.json จริง */
+async function learnNamesFromText(root) {
+  if (!root) return 0;
+  const text = String(root.textContent || "").slice(0, 240000);
+  if (!text || !/[A-Za-z]{3}/.test(text)) return 0;
+  const pairs = [];
+  // ชื่อไทยต้องเป็นคำสั้น ๆ ไม่มีเว้นวรรค ไม่งั้นจะลากทั้งประโยคมาเป็น “ชื่อ”
+  const thai = "[ก-๙][ก-๙.'’-]{1,23}";
+  const latin = "[A-Z][A-Za-z.'’-]{1,24}(?:\\s+[A-Z][A-Za-z.'’-]{1,24}){0,3}";
+  for (const match of text.matchAll(new RegExp(`(${thai})\\s*[（(]\\s*(${latin})\\s*[)）]`, "gu"))) pairs.push([match[1], match[2]]);
+  for (const match of text.matchAll(new RegExp(`(${latin})\\s*[（(]\\s*(${thai})\\s*[)）]`, "gu"))) pairs.push([match[2], match[1]]);
+  if (!pairs.length) return 0;
+  const table = await characterNameTable();
+  const learned = [];
+  for (const [rawThai, rawLatin] of pairs) {
+    const key = normalizeCharacterKey(rawThai);
+    if (!key || key.length < 2 || table[key] || learned.some(item => item.key === key)) continue;
+    const entry = await characterIndexEntry(rawLatin.trim());
+    if (!entry) continue; // ไม่มีคนนี้ใน characters.json = ไม่รับ
+    table[key] = entry.title;
+    learned.push({ key, title: entry.title });
+    if (learned.length >= 30) break;
+  }
+  if (!learned.length) return 0;
+  await writeSetting("characterNames", table);
+  const sources = { ...(await readCharacterNameSources()) };
+  for (const item of learned) sources[item.key] = sources[item.key] || { kind: "text" };
+  await writeCharacterNameSources(sources);
+  void updateCharacterTableCount();
+  showStatus(`จดชื่อตัวละครใหม่จากเนื้อเรื่อง ${learned.length.toLocaleString("th-TH")} คน`, 4000);
+  return learned.length;
+}
+
 async function renderChapterCast() {
   const content = byId("reader-content");
   if (!content) return;
@@ -2383,6 +2420,7 @@ async function renderChapterCast() {
   }
   const entries = [...speakers.entries()].slice(0, 24);
   if (!entries.length) return;
+  await learnNamesFromText(content);
   const table = await characterNameTable();
   for (const [name, label] of entries) {
     const chip = document.createElement("button");
