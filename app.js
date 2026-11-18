@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.4.5";
+const APP_VERSION = "2.4.6";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.4.6", note: "แถว “ตัวละครในตอนนี้” แยกป้ายที่รวมหลายคนออกเป็นรายคน (“คูนา & ฮอลี”, “อนาสตาเชีย & อ๊อตโต”, “และ/กับ/–/・/,”) แต่ละชิปมีรูปของตัวเอง และไม่ซ้ำกับคนที่ปรากฏเดี่ยวอยู่แล้ว" },
   { version: "2.4.5", note: "ตัวละครที่ยัง “?”: แอปเทียบเสียงชื่อไทยกับชื่ออังกฤษใน characters.json เอง (เบอร์สเต็ทส์ → Berstetz Fondalfon, โมกุโร → Moguro Hagane, การ์ฟิล, อนาสตาเซีย ฯลฯ) รับเฉพาะเมื่อชนะชัดเจน ไม่เดาผิดคน แล้วจดคู่ชื่อไว้ให้ชิปใช้ต่อ (ที่มา “เดาจากเสียงชื่อ”)" },
   { version: "2.4.4", note: "คลังคำศัพท์ไทย ↔ อังกฤษย้ายมาไว้ในหมวดซิงก์: “นำเข้าไฟล์” รับได้หลายรูปแบบ ({\"ไทย\":\"English\"}, [{ src, dest }], [\"English\", \"ไทย\"], novelGlossaries ในไฟล์สำรอง) แล้วจดชื่อให้ทันที — รูปตัวละครขึ้นเองโดยไม่ต้องทำอะไรต่อ" },
   { version: "2.4.3", note: "เปิดการ์ดตัวละครที่รู้ชื่ออังกฤษอยู่แล้ว (จากป้ายหรือตาราง) แอปจะจดคู่ชื่อไทย–อังกฤษลงตารางเอง (ที่มา “จากป้ายชื่อ”) และเติมรูปให้ชิปของคนนั้นในบททันที โดยไม่ต้องรอเนื้อหามีชื่ออังกฤษในวงเล็บ" },
@@ -2389,6 +2390,15 @@ async function learnNamesFromText(root) {
   return learned.length;
 }
 
+/* ป้ายผู้พูดบางตอนรวมหลายคนไว้ เช่น “คูนา & ฮอลี” หรือ “อนาสตาเชีย & อ๊อตโต”
+   แยกเป็นรายคนเพื่อให้แต่ละชิปมีรูปของตัวเอง (เหมือนคลังแปลที่แยกการ์ดให้ทุกคน) */
+function castNameParts(name) {
+  const raw = String(name || "").replace(/\s+/gu, " ").trim();
+  if (!raw) return [];
+  const parts = raw.split(/\s*(?:&|＆|＋|\+|และ|กับ|\/|、|・|–|—|,)\s*/u).map(part => part.trim()).filter(Boolean);
+  return parts.length > 1 ? parts : [raw];
+}
+
 async function renderChapterCast() {
   const content = byId("reader-content");
   if (!content) return;
@@ -2418,10 +2428,17 @@ async function renderChapterCast() {
   const speakers = new Map();
   for (const label of content.querySelectorAll(".noat-speaker-label")) {
     const name = characterThaiName(label);
-    if (!name || name.length > 40) continue;
+    if (!name || name.length > 80) continue;
     const unknownSpeaker = /^[\s?？.·…\-–—]+$/u.test(name);
-    const speakerKey = unknownSpeaker ? "???" : name;
-    if (!speakers.has(speakerKey)) speakers.set(speakerKey, label);
+    if (unknownSpeaker) {
+      if (!speakers.has("???")) speakers.set("???", label);
+      continue;
+    }
+    // “คูนา & ฮอลี” = สองคนคนละชิป ไม่ใช่ชื่อคนเดียว
+    for (const part of castNameParts(name)) {
+      if (!part || part.length > 40 || speakers.has(part)) continue;
+      speakers.set(part, part === name ? label : { dataset: { character: part }, textContent: part, title: "" });
+    }
   }
   const entries = [...speakers.entries()].slice(0, 24);
   if (!entries.length) return;
