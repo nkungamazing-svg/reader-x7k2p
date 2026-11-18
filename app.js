@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.9";
+const APP_VERSION = "2.3.0";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.3.0", note: "การ์ดตัวละคร: จับคู่ชื่อกับ characters.json ได้ยืดหยุ่นขึ้น (ชื่อต้น คำสลับลำดับ) จึงขึ้นรูปได้เกือบทุกคนเหมือนในคลังแปล และแท็กบนการ์ด (อาชีพ · เผ่า · ค่าย) เป็นไทยทั้งหมด" },
   { version: "2.2.9", note: "หน้าตั้งค่าสั้นลง: รวม 7 หมวดเหลือ 4 (การอ่าน · เสียงอ่าน · ธีมและเอฟเฟกต์ · ซิงก์และข้อมูล) ย้ายตัวเลือกที่ใช้นาน ๆ ครั้งไว้ใน “ขั้นสูง” และเปิดครั้งแรกกางแค่หมวดแรก — ตัวเลือกเดิมอยู่ครบทุกตัว" },
   { version: "2.2.7", note: "หัวเว็บธีมรี:ซีโร่: รูปตัวละครที่ไม่ขึ้นเพราะเว็บต้นทางบล็อก referrer จะโหลดได้ และถ้ารูปไหนพังจริงจะข้ามไปคนถัดไปแทนการค้างเป็นโลโก้แอป" },
   { version: "2.2.6", note: "เก็บกวาดโค้ดตัวเลข “พร้อมออฟไลน์” ให้เล็กลง (การเทียบ URL และการเรียกซ้ำหลังวอร์มรูป) ผลลัพธ์เหมือนเดิม" },
@@ -2892,31 +2893,77 @@ function characterMatchScore(query, title) {
 
 async function characterIndex() {
   if (state.characterIndex) return state.characterIndex;
-  const byTitle = new Map(), byName = new Map();
+  const byTitle = new Map(), byName = new Map(), buckets = new Map(), all = [];
   try {
     const response = await fetch("characters.json", { cache: "force-cache" });
     if (response.ok) {
       const payload = await response.json();
       for (const entry of payload?.characters || []) {
         if (!entry || !entry.image || String(entry.image).startsWith("data:")) continue;
+        all.push(entry);
         for (const key of [entry.title, entry.slug]) {
           const normalized = normalizeCharacterKey(key).toLocaleLowerCase();
           if (normalized && !byTitle.has(normalized)) byTitle.set(normalized, entry);
         }
         const label = normalizeCharacterKey(entry.name).toLocaleLowerCase();
         if (label && !byName.has(label)) byName.set(label, entry);
+        // คลังแปลดึงรูปได้เกือบทุกตัวเพราะจับคู่ด้วย “คำเดียวในชื่อ” ได้ด้วย
+        // (“Reinhard” → “Reinhard van Astrea”): เก็บถังแยกตามคำไว้แบบเดียวกัน
+        for (const key of [entry.title, entry.slug, entry.name]) {
+          for (const word of normalizeCharacterKey(key).toLocaleLowerCase().split(" ").filter(Boolean)) {
+            if (!buckets.has(word)) buckets.set(word, []);
+            const bucket = buckets.get(word);
+            if (!bucket.includes(entry)) bucket.push(entry);
+          }
+        }
       }
     }
   } catch (_) { /* index is optional; live search still works */ }
-  state.characterIndex = { byTitle, byName };
+  state.characterIndex = { byTitle, byName, buckets, all };
   return state.characterIndex;
+}
+
+/* ให้คะแนนชื่อเหมือนคลังแปล: ชื่อเต็มก่อน แล้วค่อยชื่อต้นหรือคำในชื่อ */
+function characterNameScore(query, entry) {
+  const q = normalizeCharacterKey(query).toLocaleLowerCase();
+  if (!q) return 0;
+  let best = 0;
+  for (const key of [entry.slug, entry.title, entry.name]) {
+    const value = normalizeCharacterKey(key).toLocaleLowerCase();
+    if (!value) continue;
+    if (value === q) best = Math.max(best, 200);
+    else if (value.replace(/\s*\([^)]*\)\s*$/u, "") === q) best = Math.max(best, 190);
+    else if (value.split(" ")[0] === q) best = Math.max(best, 150);
+    else if (value.includes(q)) best = Math.max(best, 120);
+    else {
+      const words = value.split(" ").filter(Boolean);
+      const parts = q.split(" ").filter(Boolean);
+      const hits = parts.filter(part => words.includes(part)).length;
+      if (parts.length && hits === parts.length) best = Math.max(best, 100);
+      else if (hits) best = Math.max(best, Math.round(60 * hits / parts.length));
+    }
+  }
+  return best;
 }
 
 async function characterIndexEntry(query) {
   if (!query) return null;
   const index = await characterIndex();
   const key = normalizeCharacterKey(query).toLocaleLowerCase();
-  return index.byTitle.get(key) || index.byName.get(key) || null;
+  const exact = index.byTitle.get(key) || index.byName.get(key);
+  if (exact) return exact;
+  const candidates = [];
+  for (const part of key.split(" ").filter(Boolean)) {
+    for (const entry of index.buckets.get(part) || []) if (!candidates.includes(entry)) candidates.push(entry);
+  }
+  const pool = candidates.length ? candidates : index.all;
+  let best = null, bestScore = 0;
+  for (const entry of pool) {
+    const score = characterNameScore(key, entry);
+    if (score > bestScore) { bestScore = score; best = entry; }
+  }
+  // 100 ขึ้นไป = ชื่อตรงทั้งชื่อหรือตรงทุกคำ กันการเดาผิดคน
+  return bestScore >= 100 ? best : null;
 }
 
 async function lookupCharacterPortrait(query) {
@@ -2929,16 +2976,16 @@ async function lookupCharacterPortrait(query) {
 /* ค่าย/สังกัดของตัวละคร ใช้อิงสีของการ์ด (ดูจากช่อง “สังกัด” ในกล่องข้อมูลวิกิ) */
 /* สีค่ายอ้างจาก CSS ของวิกิ (character-header.* ใน MediaWiki:Common.css) */
 const CHARACTER_CAMPS = [
-  { label: "Emilia Camp", color: "#eaeae9", match: /emilia/i },
-  { label: "Crusch Camp", color: "#2f4f45", match: /crusch/i },
-  { label: "Anastasia Camp", color: "#cfb4dd", match: /anastasia/i },
-  { label: "Priscilla Camp", color: "#ffc588", match: /priscilla/i },
-  { label: "Felt Camp", color: "#eb4f50", match: /felt/i },
-  { label: "Filore Camp", color: "#415381", match: /filore/i },
-  { label: "Witch Cult", color: "#000000", match: /witch cult|sin archbishop/i },
-  { label: "Vollachia Empire", color: "#dc143c", match: /vollachia/i },
-  { label: "Kararagi", color: "#5cd411", match: /kararagi/i },
-  { label: "Kingdom of Lugunica", color: "#ffd700", match: /lugu?nica|royal guard|knights? of/i }
+  { label: "Emilia Camp", th: "กลุ่มเอมิเลีย", color: "#eaeae9", match: /emilia/i },
+  { label: "Crusch Camp", th: "กลุ่มครุช", color: "#2f4f45", match: /crusch/i },
+  { label: "Anastasia Camp", th: "กลุ่มอนาสตาเซีย", color: "#cfb4dd", match: /anastasia/i },
+  { label: "Priscilla Camp", th: "กลุ่มพริสซิลลา", color: "#ffc588", match: /priscilla/i },
+  { label: "Felt Camp", th: "กลุ่มเฟลต์", color: "#eb4f50", match: /felt/i },
+  { label: "Filore Camp", th: "กลุ่มฟิโลเร", color: "#415381", match: /filore/i },
+  { label: "Witch Cult", th: "ลัทธิมาร", color: "#000000", match: /witch cult|sin archbishop/i },
+  { label: "Vollachia Empire", th: "จักรวรรดิโวลาเคีย", color: "#dc143c", match: /vollachia/i },
+  { label: "Kararagi", th: "คารารากิ", color: "#5cd411", match: /kararagi/i },
+  { label: "Kingdom of Lugunica", th: "ราชอาณาจักรลูคูนิกา", color: "#ffd700", match: /lugu?nica|royal guard|knights? of/i }
 ];
 
 function characterCamp(fields = []) {
@@ -2967,7 +3014,7 @@ function applyCharacterFaction(entry, fields = state.characterCardFields || []) 
   }
   if (campTag) {
     campTag.hidden = !camp;
-    if (camp && campName) campName.textContent = camp.label;
+    if (camp && campName) campName.textContent = camp.th || camp.label;
   }
 }
 
@@ -3518,12 +3565,27 @@ function openCharacterWiki() {
 
 /* คำระบุตำแหน่ง/บทบาทจากวิกิ แปลเป็นไทยให้อ่านออก (วลียาวก่อน คำสั้นทีหลัง) */
 const ROLE_THAI = [
+  // วลียาวต้องมาก่อนคำสั้น ไม่งั้น "Imperial Princess" จะกลายเป็น "จักรวรรดิเจ้าหญิง"
+  [/\bimperial princess\b/gi, "เจ้าหญิงจักรวรรดิ"],
+  [/\bimperial prince\b/gi, "เจ้าชายจักรวรรดิ"],
+  [/\bimperial consort\b/gi, "มเหสีจักรวรรดิ"],
+  [/\bimperial guard\b/gi, "องครักษ์จักรวรรดิ"],
+  [/\bseventy-seventh emperor of the sacred vollachia empire\b/gi, "จักรพรรดิองค์ที่ 77 แห่งจักรวรรดิโวลาเคีย"],
+  [/\bsacred vollachia empire\b/gi, "จักรวรรดิโวลาเคีย"],
+  [/\bvollachia empire\b/gi, "จักรวรรดิโวลาเคีย"],
+  [/\bknights? of the royal guard\b/gi, "ราชองครักษ์"],
+  [/\bcourt mage\b/gi, "นักเวทราชสำนัก"],
+  [/\bgreat spirit\b/gi, "วิญญาณผู้ยิ่งใหญ่"],
+  [/\bpleiades watchtower\b/gi, "หอคอยเพลยาดีส"],
+  [/\bmatriarch (of )?house\b/gi, "หัวหน้าตระกูล"],
+  [/\bmatriarch\b/gi, "หัวหน้าตระกูล"],
+  [/\bconsort\b/gi, "มเหสี"],
   [/\bpresident of the hoshin (trading )?company\b/gi, "ประธานบริษัทโฮชิน"],
   [/\bhead of the hoshin (trading )?company\b/gi, "หัวหน้าบริษัทโฮชิน"],
   [/\bhoshin (trading )?company\b/gi, "บริษัทโฮชิน"],
   [/\broyal selection candidate\b/gi, "ผู้สมัครชิงบัลลังก์"],
   [/\broyal candidate\b/gi, "ผู้สมัครชิงบัลลังก์"],
-  [/\bsin archbishop\b/gi, "อาร์คบิชอปแห่งบาป"],
+  [/\bsin archbishop\b/gi, "นักปราชญ์บาป"],
   [/\bsword saint\b/gi, "นักดาบศักดิ์สิทธิ์"],
   [/\bdivine general\b/gi, "แม่ทัพศักดิ์สิทธิ์"],
   [/\bgreat spirit\b/gi, "วิญญาณผู้ยิ่งใหญ่"],
@@ -3580,13 +3642,94 @@ const ROLE_THAI = [
   [/\bwatchtower\b/gi, "หอคอย"]
 ];
 
+/* ---------- แท็กการ์ด: คำอังกฤษจากวิกิ → ไทย (ชุดเดียวกับคลังแปล) ---------- */
+const TAG_WORD_THAI = new Map(Object.entries({
+  "dog human hybrid": "มนุษย์สุนัขลูกครึ่ง", "human dog hybrid": "มนุษย์สุนัขลูกครึ่ง",
+  "wolf human": "มนุษย์หมาป่า", "human hybrid": "มนุษย์ลูกครึ่ง", "dog hybrid": "ลูกครึ่งสุนัข",
+  "dog human": "มนุษย์สุนัข", "half breed": "ลูกครึ่ง", "half-breed": "ลูกครึ่ง", halfbreed: "ลูกครึ่ง",
+  hybrid: "ลูกครึ่ง", dog: "สุนัข", wolf: "หมาป่า", beast: "สัตว์", human: "มนุษย์", oni: "ยักษ์"
+}));
+const RACE_THAI = {
+  human: "มนุษย์", elf: "เอลฟ์", "half elf": "ลูกครึ่งเอลฟ์", "half-elf": "ลูกครึ่งเอลฟ์",
+  "wolf human": "มนุษย์หมาป่า", wolf: "หมาป่า", werewolf: "มนุษย์หมาป่า", "wolf person": "มนุษย์หมาป่า",
+  oni: "ยักษ์", "half oni": "ลูกครึ่งยักษ์", "half-oni": "ลูกครึ่งยักษ์", beastman: "มนุษย์สัตว์",
+  spirit: "วิญญาณ", "artificial spirit": "วิญญาณเทียม", "quasi-spirit": "กึ่งวิญญาณ",
+  dragon: "มังกร", demon: "ปีศาจ", "half demon": "ลูกครึ่งปีศาจ", ghost: "วิญญาณ",
+  witch: "แม่มด", mabeast: "สัตว์วิเศษ", "demon beast": "สัตว์ปีศาจ",
+  "dog human hybrid": "มนุษย์สุนัขลูกครึ่ง", "human dog hybrid": "มนุษย์สุนัขลูกครึ่ง",
+  "dog human": "มนุษย์สุนัข", "human hybrid": "มนุษย์ลูกครึ่ง", "dog hybrid": "ลูกครึ่งสุนัข",
+  "wolf hybrid": "ลูกครึ่งหมาป่า", "human wolf hybrid": "มนุษย์หมาป่าลูกครึ่ง",
+  "human dog": "มนุษย์สุนัข", "human beast": "มนุษย์สัตว์",
+  dog: "สุนัข", hybrid: "ลูกครึ่ง", "half breed": "ลูกครึ่ง", "half-breed": "ลูกครึ่ง", halfbreed: "ลูกครึ่ง"
+};
+const RANK_THAI = { emperor: "จักรพรรดิ", empress: "จักรพรรดินี", king: "กษัตริย์", queen: "ราชินี", prince: "เจ้าชาย", princess: "เจ้าหญิง" };
+const ORDINAL_WORDS = { first: 1, second: 2, third: 3, fourth: 4, fifth: 5, sixth: 6, seventh: 7, eighth: 8, ninth: 9, tenth: 10, eleventh: 11, twelfth: 12 };
+const TENS_WORDS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+
+function ordinalNumber(word) {
+  const key = String(word || "").trim().toLocaleLowerCase();
+  if (ORDINAL_WORDS[key]) return ORDINAL_WORDS[key];
+  const compound = key.match(/^(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)[-\s](first|second|third|fourth|fifth|sixth|seventh|eighth|ninth)$/);
+  if (compound) return TENS_WORDS[compound[1]] + ORDINAL_WORDS[compound[2]];
+  return 0;
+}
+
+/* แทนคำอังกฤษที่เหลือในแท็กด้วยคำไทย โดยเลือกคำยาวก่อน (dog human ก่อน dog) */
+function translateTagWords(value) {
+  let text = String(value || "").trim();
+  if (!text) return text;
+  const keys = [...TAG_WORD_THAI.keys()].sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    const pattern = new RegExp(`(^|[^A-Za-z])(${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(?=[^A-Za-z]|$)`, "gi");
+    text = text.replace(pattern, (match, lead) => lead + TAG_WORD_THAI.get(key));
+  }
+  return text.replace(/\s{2,}/gu, " ").trim();
+}
+
+/* วิกิเขียนเผ่าเป็น “Human (Human)” หรือ “Dog Human/Human Hybrid” */
+function raceTagThai(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const bare = raw.replace(/\s*\([^()]*\)/gu, " ").replace(/\s+/gu, " ").trim();
+  const thai = bare.split("/").map(part => part.trim()).filter(Boolean)
+    .map(part => RACE_THAI[part.toLocaleLowerCase()] || translateTagWords(part))
+    .filter(Boolean)
+    .join("/");
+  if (!thai) return "";
+  return thai.startsWith("เผ่า") ? thai : `เผ่า${thai}`;
+}
+
+/* บาปทั้งเก้าและชื่อเฉพาะที่วิกิเขียนเป็นอังกฤษ (ชุดเดียวกับคลังแปล) */
+const SIN_THAI = { sloth: "เกียจคร้าน", greed: "โลภะ", wrath: "โทสะ", lust: "กำหนัด", gluttony: "ตะกละ", pride: "หยิ่งยโส", envy: "อิจฉา", melancholy: "โศกเศร้า", vanity: "ว่างเปล่า" };
+const TAG_NAME_THAI = {
+  emilia: "เอมิเลีย", subaru: "ซูบารุ", rem: "เรม", ram: "แรม", beatrice: "เบียทริช",
+  roswaal: "โรสวาล", reinhard: "ไรน์ฮาร์ท", felt: "เฟลต์", crusch: "ครุช",
+  anastasia: "อนาสตาเซีย", priscilla: "พริสซิลลา", wilhelm: "วิลเฮล์ม", julius: "จูเลียส",
+  garfiel: "การ์ฟีล", otto: "ออตโต", petra: "เปตรา", puck: "พัค", echidna: "เอคิดนา",
+  vincent: "วินเซนต์", halibel: "ฮาริเบล"
+};
+
 function roleThai(value) {
   let text = String(value || "").trim();
   if (!text) return "";
+  // "Sin Archbishop of Sloth" → "นักปราชญ์บาปเกียจคร้าน" (ไทยวางคำบาปไว้ติดกัน)
+  text = text.replace(/\bsin archbishop of ([A-Za-z]+)\b/gi, (match, sin) => `นักปราชญ์บาป${SIN_THAI[String(sin).toLocaleLowerCase()] || sin}`);
+  // "Second Divine General" → เตรียมคำบอกลำดับไว้ท้ายวลีแบบไทย
+  const ordinal = text.match(/^(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|twenty[- ]first|thirty[- ]first|forty[- ]first|fifty[- ]first|sixty[- ]first|seventy[- ](?:first|seventh))\s+(.+)$/i);
+  if (ordinal) {
+    const number = ordinalNumber(ordinal[1].replace(/\s+/gu, "-"));
+    if (number) text = `${ordinal[2]}คนที่ ${number}`;
+  }
   for (const [pattern, thai] of ROLE_THAI) text = text.replace(pattern, thai);
-  // "Emilia's Knight" → "อัศวินของ Emilia"
+  text = translateTagWords(text);
+  // "Emilia's Knight" → "อัศวินของเอมิเลีย"
   text = text.replace(/([A-Za-z][\w.'-]*)'s\b/gi, "ของ $1");
-  text = text.replace(/(ของ\s+[A-Za-z][\w.'-]*)\s+(อัศวิน|เมด|พ่อบ้าน|นักเรียน|ผู้ดูแล)/gu, "$2$1");
+  text = text.replace(/\b(?:sloth|greed|wrath|lust|gluttony|pride|envy|melancholy|vanity)\b/gi, word => SIN_THAI[word.toLocaleLowerCase()] || word);
+  text = text.replace(/\b([A-Za-z][A-Za-z.'-]{2,})\b/g, word => TAG_NAME_THAI[word.toLocaleLowerCase().replace(/[.'-]/g, "")] || word);
+  // "(Arc 4+)" → "(ภาค 4 ขึ้นไป)" เพื่อไม่ให้วงเล็บยังเป็นอังกฤษ
+  text = text.replace(/\barcs?\s*(\d+)\s*[-–]\s*(\d+)/gi, "ภาค $1-$2").replace(/\barc\s*(\d+)\s*\+/gi, "ภาค $1 ขึ้นไป").replace(/\barcs?\s*(\d+)/gi, "ภาค $1");
+  text = text.replace(/(ของ\s+(?:[A-Za-z][\w.'-]*|[ก-๙][^\s()]*))\s+(อัศวิน|เมด|พ่อบ้าน|นักเรียน|ผู้ดูแล|ผู้คุ้มกัน)/gu, "$2$1");
+  text = text.replace(/ของ\s+(?=[ก-๙])/gu, "ของ");
   // ตัดคำเชื่อมอังกฤษที่ค้างอยู่ และจัดช่องว่าง/จุลภาค
   text = text.replace(/\b(of|the|and|a|an|in)\b/gi, " ");
   text = text.replace(/\s*,\s*/gu, " · ").replace(/\s+/gu, " ").trim();
@@ -3635,9 +3778,8 @@ function renderCardTags(fields = state.characterCardFields || []) {
   }
   const race = fields.find(row => row.label === "เผ่าพันธุ์");
   if (race) {
-    const thai = WIKI_VALUE_THAI[String(race.value || "").trim().toLocaleLowerCase()] || race.value;
-    const short = String(thai).replace(/\s*\([^()]*\)/u, "").trim();
-    if (short) add(short.startsWith("เผ่า") ? short : `เผ่า${short}`, true);
+    const thai = raceTagThai(race.value);
+    if (thai) add(thai, true);
   }
 }
 
