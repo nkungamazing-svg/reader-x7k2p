@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.1";
+const APP_VERSION = "2.5.2";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.2", note: "หน้าสรุปออฟไลน์แสดงแคชของเวอร์ชันที่ใช้อยู่จริง (เดิมหยิบแคชเก่าที่ยังค้างอยู่มาแสดง) · ปุ่มทั้งสองตอบสถานะทุกครั้งที่กด" },
   { version: "2.5.1", note: "แก้ปุ่มในหน้าสรุปออฟไลน์: เลิกปิดปุ่มเงียบ ๆ กดแล้วมีสถานะบอกทุกครั้ง (กำลังเก็บ/สำเร็จ/พลาดกี่รูป/ต้องต่อเน็ต/ปิดโหลดรูปอยู่) · เก็บรูปในบทไม่นับรูปที่โหลดไม่สำเร็จว่าสำเร็จแล้ว จึงกดซ้ำเพื่อลองใหม่ได้ และข้ามรูปที่มีในแคชแล้ว" },
   { version: "2.5.0", note: "หน้าสรุปความพร้อมออฟไลน์: ตั้งค่า → ซิงก์และข้อมูล → “ดูสรุป” แสดงจำนวนตอน ข้อความ รูปในบท รูปตัวละคร ฟอนต์ แคชที่ใช้ และพื้นที่ที่ใช้ พร้อมบอกว่ายังขาดอะไร และกดเก็บเพิ่มได้จากหน้านั้นเลย · เพิ่มฟอนต์ Mali ฝังมาในแอป (ไทย/ละติน 400/600)" },
   { version: "2.4.8", note: "รูปตัวละครออฟไลน์: ปุ่ม “เก็บรูปเลย” ในหมวดซิงก์ (และทำงานเบา ๆ หลังซิงก์) เก็บรูปของชื่อในตารางครั้งละ 60 คน ข้ามรูปที่มีแล้ว ไม่ทำเมื่อออฟไลน์หรือเปิด Save-Data แล้วรายงานจำนวนรูปกับพื้นที่ที่ใช้" },
@@ -1112,7 +1113,12 @@ async function offlineReadiness() {
   let cacheName = "";
   try {
     const keys = globalThis.caches ? await caches.keys() : [];
-    cacheName = keys.find(key => key.startsWith("noat-mobile-reader-")) || "";
+    const appCaches = keys.filter(key => key.startsWith("noat-mobile-reader-"));
+    // แคชเก่าอาจค้างอยู่จนกว่า service worker ชุดใหม่จะ activate — ต้องหยิบของเวอร์ชันนี้ก่อน
+    const wanted = "noat-mobile-reader-" + APP_VERSION;
+    cacheName = appCaches.includes(wanted)
+      ? wanted
+      : appCaches.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).pop() || "";
   } catch (_) { cacheName = ""; }
   const usage = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
   return {
