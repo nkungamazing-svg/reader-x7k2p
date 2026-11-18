@@ -5,10 +5,11 @@ const DB_VERSION = 1;
 const CHAPTERS = "chapters";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.2.2";
+const APP_VERSION = "2.2.3";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.2.3", note: "ธีมรี:ซีโร่: รูปบนหัวเว็บเปลี่ยนตามตัวละครของตอนที่กำลังอ่าน แทนการสุ่มจากทั้งเรื่อง" },
   { version: "2.2.2", note: "แผงรายการบทเต็มความสูงจรดขอบบน–ล่าง เผยรายการได้มากขึ้น ไม่เป็นกล่องลอยเว้นขอบอีก" },
   { version: "2.2.1", note: "ตอนที่ URL บอกว่าอยู่อาร์คไหนแต่ไม่มีเลขตอน (เช่น ปิดม่าน/บทคั่น) จะถูกจัดด้วยวันที่เผยแพร่เหมือนเว็บต้นทาง ไม่ถูกนับเป็นตอนที่ 8 อีก" },
   { version: "2.2.0", note: "เก็บกวาดโค้ดภายใน (แคชรูป ลำดับตอน และรูปไอคอน) ให้อ่านง่ายขึ้น โดยหน้าตาและการทำงานเหมือนเดิม" },
@@ -1611,6 +1612,9 @@ function paintThemeHint() {
 /* ---------- ธีมรี:ซีโร่: ภาพตัวละครเต็มหน้าเปิด + รูป/ชื่อหมุนบนหัวเว็บ ---------- */
 const COVER_TILES = 8;
 const COVER_SWAP_MS = 5200;
+// ตัวละครของตอนที่เปิดอยู่ (จากแถบ “ตัวละครในตอนนี้”) ใช้แทนรูปสุ่มบนหัวเว็บ
+let headerCastPool = [];
+let headerPoolSignature = "";
 
 function shuffleList(list) {
   const items = list.slice();
@@ -1700,8 +1704,12 @@ function stopCoverRotation() {
   resetCoverHeader();
 }
 
-/* หัวเว็บ: รูปตัวละครสุ่มค่อย ๆ จางสลับไปเรื่อย ๆ พร้อมเปลี่ยนชื่อตามคนที่โผล่ */
+/* หัวเว็บ: รูปตัวละครค่อย ๆ จางสลับไปเรื่อย ๆ พร้อมเปลี่ยนชื่อตามคนที่โผล่
+   ระหว่างอ่านจะใช้ชุดของตอนนั้น เปิดแอปเฉย ๆ จึงสุ่มจากทั้งเรื่อง */
 function startCoverRotation(pool) {
+  const signature = pool.map(item => item.image || "").join("|");
+  if (signature && signature === headerPoolSignature && state.coverTimer) return;
+  headerPoolSignature = signature;
   stopCoverRotation();
   if (!pool.length) return;
   const avatar = byId("brand-avatar");
@@ -1740,8 +1748,11 @@ async function syncRezeroCover() {
     byId("cover-collage")?.replaceChildren();
     return;
   }
+  // อ่านตอนไหน หัวเว็บใช้ตัวละครของตอนนั้นก่อน ถ้ายังไม่มีค่อยใช้รูปสุ่ม
+  if (state.activeId && headerCastPool.length) { startCoverRotation(headerCastPool); return; }
   const pool = await loadCoverPool();
   if (state.theme !== "rezero" && state.theme !== "custom") return;
+  if (state.activeId && headerCastPool.length) { startCoverRotation(headerCastPool); return; }
   fillCoverCollage(pool);
   startCoverRotation(pool);
 }
@@ -2012,6 +2023,7 @@ function closeReader() {
   document.body.classList.remove("reading");
   toggleChrome(true);
   stopSpeech(false); state.activeId = ""; updateScrollProgress(); byId("reader").hidden = true; byId("chapter-navigation").hidden = true; byId("welcome").hidden = false; byId("audio-bar").hidden = true; void syncWakeLock(); renderChapterList();
+  headerCastPool = []; headerPoolSignature = ""; void syncRezeroCover();
 }
 
 function markSmallImages(root) {
@@ -2255,6 +2267,9 @@ async function renderChapterCast() {
   const content = byId("reader-content");
   if (!content) return;
   const chapterId = state.activeId;
+  headerCastPool = [];
+  headerPoolSignature = "";
+  void syncRezeroCover();
   const section = document.createElement("section");
   section.id = "chapter-cast";
   section.className = "chapter-cast";
@@ -2337,6 +2352,8 @@ async function renderChapterCast() {
           avatar.classList.remove("is-unknown");
           avatar.textContent = "";
           avatar.append(image);
+          headerCastPool.push({ title: name, image: url });
+          void syncRezeroCover();
         };
         // ยิงขอรูปด้วย referrerPolicy no-referrer ก่อน ถ้าถูกบล็อกค่อยลอง API วิกิ
         const canLoad = url => new Promise(resolve => {
