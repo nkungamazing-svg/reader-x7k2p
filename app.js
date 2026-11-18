@@ -1773,7 +1773,7 @@ function startCoverRotation(pool) {
     if (!item) { avatar.onerror = null; avatar.src = themeLogoPath(); name.textContent = "Re:NovelTH"; return; }
     const source = String(item.image);
     const small = coverImageUrl(source);
-    // รูปย่อ 240px บางไฟล์ไม่มีจริง — ถ้าพลาดให้ลองไฟล์ต้นฉบับก่อนตัดคนนั้นทิ้ง
+    // รูปย่อ 240px ของวิกิมีครบทุกไฟล์ที่ใช้อยู่ แต่รูปใหม่/โฮสต์อื่นอาจไม่มี — พลาดแล้วลองต้นฉบับก่อนตัดคนนั้นทิ้ง
     const show = url => {
       avatar.onerror = () => {
         if (avatar.getAttribute("src") !== url) return;
