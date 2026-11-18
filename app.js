@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.7";
+const APP_VERSION = "2.5.8";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.8", note: "แอปเติมรูปตัวละครที่ยังขาดให้เองเบา ๆ ครั้งละ 20 รูป: ตอนเปิดแอป (หลังโหลดหน้าเสร็จ) และหลังซิงก์ — เฉพาะเมื่อมีเน็ต ไม่ได้เปิดประหยัดข้อมูล และเปิดโหลดรูปอยู่ · หน้าสรุปบอกว่ายังเหลือกี่รูป" },
   { version: "2.5.7", note: "ปุ่มเก็บรูปตัวละครไม่หยุดที่ 60 คนแล้ว: เก็บต่อเนื่องจนครบทุกคนในตาราง (ข้ามรูปที่มีในเครื่องจริง) พร้อมหลอดโหลดนับต่อเนื่อง · ตัวเลขในหน้าสรุปนับจากรูปที่ยังขาดจริง" },
   { version: "2.5.6", note: "หน้าสรุปออฟไลน์: เปลี่ยนจากการกำหนดแถว grid แบบนับมือ (เสี่ยงแถวปุ่มถูกตัดบนจอเตี้ย) เป็น flex ที่รายการตรงกลางยืด/เลื่อนได้ ส่วนหัว หลอด และแถวปุ่มอยู่ครบเสมอ และกันเนื้อหาล้นออกนอกแผง" },
   { version: "2.5.5", note: "หน้าสรุปออฟไลน์: เพิ่มหลอดโหลดพร้อมตัวเลขนับ “เก็บรูป 37/497 รูป (7%)” ทั้งตอนเก็บรูปในบทและรูปตัวละคร · แผงใช้ความสูงคงที่ เนื้อหายุบ/ขยายภายในโดยไม่ดันหน้าต่างให้เปลี่ยนขนาด" },
@@ -1158,7 +1159,7 @@ async function paintOfflineSummary() {
     ["แคชที่ใช้", summary.cacheName || "ยังไม่พร้อม (service worker ยังไม่ทำงาน)"],
     ["ตอนในเครื่อง", `${summary.chapters.toLocaleString("th-TH")} ตอน · มีข้อความ ${summary.chaptersWithText.toLocaleString("th-TH")} (${percent(summary.chaptersWithText, summary.chapters)})`],
     ["รูปในบท", `${summary.imagesCached.toLocaleString("th-TH")}/${summary.images.toLocaleString("th-TH")} (${percent(summary.imagesCached, summary.images)})`],
-    ["รูปตัวละคร", `${summary.portraitsCached.toLocaleString("th-TH")}/${summary.portraits.toLocaleString("th-TH")} (${percent(summary.portraitsCached, summary.portraits)})`],
+    ["รูปตัวละคร", `${summary.portraitsCached.toLocaleString("th-TH")}/${summary.portraits.toLocaleString("th-TH")} (${percent(summary.portraitsCached, summary.portraits)})${summary.portraits > summary.portraitsCached ? ` · เหลือ ${(summary.portraits - summary.portraitsCached).toLocaleString("th-TH")} รูป` : ""}`],
     ["ฟอนต์ที่พร้อมใช้", `${summary.fonts.toLocaleString("th-TH")} ไฟล์ (ฝังในแอป ไม่ใช้ CDN)`],
     ["พื้นที่ใช้ไป", formatSize(summary.usage)]
   ];
@@ -4727,6 +4728,8 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
 /* ---------- อุ่นรูปตัวละครไว้ใช้ออฟไลน์ (จำกัดจำนวนต่อครั้ง) ---------- */
 const PORTRAIT_WARM_LIMIT = 60;
 const PORTRAIT_WARM_CONCURRENCY = 3;
+// เติมรูปเองเบา ๆ ที่ละ 20 รูป: หลังซิงก์และตอนเปิดแอป (เฉพาะเมื่อมีเน็ต/ไม่ประหยัดข้อมูล)
+const AUTO_PORTRAIT_BATCH = 20;
 let portraitWarming = false;
 
 /* เลือกชื่อที่ควรเก็บรูปก่อน: คนที่ปรากฏในบทที่ซิงก์ไว้ → ที่เหลือในตารางชื่อ
@@ -4761,31 +4764,44 @@ async function portraitWarmState() {
   const all = portraitWarmTargets(table, state.chapters, Number.MAX_SAFE_INTEGER);
   const known = await characterPortraitTable();
   const cached = await cachedImageKeys();
-  const pending = all.filter(item => {
-    const url = known[normalizeCharacterKey(item.thai)] || "";
-    return !url || !cached.has(imageCacheKey(url));
-  });
+  const pending = [];
+  for (const item of all) {
+    const knownUrl = known[normalizeCharacterKey(item.thai)] || "";
+    if (knownUrl) {
+      if (!cached.has(imageCacheKey(knownUrl))) pending.push(item);
+      continue;
+    }
+    // ยังไม่เคยจำ URL — ลองหาจาก characters.json (อยู่ในเครื่อง ไม่กินเน็ต) ก่อนตัดสินว่ายังขาด
+    let url = "";
+    try {
+      const entry = await characterIndexEntry(item.title);
+      url = entry?.image || "";
+    } catch (_) { url = ""; }
+    if (url && cached.has(imageCacheKey(url))) continue;
+    pending.push(item);
+  }
   return { all, pending };
 }
 
 async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIMIT, all = false } = {}) {
   const hasChapters = Boolean((state.chapters || []).length);
-  if (portraitWarming) { offlineStatus("กำลังเก็บรูปตัวละคร…"); return { done: 0, bytes: 0 }; }
-  if (!state.loadRemoteImages) { offlineStatus("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, bytes: 0 }; }
-  if (navigator.onLine === false) { offlineStatus("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, bytes: 0 }; }
-  if (savedDataOn()) { offlineStatus("เปิดประหยัดข้อมูลอยู่"); return { done: 0, bytes: 0 }; }
+  const say = text => { if (!quiet) offlineStatus(text); };
+  if (portraitWarming) { say("กำลังเก็บรูปตัวละคร…"); return { done: 0, bytes: 0 }; }
+  if (!state.loadRemoteImages) { say("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, bytes: 0 }; }
+  if (navigator.onLine === false) { say("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, bytes: 0 }; }
+  if (savedDataOn()) { say("เปิดประหยัดข้อมูลอยู่"); return { done: 0, bytes: 0 }; }
   const hint = byId("portrait-warm-hint");
   const ready = await portraitWarmState();
   if (!ready.all.length) {
     // ถ้ายังไม่มีตอน บรรทัด “ยังไม่มีตอนในเครื่อง” บอกอยู่แล้ว ไม่ต้องเขียนซ้ำ
-    offlineStatus(hasChapters ? "ยังไม่มีชื่อในตาราง" : "");
+    if (hasChapters) say("ยังไม่มีชื่อในตาราง");
     return { done: 0, bytes: 0 };
   }
   // all = เก็บต่อเนื่องจนครบทุกคน ไม่จำกัดทีละ 60 (ยังคงโหลดทีละ 3 พร้อมกัน)
   const picked = all ? ready.pending : ready.pending.slice(0, limit);
   const skipped = ready.all.length - ready.pending.length;
   if (!picked.length) {
-    offlineStatus("รูปตัวละครครบแล้ว");
+    say("รูปตัวละครครบแล้ว");
     return { done: 0, bytes: 0 };
   }
   portraitWarming = true;
@@ -4793,8 +4809,10 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   const queue = [...picked];
   let done = 0, bytes = 0, failed = 0, alreadyCached = 0;
   const total = picked.length;
-  offlineProgress(0, total, "เก็บรูปตัวละคร");
-  offlineStatus(`กำลังเก็บรูปตัวละคร ${total.toLocaleString("th-TH")} คน…`);
+  if (!quiet) {
+    offlineProgress(0, total, "เก็บรูปตัวละคร");
+    offlineStatus(`กำลังเก็บรูปตัวละคร ${total.toLocaleString("th-TH")} คน…`);
+  }
   try {
     const worker = async () => {
       while (queue.length) {
@@ -4821,6 +4839,7 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
             done += 1;
           } catch (_) { failed += 1; }
         }
+        if (quiet) continue;
         offlineProgress(done + failed, total, "เก็บรูปตัวละคร");
         if ((done + failed) % 3 === 0) {
           const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`;
@@ -4836,14 +4855,16 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
     const after = (await navigator.storage.estimate()).usage || 0;
     used = Math.max(0, after - before);
   }
-  offlineProgress(total, total, "เก็บรูปตัวละคร");
   const already = skipped + alreadyCached;
   const message = done
     ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${already ? ` · มีอยู่แล้ว ${already.toLocaleString("th-TH")}` : ""}`
     : already ? "รูปตัวละครครบแล้ว" : "ยังหารูปของชื่อในตารางไม่ได้ — ลองกดซ้ำหรือนำเข้าชื่ออังกฤษ";
   if (hint) hint.textContent = message;
-  offlineStatus(message);
-  if (!quiet) showStatus(message, 9000);
+  if (!quiet) {
+    offlineProgress(total, total, "เก็บรูปตัวละคร");
+    offlineStatus(message);
+    showStatus(message, 9000);
+  }
   void paintOfflineReady();
   return { done, bytes: used };
 }
@@ -4910,7 +4931,7 @@ async function syncChapters({ manual = false } = {}) {
     if (summary.length) showStatus(`${manual ? "ซิงก์แล้ว" : "ซิงก์อัตโนมัติ"} · ${summary.join(" · ")}`, 8000);
     else if (manual) showStatus("ทุกบทตรงกับต้นทางแล้ว", 6000);
     void warmChapterImages();
-    void warmCharacterPortraits({ quiet: true });
+    void warmCharacterPortraits({ quiet: true, limit: AUTO_PORTRAIT_BATCH });
   } catch (error) {
     paintSyncHint(`ซิงก์ไม่สำเร็จ: ${error.message}`);
     if (manual) showStatus(`ซิงก์ไม่สำเร็จ: ${error.message}`, 0);
@@ -5576,6 +5597,8 @@ async function initialize() {
     await refreshChapters(); bindEvents(); startReadingClock(); paintReadingStats();
     void paintOfflineReady();
     void warmChapterImages({ quiet: true });
+    // เปิดแอปแล้วค่อย ๆ เติมรูปตัวละครที่ยังขาด (ไม่แย่งเน็ตตอนโหลดหน้าแรก)
+    setTimeout(() => { void warmCharacterPortraits({ quiet: true, limit: AUTO_PORTRAIT_BATCH }); }, 4000);
     const fragmentId = decodeURIComponent(location.hash.replace(/^#chapter=/, ""));
     const activeId = fragmentId || await readSetting("lastActiveId", "");
     if (activeId && state.chapters.some(item => item.id === activeId)) await openChapter(activeId);
