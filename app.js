@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.17";
+const APP_VERSION = "2.5.18";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.18", note: "แก้กดเก็บรูปบนมือถือแล้วไม่ขึ้นเลย: เลิก await ตัวกันจอดับ (บางเครื่องค้างทำให้เก็บรูปไม่เริ่ม) และปลดสถานะค้างอัตโนมัติเมื่อเกิน 3 นาที · เน็ตมือถือ/ประหยัดข้อมูลกันเฉพาะการเก็บอัตโนมัติ ถ้ากดปุ่มเองจะเก็บให้ทันทีพร้อมบอกว่าใช้เน็ตมือถืออยู่" },
   { version: "2.5.17", note: "ลบรูปที่ดาวน์โหลดไว้ได้แล้ว: ตั้งค่า → ซิงก์และข้อมูล → “ลบรูปที่เก็บไว้” (หรือในหน้าสรุปออฟไลน์) ลบรูปในบทกับรูปตัวละครทั้งหมด คืนพื้นที่และหยุดกินเน็ตจากรูปที่เคยเก็บ — ตอน ข้อความ บุ๊กมาร์ก และโน้ตยังอยู่ครบ" },
   { version: "2.5.16", note: "เน็ตมือถือไม่โดนกินตอนเดินทาง: สวิตช์ใหม่ “เก็บรูปหนัก ๆ เฉพาะ Wi-Fi” (เปิดไว้ให้แล้ว) ทำให้การเก็บรูปในบท/รูปตัวละคร และการเติมรูปอัตโนมัติหยุดเมื่อใช้เน็ตมือถือ · เก็บรูปเร็วขึ้น (โหลดพร้อมกัน 6 รูป) ไม่ค้างทั้งชุดถ้ารูปใดรูปหนึ่งค้าง (ตัดที่ 25 วินาที) และกันจอดับระหว่างเก็บ · เก็บต่อจากเดิมได้เสมอ กดซ้ำแล้วข้ามรูปที่มีอยู่แล้ว" },
   { version: "2.5.15", note: "ตัดบรรทัดเครดิตเพิ่มอีกรูปแบบ: “แปลด้วยระบบอัตโนมัติโดย:” และ “Machine translated by:” · พรีเคชใหม่ทั้งหมด" },
@@ -4725,8 +4726,11 @@ function startAutoSyncWatch() {
 /* ---------- เก็บรูปในบทไว้ในเครื่อง (อ่านออฟไลน์แล้วรูปยังอยู่) ---------- */
 const IMAGE_WARM_CONCURRENCY = 6;
 const IMAGE_WARM_TIMEOUT_MS = 25000;
+// ถ้าสถานะ “กำลังเก็บ” ค้างเกินนี้ ให้ปลดล็อกเอง (กันกดแล้วเงียบไปตลอด)
+const IMAGE_WARM_STALL_MS = 3 * 60 * 1000;
 const warmedImages = new Set();
 let imageWarming = false;
+let imageWarmStartedAt = 0;
 let imageWakeLock = null;
 
 /* กันจอดับ/เครื่องล็อกระหว่างเก็บรูป — จอที่ปิดจะหยุด JavaScript ให้โหลดค้างกลางทาง */
@@ -4836,16 +4840,27 @@ async function cachedImageKeys() {
   return keys;
 }
 
-async function warmChapterImages({ quiet = false, force = false } = {}) {
-  if (imageWarming) { offlineStatus("กำลังเก็บรูปในบท…"); return { done: 0, failed: 0 }; }
+async function warmChapterImages({ quiet = false, force = false, manual = false } = {}) {
+  if (imageWarming) {
+    if (Date.now() - imageWarmStartedAt < IMAGE_WARM_STALL_MS) {
+      offlineStatus("กำลังเก็บรูปในบท…");
+      return { done: 0, failed: 0 };
+    }
+    // รอบเก่าค้างเกิน 3 นาที (จอดับ/เบราว์เซอร์หยุดสคริปต์) — เริ่มรอบใหม่ได้
+    imageWarming = false;
+  }
   if (!state.loadRemoteImages) { offlineStatus("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, failed: 0 }; }
   if (navigator.onLine === false) { offlineStatus("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, failed: 0 }; }
-  if (savedDataOn()) { offlineStatus("เปิดประหยัดข้อมูลอยู่"); return { done: 0, failed: 0 }; }
-  if (wifiOnlyBlocksImages()) {
+  // กันเน็ตมือถือ/ประหยัดข้อมูลเฉพาะการเก็บอัตโนมัติ — ถ้าผู้ใช้กดเอง ให้ทำตามที่สั่ง
+  if (!manual && savedDataOn()) { offlineStatus("เปิดประหยัดข้อมูลอยู่"); return { done: 0, failed: 0 }; }
+  if (!manual && wifiOnlyBlocksImages()) {
     offlineProgressHide();
     offlineStatus(WIFI_ONLY_HINT);
     if (!quiet) showStatus(WIFI_ONLY_HINT, 9000);
     return { done: 0, failed: 0 };
+  }
+  if (manual && (savedDataOn() || wifiOnlyBlocksImages())) {
+    showStatus("ใช้เน็ตมือถืออยู่ — กำลังเก็บรูปตามที่กด", 4000);
   }
   // เก็บให้ครบทุกบทในคลัง ไม่ใช่แค่ชุดแรก ไม่อย่างนั้นรูปของบทท้าย ๆ จะหายตอนออฟไลน์
   const all = chapterImageUrls(state.chapters);
@@ -4858,7 +4873,9 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
     return { done: 0, failed: 0 };
   }
   imageWarming = true;
-  await holdImageWakeLock();
+  imageWarmStartedAt = Date.now();
+  // ขอ wake lock แบบไม่รอผล: บางเครื่อง promise ค้างถ้าแท็บไม่ active ทำให้เก็บรูปไม่เริ่มเลย
+  void holdImageWakeLock();
   let done = 0, failed = 0;
   const total = queue.length + 0;
   offlineProgress(0, total, "เก็บรูปในบท");
@@ -4878,7 +4895,7 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-  } finally { releaseImageWakeLock(); imageWarming = false; void paintOfflineReady(); }
+  } finally { releaseImageWakeLock(); imageWarming = false; imageWarmStartedAt = 0; void paintOfflineReady(); }
   offlineProgress(done + failed, total, "เก็บรูปในบท");
   const message = failed
     ? `เก็บรูปในบทได้ ${done.toLocaleString("th-TH")} รูป · โหลดไม่สำเร็จ ${failed.toLocaleString("th-TH")} รูป (กดอีกครั้งได้)`
@@ -4946,14 +4963,16 @@ async function portraitWarmState() {
   return { all, pending };
 }
 
-async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIMIT, all = false } = {}) {
+async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIMIT, all = false, manual = false } = {}) {
   const hasChapters = Boolean((state.chapters || []).length);
   const say = text => { if (!quiet) offlineStatus(text); };
   if (portraitWarming) { say("กำลังเก็บรูปตัวละคร…"); return { done: 0, bytes: 0 }; }
   if (!state.loadRemoteImages) { say("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, bytes: 0 }; }
   if (navigator.onLine === false) { say("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, bytes: 0 }; }
-  if (savedDataOn()) { say("เปิดประหยัดข้อมูลอยู่"); return { done: 0, bytes: 0 }; }
-  if (wifiOnlyBlocksImages()) { say(WIFI_ONLY_HINT); if (!quiet) showStatus(WIFI_ONLY_HINT, 9000); return { done: 0, bytes: 0 }; }
+  // การเก็บอัตโนมัติเคารพเน็ตมือถือ/ประหยัดข้อมูล แต่ถ้าผู้ใช้กดปุ่มเองให้ทำตามที่สั่ง
+  if (!manual && savedDataOn()) { say("เปิดประหยัดข้อมูลอยู่"); return { done: 0, bytes: 0 }; }
+  if (!manual && wifiOnlyBlocksImages()) { say(WIFI_ONLY_HINT); if (!quiet) showStatus(WIFI_ONLY_HINT, 9000); return { done: 0, bytes: 0 }; }
+  if (manual && (savedDataOn() || wifiOnlyBlocksImages())) showStatus("ใช้เน็ตมือถืออยู่ — กำลังเก็บรูปตามที่กด", 4000);
   const hint = byId("portrait-warm-hint");
   const ready = await portraitWarmState();
   if (!ready.all.length) {
@@ -5159,17 +5178,17 @@ function bindEvents() {
   byId("glossary-search")?.addEventListener("input", () => { void paintGlossary(); });
   byId("storage-check")?.addEventListener("click", () => { void paintStorageUsage(); });
   byId("offline-check")?.addEventListener("click", () => { void paintOfflineReady(); });
-  byId("portrait-warm")?.addEventListener("click", () => { void warmCharacterPortraits({ all: true }); });
+  byId("portrait-warm")?.addEventListener("click", () => { void warmCharacterPortraits({ all: true, manual: true }); });
   byId("offline-open")?.addEventListener("click", () => { void openOfflineSummary(); });
   byId("offline-refresh")?.addEventListener("click", () => { void paintOfflineSummary(); });
   byId("offline-warm-images")?.addEventListener("click", async () => {
     // force = ลองใหม่ได้เสมอ แต่ข้ามรูปที่อยู่ในแคชแล้ว (ไม่กินเน็ตซ้ำ)
-    await warmChapterImages({ force: true });
+    await warmChapterImages({ force: true, manual: true });
     void paintOfflineSummary();
   });
   byId("offline-warm-portraits")?.addEventListener("click", async () => {
     // เก็บต่อเนื่องจนครบทุกคน (ไม่หยุดที่ 60)
-    await warmCharacterPortraits({ all: true });
+    await warmCharacterPortraits({ all: true, manual: true });
     void paintOfflineSummary();
   });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
