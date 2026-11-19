@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.12";
+const APP_VERSION = "2.5.13";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.13", note: "ช่องบทคั่น/ปิดม่านเหลือไอคอนอย่างเดียว (ตัดคำที่ล้นกรอบออก) — เลขตอนกลับมาตรงกลางเท่าตอนอื่นทั้งโหมดรายการและตาราง" },
   { version: "2.5.12", note: "เพิ่มไอคอนประจำบทคั่น (ประกาย) และปิดม่าน (ม่านคู่) ในรายการบท ทั้งโหมดรายการและตาราง — เป็น SVG ฝังในแอป ไม่โหลดจากเน็ต" },
   { version: "2.5.11", note: "บทคั่น/ปิดม่าน: รู้จักคำว่า “ช่วงคั่น” และ “ปิดม่าน” แล้ว (ขึ้นป้ายในรายการแทนจุด) และจัดตำแหน่งตามสารบัญของเว็บก่อนวันที่เผยแพร่ — จึงอยู่หลังตอน 59 ตามเว็บจริง" },
   { version: "2.5.10", note: "ปรับโค้ดเรียงตอนให้เรียบง่ายขึ้น: หาตอนข้างเคียงของบทคั่น/บทนำในรอบเดียว (เลิกเตรียมสองลิสต์ที่ต้องเรียงซ้ำ) — ลำดับที่ได้เหมือน 2.5.9 ทุกกรณี" },
@@ -539,9 +540,10 @@ function renderChapterList() {
         button.setAttribute("aria-current", active ? "true" : "false");
         button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
         const index = document.createElement("span"); index.className = "chapter-index";
+        // บทคั่น/ปิดม่านใช้ไอคอนแทนตัวเลขในช่องแคบ ๆ — ชื่อบทในบรรทัดเดียวกันบอกว่าเป็นอะไรอยู่แล้ว
         const icon = number == null ? chapterExtraIcon(item) : "";
-        index.classList.toggle("is-word", number == null);
-        if (icon) index.innerHTML = `${icon}<span>${chapterCompactLabel(item, number)}</span>`;
+        index.classList.toggle("is-word", !!icon);
+        if (icon) index.innerHTML = icon;
         else index.textContent = chapterCompactLabel(item, number);
         const text = document.createElement("span"); text.className = "chapter-text";
         const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
