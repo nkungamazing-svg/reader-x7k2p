@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.11";
+const APP_VERSION = "2.5.12";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.12", note: "เพิ่มไอคอนประจำบทคั่น (ประกาย) และปิดม่าน (ม่านคู่) ในรายการบท ทั้งโหมดรายการและตาราง — เป็น SVG ฝังในแอป ไม่โหลดจากเน็ต" },
   { version: "2.5.11", note: "บทคั่น/ปิดม่าน: รู้จักคำว่า “ช่วงคั่น” และ “ปิดม่าน” แล้ว (ขึ้นป้ายในรายการแทนจุด) และจัดตำแหน่งตามสารบัญของเว็บก่อนวันที่เผยแพร่ — จึงอยู่หลังตอน 59 ตามเว็บจริง" },
   { version: "2.5.10", note: "ปรับโค้ดเรียงตอนให้เรียบง่ายขึ้น: หาตอนข้างเคียงของบทคั่น/บทนำในรอบเดียว (เลิกเตรียมสองลิสต์ที่ต้องเรียงซ้ำ) — ลำดับที่ได้เหมือน 2.5.9 ทุกกรณี" },
   { version: "2.5.9", note: "เรียงตอนยึดเลขตอนเป็นหลัก: เลิกให้ลำดับสารบัญของเว็บคุมทั้งอาร์ค (ลำดับจึงเคยเป็น 1,3,5,…,27,…,2,4) · บทคั่น/บทนำยังเกาะตำแหน่งจากสารบัญหรือวันที่เผยแพร่" },
@@ -452,6 +453,19 @@ function chapterCompactLabel(item, number) {
   return number == null ? "•" : String(number);
 }
 
+/* ไอคอนประจำบทคั่น/ปิดม่าน — เส้นบางปลายมนแบบไอคอน UI สมัยใหม่ (ฝังในแอป ไม่โหลดจากเน็ต)
+   บทคั่น = ประกาย (จังหวะคั่นกลางเรื่อง) · ปิดม่าน = ม่านคู่ปิดสนิท */
+function chapterExtraIcon(item) {
+  const attrs = 'viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  if (chapterIsCurtainClose(item)) {
+    return `<svg ${attrs}><path d="M2.6 3.2h10.8"/><path d="M4 3.2v7.9c0 1.5 1.7 2 2.6 1.1l1.4-1.4"/><path d="M12 3.2v7.9c0 1.5-1.7 2-2.6 1.1l-1.4-1.4"/></svg>`;
+  }
+  if (chapterIsInterlude(item)) {
+    return `<svg ${attrs}><path d="M8 2.6l1.5 3.9 3.9 1.5-3.9 1.5L8 13.4l-1.5-3.9L2.6 8l3.9-1.5z"/><path d="M12.6 11.4l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z"/></svg>`;
+  }
+  return "";
+}
+
 function applyChapterView() {
   const grid = state.chapterView === "grid";
   document.body.classList.toggle("chapter-grid", grid);
@@ -525,8 +539,10 @@ function renderChapterList() {
         button.setAttribute("aria-current", active ? "true" : "false");
         button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
         const index = document.createElement("span"); index.className = "chapter-index";
-        index.textContent = chapterCompactLabel(item, number);
+        const icon = number == null ? chapterExtraIcon(item) : "";
         index.classList.toggle("is-word", number == null);
+        if (icon) index.innerHTML = `${icon}<span>${chapterCompactLabel(item, number)}</span>`;
+        else index.textContent = chapterCompactLabel(item, number);
         const text = document.createElement("span"); text.className = "chapter-text";
         const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
         button.append(index, text);
