@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.16";
+const APP_VERSION = "2.5.17";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.17", note: "ลบรูปที่ดาวน์โหลดไว้ได้แล้ว: ตั้งค่า → ซิงก์และข้อมูล → “ลบรูปที่เก็บไว้” (หรือในหน้าสรุปออฟไลน์) ลบรูปในบทกับรูปตัวละครทั้งหมด คืนพื้นที่และหยุดกินเน็ตจากรูปที่เคยเก็บ — ตอน ข้อความ บุ๊กมาร์ก และโน้ตยังอยู่ครบ" },
   { version: "2.5.16", note: "เน็ตมือถือไม่โดนกินตอนเดินทาง: สวิตช์ใหม่ “เก็บรูปหนัก ๆ เฉพาะ Wi-Fi” (เปิดไว้ให้แล้ว) ทำให้การเก็บรูปในบท/รูปตัวละคร และการเติมรูปอัตโนมัติหยุดเมื่อใช้เน็ตมือถือ · เก็บรูปเร็วขึ้น (โหลดพร้อมกัน 6 รูป) ไม่ค้างทั้งชุดถ้ารูปใดรูปหนึ่งค้าง (ตัดที่ 25 วินาที) และกันจอดับระหว่างเก็บ · เก็บต่อจากเดิมได้เสมอ กดซ้ำแล้วข้ามรูปที่มีอยู่แล้ว" },
   { version: "2.5.15", note: "ตัดบรรทัดเครดิตเพิ่มอีกรูปแบบ: “แปลด้วยระบบอัตโนมัติโดย:” และ “Machine translated by:” · พรีเคชใหม่ทั้งหมด" },
   { version: "2.5.14", note: "ตัดบรรทัดเครดิตของเว็บต้นทางที่ถูกแปลติดมาด้วย (เช่น “แปลด้วยเครื่องโดย:” / “ตรวจสอบญี่ปุ่น-อังกฤษโดย:” / “Translated by:”) ออกจากหน้าอ่าน — ไม่กระทบเนื้อเรื่อง" },
@@ -1126,6 +1127,31 @@ async function paintStorageUsage() {
   }
 }
 
+/* ลบรูปที่ดาวน์โหลดไว้ออฟไลน์ทั้งหมด (รูปในบท + รูปตัวละคร) — คืนพื้นที่และหยุดใช้เน็ตกับรูปที่เก็บไว้ */
+async function clearCachedImages() {
+  if (!globalThis.caches) { showStatus("เบราว์เซอร์นี้ลบแคชรูปไม่ได้", 4000); return 0; }
+  let count = 0;
+  try { count = (await (await caches.open(IMAGE_CACHE)).keys()).length; } catch (_) { count = 0; }
+  if (!count) { showStatus("ยังไม่มีรูปที่เก็บไว้ให้ลบ", 4000); return 0; }
+  const okay = window.confirm(`ลบรูปที่ดาวน์โหลดไว้ ${count.toLocaleString("th-TH")} รูปออกจากเครื่อง?\nตอน ข้อความ บุ๊กมาร์ก และโน้ตยังอยู่ครบ · รูปจะโหลดจากเว็บใหม่เมื่อเปิดอ่านตอนที่ต่อเน็ต`);
+  if (!okay) return -1;
+  const before = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
+  let removed = false;
+  try { removed = await caches.delete(IMAGE_CACHE); } catch (_) { removed = false; }
+  warmedImages.clear();
+  const after = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
+  const freed = Math.max(0, before - after);
+  const message = removed
+    ? `ลบรูปที่เก็บไว้แล้ว ${count.toLocaleString("th-TH")} รูป${freed ? ` · คืนพื้นที่ ${formatSize(freed)}` : ""}`
+    : "ไม่มีรูปที่เก็บไว้ให้ลบ";
+  showStatus(message, 6000);
+  offlineStatus(message);
+  await paintStorageUsage();
+  void paintOfflineReady();
+  await paintOfflineSummary();
+  return removed ? count : 0;
+}
+
 async function pruneFinishedChapters() {
   const finished = state.chapters.filter(item => Number(item.lastReadProgress || 0) >= 0.98);
   if (!finished.length) { showStatus("ยังไม่มีตอนที่อ่านจบให้ลบ", 3500); return; }
@@ -1249,6 +1275,12 @@ async function paintOfflineSummary() {
   if (imagesButton) {
     imagesButton.hidden = imagesPending <= 0;
     imagesButton.textContent = `เก็บรูปในบท (${imagesPending.toLocaleString("th-TH")})`;
+  }
+  const clearButton = byId("offline-clear-images");
+  if (clearButton) {
+    const cachedTotal = summary.imagesCached + summary.portraitsCached;
+    clearButton.hidden = cachedTotal <= 0;
+    clearButton.textContent = `ลบรูปที่เก็บไว้ (${cachedTotal.toLocaleString("th-TH")})`;
   }
   const portraitButton = byId("offline-warm-portraits");
   if (portraitButton) {
@@ -5141,6 +5173,8 @@ function bindEvents() {
     void paintOfflineSummary();
   });
   byId("storage-prune")?.addEventListener("click", () => { void pruneFinishedChapters(); });
+  byId("storage-clear-images")?.addEventListener("click", () => { void clearCachedImages(); });
+  byId("offline-clear-images")?.addEventListener("click", () => { void clearCachedImages(); });
   byId("note-highlight")?.addEventListener("click", () => addNote(""));
   byId("note-add")?.addEventListener("click", () => {
     const dialog = byId("note-dialog");
