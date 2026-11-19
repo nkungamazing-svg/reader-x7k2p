@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.14";
+const APP_VERSION = "2.5.15";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.15", note: "ตัดบรรทัดเครดิตเพิ่มอีกรูปแบบ: “แปลด้วยระบบอัตโนมัติโดย:” และ “Machine translated by:” · พรีเคชใหม่ทั้งหมด" },
   { version: "2.5.14", note: "ตัดบรรทัดเครดิตของเว็บต้นทางที่ถูกแปลติดมาด้วย (เช่น “แปลด้วยเครื่องโดย:” / “ตรวจสอบญี่ปุ่น-อังกฤษโดย:” / “Translated by:”) ออกจากหน้าอ่าน — ไม่กระทบเนื้อเรื่อง" },
   { version: "2.5.13", note: "ช่องบทคั่น/ปิดม่านเหลือไอคอนอย่างเดียว (ตัดคำที่ล้นกรอบออก) — เลขตอนกลับมาตรงกลางเท่าตอนอื่นทั้งโหมดรายการและตาราง" },
   { version: "2.5.12", note: "เพิ่มไอคอนประจำบทคั่น (ประกาย) และปิดม่าน (ม่านคู่) ในรายการบท ทั้งโหมดรายการและตาราง — เป็น SVG ฝังในแอป ไม่โหลดจากเน็ต" },
@@ -2362,7 +2363,7 @@ function indexReaderBlocks(content) {
 /* บรรทัดเครดิตของเว็บต้นทาง (“แปลด้วยเครื่องโดย:” / “ตรวจสอบญี่ปุ่น-อังกฤษโดย:” /
    “Translated by:”) ถูกแปลติดมาใน html ของบท — ไม่ใช่เนื้อเรื่อง จึงตัดออกตอนแสดงผล
    รับเฉพาะบรรทัดสั้น ๆ ที่เป็นป้ายเครดิตจริง ไม่โดนประโยคบรรยาย */
-const SOURCE_CREDIT_LINE = /^(?:แปล(?:ด้วยเครื่อง)?|แปลภาษา(?:ไทย)?|ตรวจสอบ(?:ภาษา)?(?:ญี่ปุ่น\s*[-–—/]\s*อังกฤษ)?|ตรวจทาน|พิสูจน์อักษร|ศิลปะ(?:ประกอบ)?|แหล่งที่มา(?:ของภาพ)?|machine\s*translat(?:ed|ion)|translated|proofread(?:ing)?|japanese[-\s]*english\s*proofread(?:ing)?|art\s*sources?|editing|edited)\s*(?:โดย|by)?$/iu;
+const SOURCE_CREDIT_LINE = /^(?:แปล(?:ด้วยเครื่อง|ด้วยระบบอัตโนมัติ|อัตโนมัติ)?|แปลภาษา(?:ไทย)?|ตรวจสอบ(?:ภาษา)?(?:ญี่ปุ่น\s*[-–—/]\s*อังกฤษ)?|ตรวจทาน|พิสูจน์อักษร|ศิลปะ(?:ประกอบ)?|แหล่งที่มา(?:ของภาพ)?|machine\s*translat(?:ed|ion)|translated|proofread(?:ing)?|japanese[-\s]*english\s*proofread(?:ing)?|art\s*sources?|editing|edited)\s*(?:โดย|by)?$/iu;
 
 function dropSourceCredits(content) {
   const nodes = content.querySelectorAll("p,div,h1,h2,h3,h4,h5,h6,li,blockquote");
