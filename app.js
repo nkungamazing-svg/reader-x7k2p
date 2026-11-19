@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.18";
+const APP_VERSION = "2.5.19";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.19", note: "แก้หลอด “เก็บรูปตัวละคร” ค้างที่ 0%: เดิมนับคืบหน้าเฉพาะคนที่โหลดได้ ทำให้ชื่อที่หาไม่เจอ/วิกินิ่งค้างไม่ขยับเลย · ตอนนี้นับทุกคนที่ตรวจแล้ว, ขอวิกิพร้อมเพดานเวลา 12 วินาที, ถ้าวิกิล่มติดกัน 3 ครั้งหยุดถามต่อรอบนั้นทันที, และอ่านรายการรูปในเครื่องครั้งเดียวแทนการเปิดแคชซ้ำทุกคน (เร็วขึ้นมากเมื่อมีหลายร้อยรูป)" },
   { version: "2.5.18", note: "แก้กดเก็บรูปบนมือถือแล้วไม่ขึ้นเลย: เลิก await ตัวกันจอดับ (บางเครื่องค้างทำให้เก็บรูปไม่เริ่ม) และปลดสถานะค้างอัตโนมัติเมื่อเกิน 3 นาที · เน็ตมือถือ/ประหยัดข้อมูลกันเฉพาะการเก็บอัตโนมัติ ถ้ากดปุ่มเองจะเก็บให้ทันทีพร้อมบอกว่าใช้เน็ตมือถืออยู่" },
   { version: "2.5.17", note: "ลบรูปที่ดาวน์โหลดไว้ได้แล้ว: ตั้งค่า → ซิงก์และข้อมูล → “ลบรูปที่เก็บไว้” (หรือในหน้าสรุปออฟไลน์) ลบรูปในบทกับรูปตัวละครทั้งหมด คืนพื้นที่และหยุดกินเน็ตจากรูปที่เคยเก็บ — ตอน ข้อความ บุ๊กมาร์ก และโน้ตยังอยู่ครบ" },
   { version: "2.5.16", note: "เน็ตมือถือไม่โดนกินตอนเดินทาง: สวิตช์ใหม่ “เก็บรูปหนัก ๆ เฉพาะ Wi-Fi” (เปิดไว้ให้แล้ว) ทำให้การเก็บรูปในบท/รูปตัวละคร และการเติมรูปอัตโนมัติหยุดเมื่อใช้เน็ตมือถือ · เก็บรูปเร็วขึ้น (โหลดพร้อมกัน 6 รูป) ไม่ค้างทั้งชุดถ้ารูปใดรูปหนึ่งค้าง (ตัดที่ 25 วินาที) และกันจอดับระหว่างเก็บ · เก็บต่อจากเดิมได้เสมอ กดซ้ำแล้วข้ามรูปที่มีอยู่แล้ว" },
@@ -3383,7 +3384,7 @@ async function applyCharacterNames(rows, options = {}) {
 async function searchCharacterPages(query) {
   if (!query || query.length < 2) return [];
   try {
-    const response = await fetch("https://rezero.fandom.com/api.php?action=query&format=json&origin=*&list=search&srlimit=5&srsearch=" + encodeURIComponent(query), { referrerPolicy: "no-referrer" });
+    const response = await fetchWithTimeout("https://rezero.fandom.com/api.php?action=query&format=json&origin=*&list=search&srlimit=5&srsearch=" + encodeURIComponent(query), { referrerPolicy: "no-referrer" }, 12000);
     if (!response.ok) return [];
     const payload = await response.json();
     return (payload?.query?.search || []).map(hit => hit.title).filter(Boolean);
@@ -3577,7 +3578,7 @@ function characterFactionLabel(entry) {
 async function searchCharacterImages(query) {
   const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=6&gsrsearch="
     + encodeURIComponent(query) + "&prop=pageimages&piprop=thumbnail&pithumbsize=320";
-  const response = await fetch(url, { referrerPolicy: "no-referrer" });
+  const response = await fetchWithTimeout(url, { referrerPolicy: "no-referrer" }, 12000);
   if (!response.ok) return "";
   const payload = await response.json();
   const pages = Object.values(payload?.query?.pages || {});
@@ -3591,7 +3592,7 @@ async function searchCharacterImages(query) {
   return best;
 }
 
-async function lookupCharacterImage(query) {
+async function lookupCharacterImage(query, onNetworkError) {
   if (!query || !state.loadRemoteImages) return "";
   if (!state.characterImages) state.characterImages = await readSetting("characterImages", {});
   const key = query.toLocaleLowerCase();
@@ -3599,7 +3600,7 @@ async function lookupCharacterImage(query) {
   if (cached) return cached;
   const pageImage = async title => {
     const url = "https://rezero.fandom.com/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=320&titles=" + encodeURIComponent(title);
-    const response = await fetch(url, { referrerPolicy: "no-referrer" });
+    const response = await fetchWithTimeout(url, { referrerPolicy: "no-referrer" }, 12000);
     if (!response.ok) return "";
     const payload = await response.json();
     const pages = payload?.query?.pages || {};
@@ -3609,7 +3610,10 @@ async function lookupCharacterImage(query) {
   try {
     image = await pageImage(query);
     if (!image) image = await searchCharacterImages(query);
-  } catch (_) { image = ""; }
+  } catch (error) {
+    image = "";
+    try { onNetworkError?.(error); } catch (_) { /* ไม่เป็นไร */ }
+  }
   if (image) {
     state.characterImages[key] = image;
     void writeSetting("characterImages", state.characterImages);
@@ -4746,13 +4750,17 @@ function releaseImageWakeLock() {
   imageWakeLock = null;
 }
 
-/* รูปใดรูปหนึ่งค้าง ต้องไม่ทำให้คิวทั้งชุดค้างตามไปด้วย */
-async function fetchImageWithTimeout(url) {
+/* คำขอใดคำขอหนึ่งค้าง ต้องไม่ทำให้คิวทั้งชุดค้างตามไปด้วย */
+async function fetchWithTimeout(url, options = {}, timeout = IMAGE_WARM_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), IMAGE_WARM_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeout);
   try {
-    return await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer", signal: controller.signal });
+    return await fetch(url, { ...options, signal: controller.signal });
   } finally { clearTimeout(timer); }
+}
+
+function fetchImageWithTimeout(url) {
+  return fetchWithTimeout(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
 }
 
 function chapterImageUrls(chapters) {
@@ -4974,6 +4982,7 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   if (!manual && wifiOnlyBlocksImages()) { say(WIFI_ONLY_HINT); if (!quiet) showStatus(WIFI_ONLY_HINT, 9000); return { done: 0, bytes: 0 }; }
   if (manual && (savedDataOn() || wifiOnlyBlocksImages())) showStatus("ใช้เน็ตมือถืออยู่ — กำลังเก็บรูปตามที่กด", 4000);
   const hint = byId("portrait-warm-hint");
+  if (!quiet) offlineStatus("กำลังตรวจรูปที่มีอยู่แล้ว…");
   const ready = await portraitWarmState();
   if (!ready.all.length) {
     // ถ้ายังไม่มีตอน บรรทัด “ยังไม่มีตอนในเครื่อง” บอกอยู่แล้ว ไม่ต้องเขียนซ้ำ
@@ -4990,8 +4999,12 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   portraitWarming = true;
   const before = navigator.storage?.estimate ? (await navigator.storage.estimate()).usage || 0 : 0;
   const queue = [...picked];
-  let done = 0, bytes = 0, failed = 0, alreadyCached = 0;
+  let done = 0, bytes = 0, failed = 0, alreadyCached = 0, processed = 0;
   const total = picked.length;
+  // อ่านรายการรูปที่มีในเครื่องครั้งเดียว — เดิมเปิดแคชทั้งก้อนซ้ำทุกคน (ช้ามากเมื่อมีหลายร้อยรูป)
+  const cachedKeys = await cachedImageKeys();
+  // วิกิอาจไม่ตอบเลยบนเน็ตมือถือ — ถ้าพลาดติดกัน 3 ครั้ง หยุดถามวิกิรอบนี้
+  let wikiFailures = 0, wikiOffline = false;
   if (!quiet) {
     offlineProgress(0, total, "เก็บรูปตัวละคร");
     offlineStatus(`กำลังเก็บรูปตัวละคร ${total.toLocaleString("th-TH")} คน…`);
@@ -5003,29 +5016,42 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
         let url = "";
         try {
           const entry = await characterIndexEntry(title);
-          url = entry?.image || (await lookupCharacterImage(title));
+          url = entry?.image || (wikiOffline ? "" : await lookupCharacterImage(title, () => {
+            wikiFailures += 1;
+            if (wikiFailures >= 3) wikiOffline = true;
+          }));
         } catch (_) { url = ""; }
-        if (!url) continue;
-        void rememberCharacterPortrait(thai, url);
-        if (await countCachedImages([url])) { alreadyCached += 1; continue; }
-        try {
-          // ขอแบบ CORS ก่อน เพื่อให้รู้ขนาดไฟล์จริง
-          const response = await fetch(url, { mode: "cors", credentials: "omit", referrerPolicy: "no-referrer" });
-          if (response.ok) {
-            const blob = await response.clone().blob();
-            bytes += blob.size || 0;
-            done += 1;
-          } else { failed += 1; }
-        } catch (_) {
-          try {
-            await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
-            done += 1;
-          } catch (_) { failed += 1; }
+        if (url) {
+          void rememberCharacterPortrait(thai, url);
+          const key = imageCacheKey(url);
+          if (cachedKeys.has(key)) { alreadyCached += 1; }
+          else {
+            try {
+              // ขอแบบ CORS ก่อน เพื่อให้รู้ขนาดไฟล์จริง
+              const response = await fetchWithTimeout(url, { mode: "cors", credentials: "omit", referrerPolicy: "no-referrer" });
+              if (response.ok) {
+                const blob = await response.clone().blob();
+                bytes += blob.size || 0;
+                cachedKeys.add(key);
+                done += 1;
+              } else { failed += 1; }
+            } catch (_) {
+              try {
+                await fetchWithTimeout(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
+                cachedKeys.add(key);
+                done += 1;
+              } catch (_) { failed += 1; }
+            }
+          }
+        } else {
+          // หาแหล่งรูปไม่เจอ/วิกิไม่ตอบ — นับเป็นความคืบหน้า ไม่อย่างนั้นหลอดจะค้างที่ 0% ตลอด
+          failed += 1;
         }
+        processed += 1;
         if (quiet) continue;
-        offlineProgress(done + failed, total, "เก็บรูปตัวละคร");
-        if ((done + failed) % 3 === 0) {
-          const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ${formatSize(bytes)}`;
+        offlineProgress(processed, total, "เก็บรูปตัวละคร");
+        if (processed % 3 === 0 || processed === total) {
+          const line = `เก็บรูปแล้ว ${done.toLocaleString("th-TH")} รูป · ยังไม่ได้ ${(total - processed + failed).toLocaleString("th-TH")} คน · ${formatSize(bytes)}`;
           if (hint && !quiet) hint.textContent = line;
           offlineStatus(line);
         }
@@ -5039,8 +5065,9 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
     used = Math.max(0, after - before);
   }
   const already = skipped + alreadyCached;
+  const missing = Math.max(0, failed);
   const message = done
-    ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${already ? ` · มีอยู่แล้ว ${already.toLocaleString("th-TH")}` : ""}`
+    ? `เก็บรูปตัวละครเพิ่ม ${done.toLocaleString("th-TH")} รูป ใช้พื้นที่ประมาณ ${formatSize(used)}${already ? ` · มีอยู่แล้ว ${already.toLocaleString("th-TH")}` : ""}${missing ? ` · ยังไม่ได้ ${missing.toLocaleString("th-TH")} คน` : ""}`
     : already ? "รูปตัวละครครบแล้ว" : "ยังหารูปของชื่อในตารางไม่ได้ — ลองกดซ้ำหรือนำเข้าชื่ออังกฤษ";
   if (hint) hint.textContent = message;
   if (!quiet) {
