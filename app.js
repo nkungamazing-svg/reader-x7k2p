@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.9";
+const APP_VERSION = "2.5.10";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.10", note: "ปรับโค้ดเรียงตอนให้เรียบง่ายขึ้น: หาตอนข้างเคียงของบทคั่น/บทนำในรอบเดียว (เลิกเตรียมสองลิสต์ที่ต้องเรียงซ้ำ) — ลำดับที่ได้เหมือน 2.5.9 ทุกกรณี" },
   { version: "2.5.9", note: "เรียงตอนยึดเลขตอนเป็นหลัก: เลิกให้ลำดับสารบัญของเว็บคุมทั้งอาร์ค (ลำดับจึงเคยเป็น 1,3,5,…,27,…,2,4) · บทคั่น/บทนำยังเกาะตำแหน่งจากสารบัญหรือวันที่เผยแพร่" },
   { version: "2.5.8", note: "แอปเติมรูปตัวละครที่ยังขาดให้เองเบา ๆ ครั้งละ 20 รูป: ตอนเปิดแอป (หลังโหลดหน้าเสร็จ) และหลังซิงก์ — เฉพาะเมื่อมีเน็ต ไม่ได้เปิดประหยัดข้อมูล และเปิดโหลดรูปอยู่ · หน้าสรุปบอกว่ายังเหลือกี่รูป" },
   { version: "2.5.7", note: "ปุ่มเก็บรูปตัวละครไม่หยุดที่ 60 คนแล้ว: เก็บต่อเนื่องจนครบทุกคนในตาราง (ข้ามรูปที่มีในเครื่องจริง) พร้อมหลอดโหลดนับต่อเนื่อง · ตัวเลขในหน้าสรุปนับจากรูปที่ยังขาดจริง" },
@@ -358,25 +359,20 @@ function chapterSortPlan(items) {
     return { item, arc: parts.arc, chapter: parts.chapter, toc: chapterTocOrder(item), time: chapterPublishTime(item), position: null };
   });
   const numbered = plan.filter(entry => entry.chapter !== null);
-  const byToc = numbered.filter(entry => entry.toc !== null).sort((a, b) => a.toc - b.toc);
-  const byTime = numbered.filter(entry => entry.time !== null).sort((a, b) => a.time - b.time);
-  const sameArc = (entry, anchor) => entry.arc === null || anchor.arc === entry.arc;
-  const neighbour = (anchors, entry, key) => {
-    let previous = null, next = null;
-    for (const anchor of anchors) {
-      if (anchor[key] <= entry[key]) { if (sameArc(entry, anchor)) previous = anchor; }
-      else if (next === null && sameArc(entry, anchor)) next = anchor;
-    }
-    return { previous, next };
-  };
   for (const entry of plan) {
     if (entry.chapter !== null) { entry.position = entry.chapter; continue; }
     // วันที่เผยแพร่ของบทนั้นเองแม่นกว่าสารบัญ (สารบัญเรียงตามวันที่ประกาศซึ่งอาจสลับกับเลข)
-    const order = entry.time !== null
-      ? neighbour(byTime, entry, "time")
-      : entry.toc !== null ? neighbour(byToc, entry, "toc") : { previous: null, next: null };
-    if (order.previous) entry.position = order.previous.chapter + 0.5;
-    else if (order.next) entry.position = order.next.chapter - 0.5;
+    const axis = entry.time !== null ? "time" : entry.toc !== null ? "toc" : null;
+    if (!axis) continue;
+    // ตอนที่มีเลขในอาร์คเดียวกัน + เทียบได้ในแกนนี้ → เกาะช่องว่างระหว่างตัวก่อนหน้า/ถัดไป
+    let before = null, after = null;
+    for (const other of numbered) {
+      if (other[axis] === null || (entry.arc !== null && other.arc !== entry.arc)) continue;
+      if (other[axis] <= entry[axis]) { if (!before || other[axis] > before[axis]) before = other; }
+      else if (!after || other[axis] < after[axis]) after = other;
+    }
+    if (before) entry.position = before.chapter + 0.5;
+    else if (after) entry.position = after.chapter - 0.5;
   }
   return plan;
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "noat-mobile-reader-2.5.9";
+const CACHE_NAME = "noat-mobile-reader-2.5.10";
 // รูปในบท (คนละโดเมนกับแอป) ถูกเก็บแยกไว้ เพื่อให้อ่านออฟไลน์แล้วรูปยังอยู่
 const IMAGE_CACHE = "noat-reader-images";
 const IMAGE_PATTERN = /\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[/?#]|$)/i;
