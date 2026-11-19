@@ -48,6 +48,7 @@ button:disabled { opacity:.48; cursor:not-allowed; }
 .chapter-link.active::before { position:absolute; inset:9px auto 9px 0; width:3px; border-radius:0 3px 3px 0; background:var(--accent-strong); content:""; }
 .chapter-index { display:grid; place-items:center; min-width:36px; min-height:32px; padding:3px 5px; border:1px solid var(--line); border-radius:9px; background:color-mix(in srgb,var(--text) 4%,var(--surface-2)); color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; font-weight:700; }
 .chapter-link.active .chapter-index { border-color:color-mix(in srgb,var(--accent) 60%,var(--line)); background:var(--accent); color:#fff; }
+.chapter-index.is-word { min-width:0; padding:3px 8px; font-size:10.5px; white-space:nowrap; }
 .chapter-text { display:grid; min-width:0; gap:2px; }
 .chapter-link strong { display:block; overflow:hidden; color:var(--text); font-size:13px; font-weight:600; line-height:1.45; text-overflow:ellipsis; white-space:nowrap; }
 .chapter-link.active strong { color:var(--accent-strong); font-weight:700; }

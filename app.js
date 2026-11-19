@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.10";
+const APP_VERSION = "2.5.11";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.11", note: "บทคั่น/ปิดม่าน: รู้จักคำว่า “ช่วงคั่น” และ “ปิดม่าน” แล้ว (ขึ้นป้ายในรายการแทนจุด) และจัดตำแหน่งตามสารบัญของเว็บก่อนวันที่เผยแพร่ — จึงอยู่หลังตอน 59 ตามเว็บจริง" },
   { version: "2.5.10", note: "ปรับโค้ดเรียงตอนให้เรียบง่ายขึ้น: หาตอนข้างเคียงของบทคั่น/บทนำในรอบเดียว (เลิกเตรียมสองลิสต์ที่ต้องเรียงซ้ำ) — ลำดับที่ได้เหมือน 2.5.9 ทุกกรณี" },
   { version: "2.5.9", note: "เรียงตอนยึดเลขตอนเป็นหลัก: เลิกให้ลำดับสารบัญของเว็บคุมทั้งอาร์ค (ลำดับจึงเคยเป็น 1,3,5,…,27,…,2,4) · บทคั่น/บทนำยังเกาะตำแหน่งจากสารบัญหรือวันที่เผยแพร่" },
   { version: "2.5.8", note: "แอปเติมรูปตัวละครที่ยังขาดให้เองเบา ๆ ครั้งละ 20 รูป: ตอนเปิดแอป (หลังโหลดหน้าเสร็จ) และหลังซิงก์ — เฉพาะเมื่อมีเน็ต ไม่ได้เปิดประหยัดข้อมูล และเปิดโหลดรูปอยู่ · หน้าสรุปบอกว่ายังเหลือกี่รูป" },
@@ -361,8 +362,8 @@ function chapterSortPlan(items) {
   const numbered = plan.filter(entry => entry.chapter !== null);
   for (const entry of plan) {
     if (entry.chapter !== null) { entry.position = entry.chapter; continue; }
-    // วันที่เผยแพร่ของบทนั้นเองแม่นกว่าสารบัญ (สารบัญเรียงตามวันที่ประกาศซึ่งอาจสลับกับเลข)
-    const axis = entry.time !== null ? "time" : entry.toc !== null ? "toc" : null;
+    // สารบัญเว็บคือลำดับอ่านจริงของบทที่ไม่มีเลข (บทคั่น/ปิดม่านมักลงย้อนหลัง) — ใช้วันที่เมื่อไม่มีสารบัญ
+    const axis = entry.toc !== null ? "toc" : entry.time !== null ? "time" : null;
     if (!axis) continue;
     // ตอนที่มีเลขในอาร์คเดียวกัน + เทียบได้ในแกนนี้ → เกาะช่องว่างระหว่างตัวก่อนหน้า/ถัดไป
     let before = null, after = null;
@@ -432,11 +433,21 @@ function scheduleChapterRender() {
 const CHAPTER_COLUMNS = [2, 4, 6];
 
 function chapterIsInterlude(item) {
-  return /บทคั่น|ตอนคั่น|\binterlude\b|幕間/iu.test(`${item?.title || ""} ${item?.translatedTitle || ""}`);
+  return /บทคั่น|ตอนคั่น|ช่วงคั่น|\binterlude\b|幕間/iu.test(`${item?.title || ""} ${item?.translatedTitle || ""}`);
+}
+
+// "Curtain's Close" ปิดม่านท้ายอาร์ค — ไม่มีเลขเหมือนบทคั่น
+function chapterIsCurtainClose(item) {
+  return /ปิดม่าน|\bcurtain'?s?\s*close\b/iu.test(`${item?.title || ""} ${item?.translatedTitle || ""}`);
+}
+
+function chapterIsExtra(item) {
+  return chapterIsInterlude(item) || chapterIsCurtainClose(item);
 }
 
 function chapterCompactLabel(item, number) {
-  // Interludes have no place in the main numbering, so they must be named.
+  // บทคั่น/ปิดม่านไม่มีเลขในสารบัญ จึงต้องมีชื่อกำกับ ไม่งั้นขึ้นเป็นจุดเฉย ๆ
+  if (chapterIsCurtainClose(item)) return number == null ? "ปิดม่าน" : `ปิดม่าน ${number}`;
   if (chapterIsInterlude(item)) return number == null ? "บทคั่น" : `บทคั่น ${number}`;
   return number == null ? "•" : String(number);
 }
@@ -487,7 +498,7 @@ function renderChapterList() {
     // ต่อจากบทที่เพิ่งผ่านมา เพื่อให้ลำดับตรงกับสารบัญเว็บเหมือนในคลัง
     let previousArc = null;
     for (const item of items) {
-      const arc = chapterParts(item).arc ?? (chapterIsInterlude(item) ? previousArc : null);
+      const arc = chapterParts(item).arc ?? (chapterIsExtra(item) ? previousArc : null);
       if (arc != null) previousArc = arc;
       const key = arc == null ? "ไม่ระบุ Arc" : `Arc ${arc}`;
       if (!arcs.has(key)) arcs.set(key, []);
@@ -514,7 +525,8 @@ function renderChapterList() {
         button.setAttribute("aria-current", active ? "true" : "false");
         button.setAttribute("aria-label", percent > 0 ? `${normalizeTitle(item)} · อ่านแล้ว ${percent}%` : normalizeTitle(item));
         const index = document.createElement("span"); index.className = "chapter-index";
-        index.textContent = state.chapterView === "grid" ? chapterCompactLabel(item, number) : number == null ? "•" : String(number);
+        index.textContent = chapterCompactLabel(item, number);
+        index.classList.toggle("is-word", number == null);
         const text = document.createElement("span"); text.className = "chapter-text";
         const title = document.createElement("strong"); title.textContent = normalizeTitle(item); text.append(title);
         button.append(index, text);
