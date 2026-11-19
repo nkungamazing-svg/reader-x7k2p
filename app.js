@@ -6,10 +6,11 @@ const CHAPTERS = "chapters";
 const IMAGE_CACHE = "noat-reader-images";
 const SETTINGS = "settings";
 const BACKUP_FORMAT = "NOAT_STORAGE_EXPORT";
-const APP_VERSION = "2.5.15";
+const APP_VERSION = "2.5.16";
 // บันทึกเฉพาะเรื่องที่คนอ่านรู้สึกได้ ไม่ลงทุกอัปเดต และแสดงแค่ไม่กี่รายการล่าสุด
 const CHANGELOG_LIMIT = 6;
 const CHANGELOG = [
+  { version: "2.5.16", note: "เน็ตมือถือไม่โดนกินตอนเดินทาง: สวิตช์ใหม่ “เก็บรูปหนัก ๆ เฉพาะ Wi-Fi” (เปิดไว้ให้แล้ว) ทำให้การเก็บรูปในบท/รูปตัวละคร และการเติมรูปอัตโนมัติหยุดเมื่อใช้เน็ตมือถือ · เก็บรูปเร็วขึ้น (โหลดพร้อมกัน 6 รูป) ไม่ค้างทั้งชุดถ้ารูปใดรูปหนึ่งค้าง (ตัดที่ 25 วินาที) และกันจอดับระหว่างเก็บ · เก็บต่อจากเดิมได้เสมอ กดซ้ำแล้วข้ามรูปที่มีอยู่แล้ว" },
   { version: "2.5.15", note: "ตัดบรรทัดเครดิตเพิ่มอีกรูปแบบ: “แปลด้วยระบบอัตโนมัติโดย:” และ “Machine translated by:” · พรีเคชใหม่ทั้งหมด" },
   { version: "2.5.14", note: "ตัดบรรทัดเครดิตของเว็บต้นทางที่ถูกแปลติดมาด้วย (เช่น “แปลด้วยเครื่องโดย:” / “ตรวจสอบญี่ปุ่น-อังกฤษโดย:” / “Translated by:”) ออกจากหน้าอ่าน — ไม่กระทบเนื้อเรื่อง" },
   { version: "2.5.13", note: "ช่องบทคั่น/ปิดม่านเหลือไอคอนอย่างเดียว (ตัดคำที่ล้นกรอบออก) — เลขตอนกลับมาตรงกลางเท่าตอนอื่นทั้งโหมดรายการและตาราง" },
@@ -231,7 +232,7 @@ function installCoverOpen() {
 }
 const dbReady = openDatabase();
 const byId = id => document.getElementById(id);
-const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", wikiTitle: "", wikiExtract: "", wikiThai: "", wikiFields: [], wikiShowThai: true, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
+const state = { chapters: [], activeId: "", theme: "dark", themeMode: "auto", seasonalAuto: true, launchStyle: "book", fontSize: 19, lineHeight: 1.9, textWidth: 760, rate: 1, voiceURI: "", pronunciation: [], voices: [], speechQueue: [], speechIndex: 0, speaking: false, utterance: null, speechToken: 0, currentBlockIndex: -1, highlightEnabled: true, followEnabled: true, loadRemoteImages: true, wifiOnlyImages: true, keepScreenAwake: false, wakeLock: null, scrollTimer: 0, noticeTimer: 0, imported: null, statusTimer: 0, sidebarLockY: null, pointerStart: null, pointerTapReady: null, pointerTapExpiry: 0, mode: "scroll", indent: true, pageTop: 0, tapSpeech: true, fontFamily: "noto", pageIndex: 0, pageTotal: 1, pageStep: 0, blockPages: new Map(), pageTimer: 0, paginateTimer: 0, pageHintShown: false, suppressTapUntil: 0, updateTimer: 0, chromeTimer: 0, tapHint: true, hintShown: false, hintTimer: 0, flashTimer: 0, chapterRenderTimer: 0, characterImages: null, characterNames: null, characterCardTitle: "", characterCardToken: 0, characterSuggestTimer: 0, scrollProgressTimer: 0, chapterView: "list", chapterColumns: 2, syncUrl: "", autoSync: true, syncing: false, syncedAt: 0, coverPool: null, coverTimer: 0, coverSwapTimer: 0, coverTilesReady: 0, customTheme: { page: "#121524", text: "#dfe5f4", surface: "#1a2036", accent: "#8c82ff", hue: 0, sat: 100, bright: 100, sky: "none" }, rezeroTheme: { accent: "#8c82ff", light: 50, hue: 0, sat: 100, bright: 100, sky: "snow", shooting: true, dust: true }, lowPower: "auto", nightDim: 0, nightAuto: false, bookmarks: [], recentChapters: [], autoBookmark: null, settingsFolds: {}, settingsFoldTimer: 0, searchTimer: 0, searchIndex: new Map(), speechContinue: false, speechAdvancing: false, notes: [], pendingSelection: "", selectionTimer: 0, characterCardQuery: "", characterCardThai: "", characterCardImage: "", characterCardWiki: "", wikiTitle: "", wikiExtract: "", wikiThai: "", wikiFields: [], wikiShowThai: true, readStats: { days: {} }, statsTick: 0, statsSaveTimer: 0 };
 
 // เริ่มโหลดดัชนีตัวละครตั้งแต่ต้นแอป จะได้มีเวลาโหลดรูประหว่างหน้าเปิดโชว์อยู่
 void loadCoverPool();
@@ -863,7 +864,7 @@ function bindUpdateBanner() {
 }
 
 /* ---------- ย้ายค่าตั้งข้ามเครื่อง: คัดลอก/วางเป็นข้อความสั้น ๆ ---------- */
-const SETTING_TRANSFER_KEYS = ["notes", "theme", "seasonalAuto", "launchStyle", "fontSize", "lineHeight", "textWidth", "pageTop", "readingMode", "indent", "highlightEnabled", "followEnabled", "fontFamily", "loadRemoteImages", "customTheme", "rezeroTheme", "lowPower", "nightDim", "nightAuto"];
+const SETTING_TRANSFER_KEYS = ["notes", "theme", "seasonalAuto", "launchStyle", "fontSize", "lineHeight", "textWidth", "pageTop", "readingMode", "indent", "highlightEnabled", "followEnabled", "fontFamily", "loadRemoteImages", "wifiOnlyImages", "customTheme", "rezeroTheme", "lowPower", "nightDim", "nightAuto"];
 
 async function copySettings() {
   const data = {};
@@ -1235,7 +1236,10 @@ async function paintOfflineSummary() {
   }
   box.replaceChildren(fragment);
   const sub = byId("offline-sheet-sub");
-  if (sub) sub.textContent = navigator.onLine === false ? "ออฟไลน์อยู่" : "";
+  if (sub) sub.textContent = navigator.onLine === false
+    ? "ออฟไลน์อยู่"
+    : wifiOnlyBlocksImages() ? "ใช้เน็ตมือถืออยู่ · เก็บรูปได้เฉพาะ Wi-Fi"
+    : "";
   const missing = byId("offline-missing");
   if (missing) missing.textContent = offlineMissingText(summary);
   // แสดงเฉพาะปุ่มที่มีงานจริง — ไม่มีอะไรเหลือก็ไม่ต้องรกจอ
@@ -1280,7 +1284,10 @@ async function paintOfflineReady() {
   const thai = value => value.toLocaleString("th-TH");
   const parts = [`ข้อความ ${thai(withText)}/${thai(chapters.length)} ตอน`];
   if (urls.length) parts.push(`รูป ${thai(cached)}/${thai(urls.length)} รูป`);
-  if (cached < urls.length) parts.push(navigator.onLine === false ? "ยังขาดรูป · ต่อเน็ตเพื่อเก็บเพิ่ม" : "กำลังเก็บรูปที่เหลือ…");
+  if (cached < urls.length) parts.push(navigator.onLine === false
+    ? "ยังขาดรูป · ต่อเน็ตเพื่อเก็บเพิ่ม"
+    : wifiOnlyBlocksImages() ? "ยังขาดรูป · จะเก็บเพิ่มเมื่อต่อ Wi-Fi"
+    : "กำลังเก็บรูปที่เหลือ…");
   else if (withText === chapters.length) parts.push("ครบแล้ว อ่านได้แม้ไม่มีเน็ต");
   hint.textContent = `พร้อมออฟไลน์ · ${parts.join(" · ")}`;
 }
@@ -4684,9 +4691,33 @@ function startAutoSyncWatch() {
 }
 
 /* ---------- เก็บรูปในบทไว้ในเครื่อง (อ่านออฟไลน์แล้วรูปยังอยู่) ---------- */
-const IMAGE_WARM_CONCURRENCY = 3;
+const IMAGE_WARM_CONCURRENCY = 6;
+const IMAGE_WARM_TIMEOUT_MS = 25000;
 const warmedImages = new Set();
 let imageWarming = false;
+let imageWakeLock = null;
+
+/* กันจอดับ/เครื่องล็อกระหว่างเก็บรูป — จอที่ปิดจะหยุด JavaScript ให้โหลดค้างกลางทาง */
+async function holdImageWakeLock() {
+  try {
+    if (!navigator.wakeLock || document.visibilityState !== "visible" || imageWakeLock) return;
+    imageWakeLock = await navigator.wakeLock.request("screen");
+  } catch (_) { imageWakeLock = null; }
+}
+
+function releaseImageWakeLock() {
+  try { imageWakeLock?.release?.(); } catch (_) { /* ไม่เป็นไร */ }
+  imageWakeLock = null;
+}
+
+/* รูปใดรูปหนึ่งค้าง ต้องไม่ทำให้คิวทั้งชุดค้างตามไปด้วย */
+async function fetchImageWithTimeout(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), IMAGE_WARM_TIMEOUT_MS);
+  try {
+    return await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer", signal: controller.signal });
+  } finally { clearTimeout(timer); }
+}
 
 function chapterImageUrls(chapters) {
   const urls = new Set();
@@ -4707,6 +4738,29 @@ function chapterImageUrls(chapters) {
 function savedDataOn() {
   return Boolean(navigator.connection?.saveData);
 }
+
+/* ---------- เช็คว่าเน็ตตอนนี้เป็น Wi-Fi ไหม (สำหรับกันเน็ตมือถือ) ---------- */
+/* Chrome บน Android บอกชนิดเน็ตได้ (wifi/cellular) ส่วนเบราว์เซอร์อื่นมักไม่บอก
+   ถ้าไม่บอก็ปล่อยให้โหลดตามปกติ แต่ยังกันไว้เมื่อเบราว์เซอร์บอกว่าประหยัดข้อมูล/เน็ตช้า */
+function networkKind() {
+  const connection = navigator.connection;
+  const type = String(connection?.type || "").toLocaleLowerCase();
+  if (type === "wifi" || type === "ethernet" || type === "wimax") return "wifi";
+  if (type === "cellular" || type === "bluetooth") return "mobile";
+  return "unknown";
+}
+
+/* true = ตอนนี้ไม่ควรโหลดรูปหนัก ๆ (ตั้งค่าไว้ว่าเฉพาะ Wi-Fi และเน็ตไม่ใช่ Wi-Fi) */
+function wifiOnlyBlocksImages() {
+  if (state.wifiOnlyImages === false) return false;
+  const kind = networkKind();
+  if (kind === "wifi") return false;
+  if (kind === "mobile") return true;
+  // ไม่รู้ชนิดเน็ต: กันเฉพาะเมื่อเบราว์เซอร์บอกว่าเป็นเน็ตช้าหรือเปิดประหยัดข้อมูล
+  return savedDataOn() || ["slow-2g", "2g", "3g"].includes(String(navigator.connection?.effectiveType || "").toLocaleLowerCase());
+}
+
+const WIFI_ONLY_HINT = "ใช้เน็ตมือถืออยู่ จึงยังไม่เก็บรูป — จะเก็บให้เองเมื่อต่อ Wi-Fi (ปิดสวิตช์ “เก็บรูปหนัก ๆ เฉพาะ Wi-Fi” ในตั้งค่า ถ้าจะใช้เน็ตมือถือเก็บ)";
 
 function offlineStatus(text) {
   const sheetLine = byId("offline-status");
@@ -4755,6 +4809,12 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
   if (!state.loadRemoteImages) { offlineStatus("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, failed: 0 }; }
   if (navigator.onLine === false) { offlineStatus("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, failed: 0 }; }
   if (savedDataOn()) { offlineStatus("เปิดประหยัดข้อมูลอยู่"); return { done: 0, failed: 0 }; }
+  if (wifiOnlyBlocksImages()) {
+    offlineProgressHide();
+    offlineStatus(WIFI_ONLY_HINT);
+    if (!quiet) showStatus(WIFI_ONLY_HINT, 9000);
+    return { done: 0, failed: 0 };
+  }
   // เก็บให้ครบทุกบทในคลัง ไม่ใช่แค่ชุดแรก ไม่อย่างนั้นรูปของบทท้าย ๆ จะหายตอนออฟไลน์
   const all = chapterImageUrls(state.chapters);
   const cachedKeys = await cachedImageKeys();
@@ -4766,6 +4826,7 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
     return { done: 0, failed: 0 };
   }
   imageWarming = true;
+  await holdImageWakeLock();
   let done = 0, failed = 0;
   const total = queue.length + 0;
   offlineProgress(0, total, "เก็บรูปในบท");
@@ -4776,7 +4837,7 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
         const url = queue.shift();
         let ok = false;
         try {
-          const response = await fetch(url, { mode: "no-cors", credentials: "omit", referrerPolicy: "no-referrer" });
+          const response = await fetchImageWithTimeout(url);
           ok = Boolean(response);
         } catch (_) { ok = false; }
         // นับเฉพาะที่โหลดสำเร็จ ถ้าพลาดให้ลองใหม่ได้เมื่อกดอีกครั้ง
@@ -4785,7 +4846,7 @@ async function warmChapterImages({ quiet = false, force = false } = {}) {
       }
     };
     await Promise.all(Array.from({ length: IMAGE_WARM_CONCURRENCY }, worker));
-  } finally { imageWarming = false; void paintOfflineReady(); }
+  } finally { releaseImageWakeLock(); imageWarming = false; void paintOfflineReady(); }
   offlineProgress(done + failed, total, "เก็บรูปในบท");
   const message = failed
     ? `เก็บรูปในบทได้ ${done.toLocaleString("th-TH")} รูป · โหลดไม่สำเร็จ ${failed.toLocaleString("th-TH")} รูป (กดอีกครั้งได้)`
@@ -4860,6 +4921,7 @@ async function warmCharacterPortraits({ quiet = false, limit = PORTRAIT_WARM_LIM
   if (!state.loadRemoteImages) { say("ปิดโหลดรูปจากเว็บอยู่"); return { done: 0, bytes: 0 }; }
   if (navigator.onLine === false) { say("ออฟไลน์อยู่ — ต่อเน็ตก่อน"); return { done: 0, bytes: 0 }; }
   if (savedDataOn()) { say("เปิดประหยัดข้อมูลอยู่"); return { done: 0, bytes: 0 }; }
+  if (wifiOnlyBlocksImages()) { say(WIFI_ONLY_HINT); if (!quiet) showStatus(WIFI_ONLY_HINT, 9000); return { done: 0, bytes: 0 }; }
   const hint = byId("portrait-warm-hint");
   const ready = await portraitWarmState();
   if (!ready.all.length) {
@@ -5160,6 +5222,13 @@ function bindEvents() {
       renderChapterContent(item);
       requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: "instant" }));
     }
+  });
+  byId("wifi-only-images-toggle")?.addEventListener("change", event => {
+    state.wifiOnlyImages = event.target.checked;
+    void writeSetting("wifiOnlyImages", state.wifiOnlyImages);
+    showStatus(state.wifiOnlyImages
+      ? "เก็บรูปหนัก ๆ เฉพาะ Wi-Fi แล้ว"
+      : "เปิดให้เก็บรูปได้ทุกเน็ต (อาจกินเน็ตมือถือ)", 4000);
   });
   byId("wake-lock-toggle").addEventListener("change", event => {
     state.keepScreenAwake = event.target.checked;
@@ -5638,6 +5707,7 @@ async function initialize() {
     state.highlightEnabled = await readSetting("highlightEnabled", true) !== false;
     state.followEnabled = await readSetting("followEnabled", true) !== false;
     state.loadRemoteImages = await readSetting("loadRemoteImages", true) !== false;
+    state.wifiOnlyImages = await readSetting("wifiOnlyImages", true) !== false;
     state.keepScreenAwake = await readSetting("keepScreenAwake", false) === true;
     state.mode = (await readSetting("readingMode", "scroll")) === "page" ? "page" : "scroll";
     state.chapterView = (await readSetting("chapterView", "list")) === "grid" ? "grid" : "list";
@@ -5661,6 +5731,7 @@ async function initialize() {
     byId("highlight-toggle").checked = state.highlightEnabled;
     byId("follow-toggle").checked = state.followEnabled;
     byId("remote-images-toggle").checked = state.loadRemoteImages;
+    byId("wifi-only-images-toggle").checked = state.wifiOnlyImages;
     byId("wake-lock-toggle").checked = state.keepScreenAwake;
     // ขอสิทธิ์เก็บข้อมูลถาวร กันเบราว์เซอร์ล้างบทที่ซิงก์ไว้ระหว่างเดินทาง
     void navigator.storage?.persist?.().catch(() => {});
